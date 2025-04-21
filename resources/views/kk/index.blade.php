@@ -81,8 +81,6 @@
     </div>
 
     {{-- MODAL DELETE --}}
-
-
     @foreach ($data as $r)
         <div class="modal fade" id="modalDelete{{ $r->id }}" tabindex="-1" aria-labelledby="modalHapusBarang"
             aria-hidden="true">
@@ -284,5 +282,5 @@
 
         @include('kk/formEdit')
         
-    </div>
+
 @endsection
