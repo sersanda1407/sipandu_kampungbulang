@@ -147,4 +147,21 @@ class RwController extends Controller
 
         return redirect()->route('rw.index');
     }
+
+    public function resetPassword($id)
+    {
+        $data = DataRw::findOrFail($id);
+    
+        if ($data->user_id) {
+            User::where('id', $data->user_id)->update([
+                'password' => bcrypt('password'),
+            ]);
+    
+            Alert::success('Sukses!', 'Password berhasil direset ke: password');
+        } else {
+            Alert::error('Gagal!', 'User RW tidak ditemukan.');
+        }
+    
+        return redirect()->route('rt.index');
+    }
 }

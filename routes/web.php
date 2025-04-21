@@ -38,12 +38,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/store', 'RwController@store')->name('rw.store');
         Route::put('/update/{id}', 'RwController@update')->name('rw.update');
         Route::delete('/delete/{id}', 'RwController@destroy')->name('rw.delete');
+        Route::post('/reset-password/{id}', 'RwController@resetPassword')->name('rw.resetPassword');
     });
     Route::group(['prefix' => 'rt'], function () {
         Route::get('/', 'RtController@index')->name('rt.index');
         Route::post('/store', 'RtController@store')->name('rt.store');
         Route::put('/update/{id}', 'RtController@update')->name('rt.update');
         Route::delete('/delete/{id}', 'RtController@destroy')->name('rt.delete');
+        Route::post('/reset-password/{id}', 'RtController@resetPassword')->name('rt.resetPassword');
     });
     Route::group(['prefix' => 'kk'], function () {
         Route::get('/', 'KkController@index')->name('kk.index');
@@ -54,6 +56,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('{id}/showPenduduk/store', 'PendudukController@store')->name('kk.storePdd');
         Route::delete('{id}/showPenduduk/delete', 'PendudukController@destroy')->name('kk.deletePdd');
         Route::put('{id}/showPenduduk/edit', 'PendudukController@update')->name('kk.editPdd');
+        Route::post('/{id}/reset-password', 'KkController@resetPassword')->name('kk.resetPassword');
+
     });
     Route::group(['prefix' => 'penduduk'], function () {
         Route::get('/', 'PendudukController@index')->name('penduduk.index');

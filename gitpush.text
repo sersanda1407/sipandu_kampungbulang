@@ -1,0 +1,12 @@
+git status
+
+
+Tambahkan semua file yang diubah:
+git add .
+
+
+Commit perubahan dengan pesan:
+git commit -m "Update: Modal tambah & hapus data keluarga, fitur preview & download foto KK"
+
+
+git push origin main

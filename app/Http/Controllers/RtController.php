@@ -172,5 +172,23 @@ class RtController extends Controller
         return redirect()->route('rt.index');
     }
 
+    public function resetPassword($id)
+{
+    $data = DataRt::findOrFail($id);
+
+    if ($data->user_id) {
+        User::where('id', $data->user_id)->update([
+            'password' => bcrypt('password'),
+        ]);
+
+        Alert::success('Sukses!', 'Password berhasil direset ke: password');
+    } else {
+        Alert::error('Gagal!', 'User RT tidak ditemukan.');
+    }
+
+    return redirect()->route('rt.index');
+}
+
+
     
 }

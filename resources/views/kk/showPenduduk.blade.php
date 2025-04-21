@@ -2,8 +2,6 @@
 
 @section('master')
     <style>
-
-        
         #modalImage {
             max-width: 100%;
             max-height: 80vh;
@@ -25,8 +23,8 @@
         }
     </style>
 
-        {{-- MODAL DELETE --}}
-        @foreach ($penduduk as $r)
+    {{-- MODAL DELETE --}}
+    @foreach ($penduduk as $r)
         <div class="modal fade" id="modalDelete{{ $r->id }}" tabindex="-1" aria-labelledby="modalHapusBarang"
             aria-hidden="true">
             <div class="modal-dialog">
@@ -246,6 +244,46 @@
                                         <span class="fw-bold me-2">Jumlah Individu:</span>
                                         <span>{{ \App\DataPenduduk::where('kk_id', $data->id)->count() }}</span>
                                     </div>
+                                    @hasrole('superadmin|rw|rt')
+                                    <div class="col-12 col-md-6 d-flex align-items-center">
+                                        <span class="fw-bold me-2">Reset Password Akun:</span>
+                                        <!-- Trigger Modal -->
+                                        <a href="#" data-bs-toggle="modal"
+                                            data-bs-target="#modalResetPassword{{ $data->id }}"
+                                            class="btn btn-sm btn-warning">
+                                            Reset
+                                        </a>
+                                    </div>
+
+                                    <!-- MODAL RESET PASSWORD -->
+                                    <div class="modal fade" id="modalResetPassword{{ $data->id }}" tabindex="-1"
+                                        aria-labelledby="modalResetLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body">
+                                                    <i class="fas fa-exclamation-circle mb-2"
+                                                        style="color: #f39c12; font-size:120px; justify-content:center; display:flex"></i>
+                                                    <h5 class="text-center">Apakah Anda yakin ingin mereset password akun
+                                                        keluarga <strong>{{ $data->kepala_keluarga }}</strong>?</h5>
+                                                    <p class="text-center mt-2 text-muted">Password akan direset ke:
+                                                        <strong>password</strong>
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form action="{{ route('kk.resetPassword', $data->id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn btn-warning">Ya, Reset
+                                                            Sekarang</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endhasrole
+
+
                                 </div>
                             </div>
                         </div>
@@ -344,10 +382,10 @@
                                             <td class="d-none d-md-table-cell">{{ $pd->rt->rt }} / {{ $pd->rw->rw }}</td>
                                             <td>
                                                 <div class="dropdown">
-                                                    <button class="btn btn-light btn-sm border-0" type="button"
+                                                    <button class="btn btn-info dropdown-toggle btn-sm" type="button"
                                                         id="dropdownMenuButton{{ $pd->id }}" data-bs-toggle="dropdown"
                                                         aria-expanded="false">
-                                                        <i class="fas fa-ellipsis-v"></i>
+                                                        Aksi
                                                     </button>
                                                     <ul class="dropdown-menu shadow-lg border-0 rounded-3"
                                                         aria-labelledby="dropdownMenuButton{{ $pd->id }}">
@@ -378,6 +416,7 @@
                                                     </ul>
                                                 </div>
                                             </td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>

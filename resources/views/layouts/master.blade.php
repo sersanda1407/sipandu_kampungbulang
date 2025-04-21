@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - SIMDATA Kampung Bulang</title>
+    <title>SIPEKA Kampung Bulang</title>
 
     <link rel="stylesheet" href={{ asset('assets/css/main/app.css') }}>
     <link rel="stylesheet" href={{ asset('assets/css/main/app-dark.css') }}>
@@ -23,7 +23,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Profile</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Profil</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="/edit-profile" method="POST">
@@ -41,8 +41,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                     </div>
                 </form>
             </div>
@@ -54,7 +54,9 @@
                 <div class="sidebar-header position-relative">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="title">
-                            <h3>SIMDATA Kampung Bulang</h3>
+                            <h3>SIPEKA</h3>
+                            <p class="small" style="font-size: 10px;">Sistem Pendataan Kependudukan Area Kampung Bulang
+                            </p>
                         </div>
                         <div class="theme-toggle d-flex gap-2 align-items-center mt-2">
                             <div class="form-check form-switch fs-6">
@@ -69,7 +71,7 @@
                 </div>
                 <div class="sidebar-menu">
                     <ul class="menu">
-                        @hasrole('superadmin|rw|rt')
+                        @hasrole('superadmin|rw|rt|warga')
                         <li class="sidebar-title">Dashboard</li>
 
                         <li class="sidebar-item {{ request()->is('dashboard*') ? 'active' : '' }} ">
@@ -113,7 +115,7 @@
 
                         @hasrole('superadmin|rw|rt')
                         <li class="sidebar-item {{ request()->is('penduduk*') ? 'active' : '' }}">
-                            <a href="{{ url('/penduduk') }}" class='sidebar-link'>
+                            <a href="{{ url('/penduduk') }}"  class='sidebar-link'>
                                 <i class="fas fa-users"></i>
                                 <span>Data Penduduk</span>
                             </a>
@@ -121,12 +123,12 @@
                         @endhasrole
 
                         <li class="sidebar-title">Setting</li>
-<li class="sidebar-item {{ request()->is('pengguna*') ? 'active' : '' }}">
-    <a href="edit#pengguna" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#edit">
-        <i class="fas fa-user-edit"></i>
-        <span>Edit Pengguna</span>
-    </a>
-</li>
+                        <li class="sidebar-item {{ request()->is('pengguna*') ? 'active' : '' }}">
+                            <a href="edit#pengguna" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#edit">
+                                <i class="fas fa-user-edit"></i>
+                                <span>Edit Pengguna</span>
+                            </a>
+                        </li>
 
 
                         <li class="sidebar-item ">
@@ -161,7 +163,7 @@
             <footer>
                 <div class="footer clearfix mb-0 text-muted">
                     <div class="float-start">
-                        <p id="year">&copy; SIMDATA Kelurahan Kampung Bulang</p>
+                        <p id="year">&copy; SIPEKA</p>
                     </div>
                 </div>
             </footer>
@@ -172,8 +174,9 @@
     <script src={{ asset('assets/js/pages/dashboard.js') }}></script>
     <script src={{ asset('assets/js/extensions/simple-datatables.js') }}></script>
     <script>
-        document.getElementById("year").innerHTML = new Date().getFullYear() + " &copy; SIMDATA Kelurahan Kampung Bulang";
+        document.getElementById("year").innerHTML = new Date().getFullYear() + " &copy; SIPEKA";
     </script>
+    
 
 
 </body>

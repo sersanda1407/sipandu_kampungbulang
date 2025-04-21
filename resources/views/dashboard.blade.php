@@ -140,6 +140,11 @@
 
             <h1>Selamat Datang, {{ Auth::check() ? Auth::user()->name : 'User' }}!</h1>
             <h3>Ada Perlu apa hari ini ?</h3>
+
+            @hasrole('warga')
+            <p>Kontak RT : sutarmi (RT 1) - 085264277766</p><br>
+            <p>Kontak RW : Tulus (RW 1) - 081231234411</p>
+            @endhasrole
             @hasrole('rw')
             <p>Cek data di Lingkungan RW {{ \App\DataRw::where('user_id', Auth::id())->value('rw') ?? '' }}, Kelurahan Kampung Bulang</p>
             @endhasrole

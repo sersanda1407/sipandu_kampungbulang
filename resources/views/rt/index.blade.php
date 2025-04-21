@@ -141,12 +141,32 @@
                                         <td>{{ $d->Rw->rw }}</td>
                                         <td>{{ $d->periode_awal }} / {{ $d->periode_akhir }}</td>
                                         <td>
-                                            <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editData{{$d->id}}"><i
-                                                    class="fas fa-edit"></i></a>
-                                            <a class="btn btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#modalDelete{{ $d->id }}"><i
-                                                    class="fas fa-trash"></i></a>
-                                        </td>
+    <div class="dropdown">
+        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuRT{{ $d->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+            Aksi
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuRT{{ $d->id }}">
+            <li>
+                <a class="dropdown-item text-success" data-bs-toggle="modal" data-bs-target="#editData{{ $d->id }}">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $d->id }}">
+                    <i class="fas fa-trash"></i> Hapus
+                </a>
+            </li>
+            @hasrole('superadmin')
+            <li>
+                <a class="dropdown-item text-warning" data-bs-toggle="modal" data-bs-target="#modalResetPasswordRT{{ $d->id }}">
+                    <i class="fas fa-key"></i> Reset Password
+                </a>
+            </li>
+            @endhasrole
+        </ul>
+    </div>
+</td>
+
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -154,6 +174,31 @@
                     </div>
                 </div>
         </div>
+        {{-- MODAL RESET PASSWORD RT --}}
+@foreach ($data as $d)
+    <div class="modal fade" id="modalResetPasswordRT{{ $d->id }}" tabindex="-1" aria-labelledby="modalResetLabelRT" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <i class="fas fa-exclamation-circle mb-2"
+                        style="color: #f39c12; font-size:120px; justify-content:center; display:flex"></i>
+                    <h5 class="text-center">
+                        Apakah Anda yakin ingin mereset password akun Ketua RT <strong>{{ $d->nama }}</strong>?
+                    </h5>
+                    <p class="text-center mt-2 text-muted">Password akan direset ke: <strong>password</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <form action="{{ route('rt.resetPassword', $d->id) }}" method="POST">
+                        @csrf
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-warning">Ya, Reset Sekarang</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
+
      
         @include('rt/formEdit')
         </section>

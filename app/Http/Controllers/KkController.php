@@ -112,6 +112,21 @@ class KkController extends Controller
     }
 
 
+    public function resetPassword($id)
+{
+    $kk = DataKk::findOrFail($id);
+    $user = User::findOrFail($kk->user_id);
+
+    // Reset password ke nilai default
+    $user->password = bcrypt('password');
+    $user->save();
+
+    Alert::success('Berhasil!', 'Password berhasil direset ke: password');
+
+    return redirect()->back();
+}
+
+
     /**
      * Display the specified resource.
      *
