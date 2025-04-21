@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Crypt;
 
 
 
@@ -25,7 +26,7 @@ class KkController extends Controller
     public function index()
     {
 
-        $user =  Auth::user();
+        $user = Auth::user();
         // dd($user);
 
         if ($user->hasRole('rw') == true) {
@@ -101,7 +102,7 @@ class KkController extends Controller
             return redirect()->back();
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->errorInfo[1] == 1062) {
-            // Menampilkan pesan No KK sudah terdaftar
+                // Menampilkan pesan No KK sudah terdaftar
                 Alert::error('Gagal!', 'No KK sudah terdaftar.');
                 return redirect()->back()->withInput();
             } else {
@@ -113,18 +114,18 @@ class KkController extends Controller
 
 
     public function resetPassword($id)
-{
-    $kk = DataKk::findOrFail($id);
-    $user = User::findOrFail($kk->user_id);
+    {
+        $kk = DataKk::findOrFail($id);
+        $user = User::findOrFail($kk->user_id);
 
-    // Reset password ke nilai default
-    $user->password = bcrypt('password');
-    $user->save();
+        // Reset password ke nilai default
+        $user->password = bcrypt('password');
+        $user->save();
 
-    Alert::success('Berhasil!', 'Password berhasil direset ke: password');
+        Alert::success('Berhasil!', 'Password berhasil direset ke: password');
 
-    return redirect()->back();
-}
+        return redirect()->back();
+    }
 
 
     /**
@@ -135,12 +136,20 @@ class KkController extends Controller
      */
     public function show($id)
     {
-        $data = DataKk::all();
-        $data = DataKk::where('id', $id)->firstOrFail();
+        try {
+            // Dekripsi ID terlebih dahulu
+            $decryptedId = Crypt::decryptString($id);
 
-        $penduduk = DataPenduduk::where('kk_id', $data->id)->get();
-        return view('kk.showPenduduk', compact(['data', 'penduduk']));
+            $data = DataKk::findOrFail($decryptedId);
+            $penduduk = DataPenduduk::where('kk_id', $data->id)->get();
+
+            return view('kk.showPenduduk', compact(['data', 'penduduk']));
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            // Jika ID tidak valid atau gagal didekripsi
+            abort(404, 'Data tidak ditemukan');
+        }
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -161,49 +170,49 @@ class KkController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     public function update(Request $request, $id)
-     {
-         $data = DataKk::findOrFail($id);
-     
-         $request->validate([
-             'kepala_keluarga' => 'required',
-             'no_kk' => 'required',
-             'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
-             'rt_id' => 'required',
-             'rw_id' => 'required',
-             'status_ekonomi' => 'required',
-         ]);
-     
-         if ($request->hasFile('image')) {
-             // Hapus gambar lama jika ada
-             if ($data->image) {
-                 Storage::disk('public')->delete('foto_kk/' . $data->image);
-             }
-     
-             // Simpan gambar baru dengan nama unik
-             $filename = Str::uuid() . '.' . $request->file('image')->getClientOriginalExtension();
-             $request->file('image')->storeAs('foto_kk', $filename, 'public');
-     
-             // Simpan nama file di database
-             $data->image = $filename;
-         }
-     
-         // Update data KK
-         $data->update($request->only(['kepala_keluarga', 'no_kk', 'rt_id', 'rw_id', 'status_ekonomi']));
-     
-         // Update data User jika ada
-         if ($data->user_id) {
-             User::where('id', $data->user_id)->update([
-                 'name' => $request->kepala_keluarga,
-                 'email' => $request->no_kk,
-             ]);
-         }
-     
-         Alert::success('Sukses!', 'Berhasil mengedit kartu keluarga');
-     
-         return redirect()->back();
-     }
-    
+    public function update(Request $request, $id)
+    {
+        $data = DataKk::findOrFail($id);
+
+        $request->validate([
+            'kepala_keluarga' => 'required',
+            'no_kk' => 'required',
+            'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
+            'rt_id' => 'required',
+            'rw_id' => 'required',
+            'status_ekonomi' => 'required',
+        ]);
+
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama jika ada
+            if ($data->image) {
+                Storage::disk('public')->delete('foto_kk/' . $data->image);
+            }
+
+            // Simpan gambar baru dengan nama unik
+            $filename = Str::uuid() . '.' . $request->file('image')->getClientOriginalExtension();
+            $request->file('image')->storeAs('foto_kk', $filename, 'public');
+
+            // Simpan nama file di database
+            $data->image = $filename;
+        }
+
+        // Update data KK
+        $data->update($request->only(['kepala_keluarga', 'no_kk', 'rt_id', 'rw_id', 'status_ekonomi']));
+
+        // Update data User jika ada
+        if ($data->user_id) {
+            User::where('id', $data->user_id)->update([
+                'name' => $request->kepala_keluarga,
+                'email' => $request->no_kk,
+            ]);
+        }
+
+        Alert::success('Sukses!', 'Berhasil mengedit kartu keluarga');
+
+        return redirect()->back();
+    }
+
     // public function update(Request $request, $id)
     // {
     //     $data = DataKk::where('id', $id)->firstOrFail();

@@ -147,20 +147,20 @@
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuRT{{ $d->id }}">
             <li>
-                <a class="dropdown-item text-success" data-bs-toggle="modal" data-bs-target="#editData{{ $d->id }}">
+                <button class="dropdown-item text-success" data-bs-toggle="modal" data-bs-target="#editData{{ $d->id }}">
                     <i class="fas fa-edit"></i> Edit
-                </a>
+                </button>
             </li>
             <li>
-                <a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $d->id }}">
+                <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $d->id }}">
                     <i class="fas fa-trash"></i> Hapus
-                </a>
+                </button>
             </li>
             @hasrole('superadmin')
             <li>
-                <a class="dropdown-item text-warning" data-bs-toggle="modal" data-bs-target="#modalResetPasswordRT{{ $d->id }}">
+                <button class="dropdown-item text-warning" data-bs-toggle="modal" data-bs-target="#modalResetPasswordRT{{ $d->id }}">
                     <i class="fas fa-key"></i> Reset Password
-                </a>
+                </button>
             </li>
             @endhasrole
         </ul>

@@ -1,8 +1,6 @@
-<title>Dashboard</title>
+<title>SIPEKA - Dashboard</title>
 
 @extends('layouts.master')
-
-
 
 
 @section('master')

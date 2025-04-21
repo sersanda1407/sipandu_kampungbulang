@@ -1,6 +1,11 @@
 @extends('layouts.master')
 
 @section('master')
+
+    @php
+        use Illuminate\Support\Facades\Crypt;
+    @endphp
+
     {{-- MODAL ADD --}}
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog  modal-lg">
@@ -93,7 +98,8 @@
                         <i class="fas fa-exclamation-circle mb-2"
                             style="color: #e74a3b; font-size:120px; justify-content:center; display:flex"></i>
                         <h5 class="text-center">Apakah anda yakin ingin menghapus Data Keluarga {{ $r->kepala_keluarga }} (No.KK
-                            {{ $r->no_kk }} ) ?</h5>
+                            {{ $r->no_kk }} ) ?
+                        </h5>
                     </div>
                     <div class="modal-footer">
                         <form action={{ url('kk/delete/' . $r->id) }} method="POST">
@@ -182,7 +188,8 @@
                                             <td class="d-none d-md-table-cell">{{ $d->Rt->rt }} / {{ $d->Rw->rw }}</td>
                                             <td class="d-none d-md-table-cell">{{ $d->status_ekonomi }}</td>
                                             <td class="d-none d-md-table-cell">
-                                                {{ \App\DataPenduduk::where('kk_id', $d->id)->count() }}</td>
+                                                {{ \App\DataPenduduk::where('kk_id', $d->id)->count() }}
+                                            </td>
                                             <td>
                                                 <div class="dropdown">
                                                     <button class="btn btn-info dropdown-toggle btn-sm" type="button"
@@ -194,7 +201,7 @@
                                                         aria-labelledby="dropdownMenuButton{{ $d->id }}">
                                                         <li>
                                                             <a class="dropdown-item d-flex align-items-center"
-                                                                href="{{ url('/kk/' . $d->id . '/showPenduduk') }}">
+                                                                href="{{ url('/kk/' . Crypt::encryptString($d->id) . '/showPenduduk') }}">
                                                                 <i class="fas fa-eye text-info me-2"></i> Lihat
                                                             </a>
                                                         </li>
