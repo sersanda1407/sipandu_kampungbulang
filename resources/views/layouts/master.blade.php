@@ -145,9 +145,17 @@
                             </a>
                         </li>
 
+                        @hasrole('superadmin')
+                        <li class="sidebar-item {{ request()->is('histori*') ? 'active' : '' }}">
+                            <a href="{{ url('/histori') }}" class="sidebar-link">
+                                <i class="fas fa-history"></i>
+                                <span>Histori Aktivitas</span>
+                            </a>
+                        </li>
+                        @endhasrole
+
 
                         <li class="sidebar-item ">
-                            {{-- <a href={{ url('/penduduk') }} class='sidebar-link'> --}}
                                 <a class="sidebar-link" href="{{ route('logout') }}" onclick="event.preventDefault();
                                     document.getElementById('logout-form').submit();">
                                     <i class="fa fa-sign-out-alt "></i>

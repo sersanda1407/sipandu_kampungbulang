@@ -123,7 +123,7 @@
                             <thead>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Ketua RT</th>
+                                    <th>Nama Ketua RT</th>
                                     <th>No Telepon</th>
                                     <th>RT</th>
                                     <th>RW</th>

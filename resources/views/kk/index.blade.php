@@ -39,12 +39,11 @@
                         <div class="row">
                             <div class="col">
                                 <div class="mb-3">
-                                    <label for="exampleInputPassword1" class="form-label">RW</label>
-                                    <select class="form-select" name="rw_id" id="rt_id">
+                                    <label class="form-label">RW</label>
+                                    <select class="form-select" name="rw_id" id="rw_id">
                                         <option value="">-- Pilih No Wilayah RW --</option>
-                                        @foreach ($selectRw as $d)
-                                            <option value="{{ $d->id }}">{{ $d->rw }} | {{ $d->nama }}
-                                            </option>
+                                        @foreach ($selectRw as $rw)
+                                            <option value="{{ $rw->id }}">{{ $rw->rw }} | {{ $rw->nama }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -52,17 +51,38 @@
 
                             <div class="col">
                                 <div class="mb-3">
-                                    <label for="exampleInputPassword1" class="form-label">RT</label>
-                                    <select class="form-select" name="rt_id" id="rw_id">
+                                    <label class="form-label">RT</label>
+                                    <select class="form-select" name="rt_id" id="rt_id">
                                         <option value="">-- Pilih No Wilayah RT --</option>
-                                        @foreach ($selectRt as $d)
-                                            <option value="{{ $d->id }}">{{ $d->rt }} | {{ $d->nama }}
-                                            </option>
-                                        @endforeach
+                                        {{-- Akan diisi oleh JS --}}
                                     </select>
                                 </div>
                             </div>
                         </div>
+
+                        <script>
+                            // Data RT dalam bentuk array JS
+                            const rtData = @json($selectRt);
+
+                            document.getElementById('rw_id').addEventListener('change', function () {
+                                const rwId = this.value;
+                                const rtSelect = document.getElementById('rt_id');
+
+                                // Kosongkan dulu isi dropdown RT
+                                rtSelect.innerHTML = '<option value="">-- Pilih No Wilayah RT --</option>';
+
+                                // Filter RT berdasarkan rw_id yang sesuai
+                                const filteredRt = rtData.filter(rt => rt.rw_id == rwId);
+
+                                // Tambahkan option ke dropdown RT
+                                filteredRt.forEach(rt => {
+                                    const option = document.createElement('option');
+                                    option.value = rt.id;
+                                    option.textContent = `${rt.rt} | ${rt.nama}`;
+                                    rtSelect.appendChild(option);
+                                });
+                            });
+                        </script>
 
 
                         <div class="mb-3">

@@ -23,34 +23,76 @@
                                 maxlength="16" minlength="16" required>
                         </div>
                         <div class="row">
+                            {{-- =====================  RW  ===================== --}}
                             <div class="col">
                                 <div class="mb-3">
                                     <label class="form-label">RW</label>
-                                    <select class="form-select" name="rw_id">
+                                    <select id="rwSelect" class="form-select" name="rw_id">
                                         <option value="">-- Pilih No Wilayah RW --</option>
                                         @foreach ($selectRw as $rw)
-                                            <option value="{{ $rw->id }}" {{ $d->rw_id == $rw->id ? 'selected' : '' }}>
-                                                {{ $rw->rw }} | {{ $d->rw_id == $rw->nama ? 'selected' : '' }} {{ $rw->nama }}
+                                            <option value="{{ $rw->id }}"
+                                                {{ $d->rw_id == $rw->id ? 'selected' : '' }}>
+                                                {{ $rw->rw }} &nbsp;|&nbsp; {{ $rw->nama }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
 
+                            {{-- =====================  RT  ===================== --}}
                             <div class="col">
                                 <div class="mb-3">
                                     <label class="form-label">RT</label>
-                                    <select class="form-select" name="rt_id">
+                                    <select id="rtSelect" class="form-select" name="rt_id">
                                         <option value="">-- Pilih No Wilayah RT --</option>
                                         @foreach ($selectRt as $rt)
-                                            <option value="{{ $rt->id }}" {{ $d->rt_id == $rt->id ? 'selected' : '' }}>
-                                                {{ $rt->rt }} | {{ $d->rt_id == $rt->nama ? 'selected' : '' }} {{ $rt->nama }}
+                                            <option value="{{ $rt->id }}"
+                                                    data-rw="{{ $rt->rw_id }}"      {{-- kunci penting --}}
+                                                    {{ $d->rt_id == $rt->id ? 'selected' : '' }}>
+                                                {{ $rt->rt }} &nbsp;|&nbsp; {{ $rt->nama }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
                         </div>
+
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const rwSelect = document.getElementById('rwSelect');
+                            const rtSelect = document.getElementById('rtSelect');
+                            const rtOptions = Array.from(rtSelect.options);   // cache semua option RT
+
+                            function filterRT() {
+                                const rwId = rwSelect.value;
+
+                                // 1. kosongkan dulu RT yang tampil
+                                rtSelect.innerHTML = '';
+
+                                // 2. selalu sisipkan option kosong di atas
+                                rtSelect.appendChild(rtOptions[0].cloneNode(true));
+
+                                // 3. sisipkan option yang rw‑nya cocok
+                                rtOptions.forEach(opt => {
+                                    if (opt.dataset.rw === rwId) {
+                                        rtSelect.appendChild(opt.cloneNode(true));
+                                    }
+                                });
+
+                                // 4. reset pilihan jika pilihan lama tidak ada di list baru
+                                if (![...rtSelect.options].some(o => o.value === rtSelect.value)) {
+                                    rtSelect.value = '';
+                                }
+                            }
+
+                            // pertama kali jalan (untuk halaman edit)
+                            filterRT();
+
+                            // tiap kali RW berubah
+                            rwSelect.addEventListener('change', filterRT);
+                        });
+                        </script>
+
 
                         <div class="mb-3">
                             <label class="form-label">Status Ekonomi</label>

@@ -6,6 +6,7 @@ use App\DataRw;
 use Illuminate\Http\Request;
 use App\User;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Validation\Rule;
 
 class RwController extends Controller
 {
@@ -16,10 +17,10 @@ class RwController extends Controller
      */
     public function index()
     {
-        $data = DataRw::get();
-
+        $data = DataRw::orderByRaw('CAST(rw AS UNSIGNED) ASC')->get();
         return view('rw.index', compact('data'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -39,37 +40,51 @@ class RwController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
+        // Validasi dasar tanpa unique untuk no_hp
+        $request->validate([
             'nama' => 'required',
-            'no_hp' => 'required',
+            'no_hp' => ['required', 'digits_between:8,12'],
             'rw' => 'required',
             'periode_awal' => 'required',
             'periode_akhir' => 'required',
         ]);
 
+        // Cek manual untuk no_hp duplicate
+        $existingNoHp = DataRw::where('no_hp', $request->no_hp)->first();
+        if ($existingNoHp) {
+            Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
+            return redirect()->back()->withInput();
+        }
+
+        // Cek manual untuk rw duplicate
+        if (DataRw::where('rw', $request->rw)->exists()) {
+            Alert::error('Gagal!', 'Nomor RW ' . $request->rw . ' sudah terdaftar.');
+            return redirect()->back()->withInput();
+        }
+
+        // Bila semua valid, buat user + data RW
         $rw = User::create([
             'name' => $request->nama,
-            'email' => 'rw' . $request->rw . '@gmail.com',
-            'password' =>  bcrypt('password'),
-
+            'email' => 'ketua-rw' . $request->rw . '@kampungbulang',
+            'password' => bcrypt('password'),
         ]);
 
-        $data = new DataRw();
-        $data->nama = $request->nama;
-        $data->no_hp = $request->no_hp;
-        $data->rw = $request->rw;
-        $data->periode_awal = $request->periode_awal;
-        $data->periode_akhir = $request->periode_akhir;
-        $data->user_id = $rw->id;
-        // dd($data);
-        $data->save();
+        $data = DataRw::create([
+            'nama' => $request->nama,
+            'no_hp' => $request->no_hp,
+            'rw' => $request->rw,
+            'periode_awal' => $request->periode_awal,
+            'periode_akhir' => $request->periode_akhir,
+            'user_id' => $rw->id,
+        ]);
 
         $rw->assignRole('rw');
 
         Alert::success('Sukses!', 'Berhasil menambah Data RW');
-
         return redirect()->back();
     }
+
+
 
     /**
      * Display the specified resource.
@@ -102,32 +117,54 @@ class RwController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = DataRw::where('id', $id)->firstOrFail();
+        $data = DataRw::findOrFail($id);
 
+        // Validasi biasa (tanpa unique dulu)
         $request->validate([
             'nama' => 'required',
-            'no_hp' => 'required',
+            'no_hp' => ['required', 'digits_between:8,12'],
             'rw' => 'required',
             'periode_awal' => 'required',
             'periode_akhir' => 'required',
         ]);
 
-        $data->nama = $request->nama;
-        $data->no_hp = $request->no_hp;
-        $data->rw = $request->rw;
-        $data->periode_awal = $request->periode_awal;
-        $data->periode_akhir = $request->periode_akhir;
-        $data->update();
+        // Cek manual untuk no_hp duplicate
+        $existingNoHp = DataRw::where('no_hp', $request->no_hp)
+            ->where('id', '!=', $id)
+            ->first();
+        if ($existingNoHp) {
+            Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
+            return redirect()->back()->withInput();
+        }
 
-        User::where('id', '=', $data->user_id)->update([
+        // Cek manual untuk rw duplicate
+        $existingRw = DataRw::where('rw', $request->rw)
+            ->where('id', '!=', $id)
+            ->first();
+        if ($existingRw) {
+            Alert::error('Gagal!', 'Nomor RW sudah digunakan oleh data lain.');
+            return redirect()->back()->withInput();
+        }
+
+        // Update data
+        $data->update([
+            'nama' => $request->nama,
+            'no_hp' => $request->no_hp,
+            'rw' => $request->rw,
+            'periode_awal' => $request->periode_awal,
+            'periode_akhir' => $request->periode_akhir,
+        ]);
+
+        // Update user
+        User::where('id', $data->user_id)->update([
             'name' => $request->nama,
-            'email' => 'rw' . $request->rw . '@gmail.com',
+            'email' => 'ketua-rw' . $request->rw . '@kampungbulang',
         ]);
 
         Alert::success('Sukses!', 'Berhasil mengedit Data RW');
-
         return redirect()->route('rw.index');
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -151,17 +188,17 @@ class RwController extends Controller
     public function resetPassword($id)
     {
         $data = DataRw::findOrFail($id);
-    
+
         if ($data->user_id) {
             User::where('id', $data->user_id)->update([
                 'password' => bcrypt('password'),
             ]);
-    
+
             Alert::success('Sukses!', 'Password berhasil direset ke: password');
         } else {
             Alert::error('Gagal!', 'User RW tidak ditemukan.');
         }
-    
+
         return redirect()->route('rt.index');
     }
 }

@@ -39,6 +39,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/update/{id}', 'RwController@update')->name('rw.update');
         Route::delete('/delete/{id}', 'RwController@destroy')->name('rw.delete');
         Route::post('/reset-password/{id}', 'RwController@resetPassword')->name('rw.resetPassword');
+        Route::get('/api/check-nohp', function (Illuminate\Http\Request $r) {
+            return ['exists' => \App\DataRw::where('no_hp', $r->no_hp)->exists()];
+        })->name('api.check-nohp');
+        // routes/web.php
+        Route::get('/api/check-rw', function (Illuminate\Http\Request $r) {
+            return ['exists' => \App\DataRw::where('rw', $r->rw)->exists()];
+        })->name('api.check-rw');
+
     });
     Route::group(['prefix' => 'rt'], function () {
         Route::get('/', 'RtController@index')->name('rt.index');

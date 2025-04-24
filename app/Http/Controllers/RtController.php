@@ -17,26 +17,28 @@ class RtController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
+{
+    $user = Auth::user();
+    $rw = DataRw::where('user_id', $user->id)->first();
+    $rt = DataRt::where('user_id', $user->id)->first();
 
-        $user = Auth::user();
-        $rw = DataRw::where('user_id', $user->id)->first();
-        $rt = DataRt::where('user_id', $user->id)->first();
-        // dd($user->Rw[0]);
+    if ($user->hasRole('rw')) {
+        $data = DataRt::where('rw_id', '=', $user->Rw[0]->id)
+            ->orderBy('rt', 'asc') // Urutkan berdasarkan RT
+            ->get();
+    } else {
+        $data = DataRt::join('rw', 'rt.rw_id', '=', 'rw.id')
+    ->orderBy('rw.rw', 'asc') // Urutkan RW dulu
+    ->orderBy('rt.rt', 'asc') // Lalu RT
+    ->select('rt.*') // Penting: ambil kolom dari data_rt saja
+    ->get();
 
-        if ($user->hasRole('rw') == true) {
-            $data = DataRt::where('rw_id', '=', $user->Rw[0]->id)->get();
-        } else {
-            $data = DataRt::all();
-        }
-
-        // dd($data);
-
-
-
-        $select = DataRw::get();
-        return view('rt.index', compact(['data', 'select', 'user']));
     }
+
+    $select = DataRw::get();
+    return view('rt.index', compact(['data', 'select', 'user']));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -57,7 +59,7 @@ class RtController extends Controller
     public function store(Request $request)
     {
         $dataRt = DataRw::where('id', $request->rw_id)->get();
-        // dd($dataRt[0]->rw);
+
         $this->validate($request, [
             'nama' => 'required',
             'no_hp' => 'required',
@@ -67,13 +69,17 @@ class RtController extends Controller
             'periode_akhir' => 'required'
         ]);
 
+        // ❗ Cek duplikat RT di RW yang sama
+        if (DataRt::where('rt', $request->rt)->where('rw_id', $request->rw_id)->exists()) {
+            Alert::error('Gagal!', 'RT ' . $request->rt . ' sudah terdaftar di RW tersebut.');
+            return redirect()->back();
+        }
+
         $rt = User::create([
             'name' => $request->nama,
-            'email' => 'rt' . $request->rt . $dataRt[0]->rw . '@gmail.com',
-            'password' =>  bcrypt('password'),
+            'email' => 'ketua-rt' . $request->rt . '.' . $dataRt[0]->rw . '@kampungbulang',
+            'password' => bcrypt('password'),
         ]);
-        // dd($rt);
-
 
         $data = new DataRt();
         $data->nama = $request->nama;
@@ -88,9 +94,9 @@ class RtController extends Controller
         $rt->assignRole('rt');
 
         Alert::success('Sukses!', 'Berhasil menambah Data RT');
-
         return redirect()->back();
     }
+
 
     /**
      * Display the specified resource.
@@ -134,25 +140,34 @@ class RtController extends Controller
             'rw_id' => 'required',
         ]);
 
+        // ❗ Cek duplikat RT di RW yang sama selain dirinya sendiri
+        $duplicate = DataRt::where('rt', $request->rt)
+            ->where('rw_id', $request->rw_id)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($duplicate) {
+            Alert::error('Gagal!', 'RT ' . $request->rt . ' sudah digunakan di RW tersebut.');
+            return redirect()->back();
+        }
+
         $data->nama = $request->nama;
         $data->no_hp = $request->no_hp;
         $data->rt = $request->rt;
         $data->rw_id = $request->rw_id;
         $data->periode_awal = $request->periode_awal;
         $data->periode_akhir = $request->periode_akhir;
-        // dd($data);
         $data->update();
-        // dd($data->rw->rw);
 
         $rt = User::where('id', $data->user_id)->update([
             'name' => $request->nama,
-            'email' => 'rt' . $request->rt . $data->rw->rw . '@gmail.com',
+            'email' => 'ketua-rt' . $request->rt . '.' . $data->rw->rw . '@kampungbulang',
         ]);
 
         Alert::success('Sukses!', 'Berhasil mengedit Data RT');
-
         return redirect()->route('rt.index');
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -173,22 +188,22 @@ class RtController extends Controller
     }
 
     public function resetPassword($id)
-{
-    $data = DataRt::findOrFail($id);
+    {
+        $data = DataRt::findOrFail($id);
 
-    if ($data->user_id) {
-        User::where('id', $data->user_id)->update([
-            'password' => bcrypt('password'),
-        ]);
+        if ($data->user_id) {
+            User::where('id', $data->user_id)->update([
+                'password' => bcrypt('password'),
+            ]);
 
-        Alert::success('Sukses!', 'Password berhasil direset ke: password');
-    } else {
-        Alert::error('Gagal!', 'User RT tidak ditemukan.');
+            Alert::success('Sukses!', 'Password berhasil direset ke: password');
+        } else {
+            Alert::error('Gagal!', 'User RT tidak ditemukan.');
+        }
+
+        return redirect()->route('rt.index');
     }
 
-    return redirect()->route('rt.index');
-}
 
 
-    
 }

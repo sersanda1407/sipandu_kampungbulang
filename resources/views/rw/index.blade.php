@@ -1,72 +1,133 @@
 @extends('layouts.master')
 
 @section('master')
-   
-<!-- Modal Tambah Data RW -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-light text-white">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Data RW Baru</h5>
-                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ url('rw/store') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="form-group mb-3">
-                        <label class="form-label">Nama Ketua RW</label>
-                        <input type="text" class="form-control text-capitalize" placeholder="Nama Lengkap" name="nama" required>
-                    </div>
-                    
-                    <div class="form-group mb-3">
-                        <label class="form-label">Nomor Telepon / WhatsApp</label>
-                        <input type="text" class="form-control" name="no_hp" id="no_hp" 
-                            placeholder="No Telepon / WhatsApp" maxlength="12" minlength="8" required>
-                    </div>
 
-                    <div class="form-group mb-3">
-                        <label class="form-label">RW</label>
-                        <input type="text" class="form-control" name="rw" id="rw" placeholder="No Wilayah RW" maxlength="3" required>
-                    </div>
 
-                    <div class="form-group mb-3">
-                        <label class="form-label">Periode</label>
-                        <div class="row">
-                            <div class="col-md-5">
-                                <input type="text" class="form-control" name="periode_awal" placeholder="Tahun Awal Menjabat" maxlength="4" required>
-                            </div>
-                            <div class="col-md-2 text-center">s/d</div>
-                            <div class="col-md-5">
-                                <input type="text" class="form-control" name="periode_akhir" placeholder="Tahun Akhir Menjabat" maxlength="4" required>
+    <!-- Modal Tambah Data RW -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-light text-white">
+                    <h5 class="modal-title" id="exampleModalLabel">Tambah Data RW Baru</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ url('rw/store') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Nama Ketua RW</label>
+                            <input type="text" class="form-control text-capitalize" placeholder="Nama Lengkap" name="nama"
+                                required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Nomor Telepon / WhatsApp</label>
+                            <input type="text" class="form-control" name="no_hp" id="no_hp"
+                                placeholder="No Telepon / WhatsApp" maxlength="12" minlength="8" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">RW</label>
+                            <input type="text" class="form-control" name="rw" id="rw" placeholder="No Wilayah RW"
+                                maxlength="3" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Periode</label>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" name="periode_awal"
+                                        placeholder="Tahun Awal Menjabat" maxlength="4" required>
+                                </div>
+                                <div class="col-md-2 text-center">s/d</div>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" name="periode_akhir"
+                                        placeholder="Tahun Akhir Menjabat" maxlength="4" required>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="bx bx-x"></i> Tutup
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bx bx-check"></i> Simpan
-                    </button>
-                </div>
-            </form>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bx bx-x"></i> Tutup
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-check"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll("#no_hp, #rw, input[name='periode_awal'], input[name='periode_akhir']")
-            .forEach(input => input.addEventListener("input", () => {
-                input.value = input.value.replace(/\D/g, ''); // Hanya angka
-            }));
-    });
-</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll("#no_hp, #rw, input[name='periode_awal'], input[name='periode_akhir']")
+                .forEach(input => input.addEventListener("input", () => {
+                    input.value = input.value.replace(/\D/g, ''); // Hanya angka
+                }));
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hpInput = document.getElementById('no_hp');
+            const rwInput = document.getElementById('rw');
+            if (!hpInput || !rwInput) return;
+
+            // Buat elemen feedback
+            const feedHp = document.createElement('div');
+            feedHp.className = 'invalid-feedback';
+            hpInput.after(feedHp);
+
+            const feedRw = document.createElement('div');
+            feedRw.className = 'invalid-feedback';
+            rwInput.after(feedRw);
+
+            // Helper set validity
+            const setValidity = (el, feed, ok, msg = '') => {
+                el.classList.toggle('is-invalid', !ok);
+                el.classList.toggle('is-valid', ok);
+                feed.textContent = msg;
+            };
+
+            // Cek API
+            async function validateField(input, feed, route, paramName, validateFn) {
+                const val = input.value.replace(/\D/g, '');
+                let ok = await validateFn(val);
+                setValidity(input, feed, ok, ok ? '' : 'Tidak valid/duplikat');
+            }
+
+            const debounce = (fn, ms = 300) => {
+                let t;
+                return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms) };
+            };
+
+            hpInput.addEventListener('input', debounce(() => {
+                validateField(hpInput, feedHp, "{{ route('api.check-nohp') }}", 'no_hp', async val => {
+                    return val.length >= 8 && !(await (await fetch(`{{ route('api.check-nohp') }}?no_hp=${val}`)).json()).exists;
+                });
+            }, 300));
+
+            rwInput.addEventListener('input', debounce(() => {
+                validateField(rwInput, feedRw, "{{ route('api.check-rw') }}", 'rw', async val => {
+                    const num = +val; if (!val || num < 1 || num > 999) return false;
+                    return !(await (await fetch(`{{ route('api.check-rw') }}?rw=${val}`)).json()).exists;
+                });
+            }, 300));
+        });
+    </script>
 
 
-    {{-- END MODAL ADD --}}
+
+
+
+
+
+
+
+    {{-- END MODAL Tambah data RW --}}
 
     {{-- MODAL DELETE --}}
     @foreach ($data as $r)
@@ -77,7 +138,9 @@
                     <div class="modal-body">
                         <i class="fas fa-exclamation-circle mb-2"
                             style="color: #e74a3b; font-size:120px; justify-content:center; display:flex"></i>
-                        <h5 class="text-center">Apakah anda yakin ingin menghapus Data Ketua RW {{ $r->rw }} atas nama {{ $r->nama }} ?</h5>
+                        <h5 class="text-center">Apakah anda yakin ingin menghapus Data Ketua RW {{ $r->rw }} atas nama
+                            {{ $r->nama }} ?
+                        </h5>
                     </div>
                     <div class="modal-footer">
                         <form action={{ url('/rw/delete/' . $r->id) }} method="POST">
@@ -124,31 +187,36 @@
                                         <td>{{ $d->rw }}</td>
                                         <td>{{ $d->periode_awal }} - {{ $d->periode_akhir }}</td>
                                         <td>
-    <div class="dropdown">
-        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton{{ $d->id }}" data-bs-toggle="dropdown" aria-expanded="false">
-            Aksi
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $d->id }}">
-            <li>
-                <button class="dropdown-item text-success" data-bs-toggle="modal" data-bs-target="#editData{{ $d->id }}">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
-            </li>
-            <li>
-                <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modalDelete{{ $d->id }}">
-                    <i class="fas fa-trash"></i> Hapus
-                </button>
-            </li>
-            @hasrole('superadmin')
-            <li>
-                <button class="dropdown-item text-warning" data-bs-toggle="modal" data-bs-target="#modalResetPasswordRW{{ $d->id }}">
-                    <i class="fas fa-key"></i> Reset Password
-                </button>
-            </li>
-            @endhasrole
-        </ul>
-    </div>
-</td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-info dropdown-toggle" type="button"
+                                                    id="dropdownMenuButton{{ $d->id }}" data-bs-toggle="dropdown"
+                                                    aria-expanded="false">
+                                                    Aksi
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $d->id }}">
+                                                    <li>
+                                                        <button class="dropdown-item text-success" data-bs-toggle="modal"
+                                                            data-bs-target="#editData{{ $d->id }}">
+                                                            <i class="fas fa-edit"></i> Edit
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item text-danger" data-bs-toggle="modal"
+                                                            data-bs-target="#modalDelete{{ $d->id }}">
+                                                            <i class="fas fa-trash"></i> Hapus
+                                                        </button>
+                                                    </li>
+                                                    @hasrole('superadmin')
+                                                    <li>
+                                                        <button class="dropdown-item text-warning" data-bs-toggle="modal"
+                                                            data-bs-target="#modalResetPasswordRW{{ $d->id }}">
+                                                            <i class="fas fa-key"></i> Reset Password
+                                                        </button>
+                                                    </li>
+                                                    @endhasrole
+                                                </ul>
+                                            </div>
+                                        </td>
 
                                     </tr>
                                 @endforeach
@@ -157,30 +225,31 @@
                     </div>
                 </div>
         </div>
-                {{-- MODAL RESET PASSWORD RW --}}
-@foreach ($data as $d)
-    <div class="modal fade" id="modalResetPasswordRW{{ $d->id }}" tabindex="-1" aria-labelledby="modalResetLabelRW" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <i class="fas fa-exclamation-circle mb-2"
-                        style="color: #f39c12; font-size:120px; justify-content:center; display:flex"></i>
-                    <h5 class="text-center">
-                        Apakah Anda yakin ingin mereset password akun Ketua RW <strong>{{ $d->nama }}</strong>?
-                    </h5>
-                    <p class="text-center mt-2 text-muted">Password akan direset ke: <strong>password</strong></p>
-                </div>
-                <div class="modal-footer">
-                    <form action="{{ route('rt.resetPassword', $d->id) }}" method="POST">
-                        @csrf
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-warning">Ya, Reset Sekarang</button>
-                    </form>
+        {{-- MODAL RESET PASSWORD RW --}}
+        @foreach ($data as $d)
+            <div class="modal fade" id="modalResetPasswordRW{{ $d->id }}" tabindex="-1" aria-labelledby="modalResetLabelRW"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <i class="fas fa-exclamation-circle mb-2"
+                                style="color: #f39c12; font-size:120px; justify-content:center; display:flex"></i>
+                            <h5 class="text-center">
+                                Apakah Anda yakin ingin mereset password akun Ketua RW <strong>{{ $d->nama }}</strong>?
+                            </h5>
+                            <p class="text-center mt-2 text-muted">Password akan direset ke: <strong>password</strong></p>
+                        </div>
+                        <div class="modal-footer">
+                            <form action="{{ route('rt.resetPassword', $d->id) }}" method="POST">
+                                @csrf
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-warning">Ya, Reset Sekarang</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-@endforeach
+        @endforeach
         @include('rw/formEdit')
         </section>
     </div>

@@ -1,0 +1,24 @@
+git status
+
+
+Tambahkan semua file yang diubah:
+git add .
+
+
+Commit perubahan dengan pesan:
+git commit -m "Update: Modal tambah & hapus data keluarga, fitur preview & download foto KK"
+
+
+git push origin main
+
+
+
+catatan : 
+
+akun rw otomatis dibuat setelah admin menambahkan data rw dengan format akun berikut : 
+jika yang dimasukan (rw 12), maka akunnya nanti : 
+ketua-rw12@kampungbulang
+
+akun rw otomatis dibuat setelahadmin menambahkan data rt dengan format akun berikut : 
+jika yang dimasukan (rt 1) & pilihan (rw 12), maka akunnya nanti : 
+ketua-rt1.12@kampungbulang

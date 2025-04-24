@@ -148,8 +148,14 @@
             @endhasrole
 
             @hasrole('rt')
-            <p>Cek data di Lingkungan RT {{ \App\DataRt::where('user_id', Auth::id())->value('rt') ?? '' }} / RW {{ \App\DataRt::where('user_id', Auth::id())->value('rw_id') ?? '' }} , Kelurahan Kampung Bulang</p>
+            <p>
+                Cek data di Lingkungan RT 
+                {{ \App\DataRt::where('user_id', Auth::id())->value('rt') ?? '' }} / 
+                RW {{ \App\DataRw::where('id', \App\DataRt::where('user_id', Auth::id())->value('rw_id'))->value('rw') ?? '' }}, 
+                Kelurahan Kampung Bulang
+            </p>
             @endhasrole
+
 
             @hasrole('rw')
             <div class="row">
