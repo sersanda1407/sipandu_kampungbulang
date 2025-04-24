@@ -42,7 +42,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/api/check-nohp', function (Illuminate\Http\Request $r) {
             return ['exists' => \App\DataRw::where('no_hp', $r->no_hp)->exists()];
         })->name('api.check-nohp');
-        // routes/web.php
         Route::get('/api/check-rw', function (Illuminate\Http\Request $r) {
             return ['exists' => \App\DataRw::where('rw', $r->rw)->exists()];
         })->name('api.check-rw');

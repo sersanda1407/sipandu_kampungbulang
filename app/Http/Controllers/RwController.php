@@ -118,52 +118,46 @@ class RwController extends Controller
     public function update(Request $request, $id)
     {
         $data = DataRw::findOrFail($id);
-
-        // Validasi biasa (tanpa unique dulu)
+    
         $request->validate([
-            'nama' => 'required',
-            'no_hp' => ['required', 'digits_between:8,12'],
-            'rw' => 'required',
-            'periode_awal' => 'required',
-            'periode_akhir' => 'required',
+            'nama'           => 'required',
+            'no_hp'          => ['required','digits_between:8,12'],
+            'rw'             => 'required',
+            'periode_awal'   => 'required',
+            'periode_akhir'  => 'required',
         ]);
-
-        // Cek manual untuk no_hp duplicate
-        $existingNoHp = DataRw::where('no_hp', $request->no_hp)
-            ->where('id', '!=', $id)
-            ->first();
-        if ($existingNoHp) {
-            Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
+    
+        if (DataRw::where('no_hp', $request->no_hp)
+                  ->where('id','!=',$id)->exists()) {
+            Alert::error('Gagal!', 'Nomor Handphone sudah digunakan.');
             return redirect()->back()->withInput();
         }
-
-        // Cek manual untuk rw duplicate
-        $existingRw = DataRw::where('rw', $request->rw)
-            ->where('id', '!=', $id)
-            ->first();
-        if ($existingRw) {
-            Alert::error('Gagal!', 'Nomor RW sudah digunakan oleh data lain.');
+    
+        if (DataRw::where('rw', $request->rw)
+                  ->where('id','!=',$id)->exists()) {
+            Alert::error('Gagal!', 'Nomor RW sudah digunakan.');
             return redirect()->back()->withInput();
         }
-
-        // Update data
+    
+        // Update DataRw
         $data->update([
-            'nama' => $request->nama,
-            'no_hp' => $request->no_hp,
-            'rw' => $request->rw,
-            'periode_awal' => $request->periode_awal,
-            'periode_akhir' => $request->periode_akhir,
+            'nama'           => $request->nama,
+            'no_hp'          => $request->no_hp,
+            'rw'             => $request->rw,
+            'periode_awal'   => $request->periode_awal,
+            'periode_akhir'  => $request->periode_akhir,
         ]);
-
-        // Update user
-        User::where('id', $data->user_id)->update([
-            'name' => $request->nama,
-            'email' => 'ketua-rw' . $request->rw . '@kampungbulang',
-        ]);
-
+    
+        // Update User model via instance
+        $user = User::find($data->user_id);
+        $user->name  = $request->nama;
+        $user->email = 'ketua-rw' . $request->rw . '@kampungbulang';
+        $user->save();
+    
         Alert::success('Sukses!', 'Berhasil mengedit Data RW');
         return redirect()->route('rw.index');
     }
+    
 
 
     /**
@@ -185,20 +179,26 @@ class RwController extends Controller
         return redirect()->route('rw.index');
     }
 
-    public function resetPassword($id)
-    {
-        $data = DataRw::findOrFail($id);
+   public function resetPassword($id)
+{
+    // Ambil data RW, atau 404 jika tidak ada
+    $data = DataRw::findOrFail($id);
 
-        if ($data->user_id) {
-            User::where('id', $data->user_id)->update([
-                'password' => bcrypt('password'),
-            ]);
-
-            Alert::success('Sukses!', 'Password berhasil direset ke: password');
-        } else {
-            Alert::error('Gagal!', 'User RW tidak ditemukan.');
-        }
-
-        return redirect()->route('rt.index');
+    // Pastikan ada user terkait
+    $user = User::find($data->user_id);
+    if (!$user) {
+        Alert::error('Gagal!', 'User RW tidak ditemukan.');
+        return redirect()->route('rw.index');
     }
+
+    // Reset password ke string 'password'
+    $user->password = bcrypt('password');
+    $user->save();
+
+    Alert::success('Sukses!', 'Password berhasil direset ke: password');
+
+    // Kembalikan ke halaman indeks RW, bukan RT
+    return redirect()->route('rw.index');
+}
+
 }

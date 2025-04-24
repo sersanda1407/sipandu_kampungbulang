@@ -240,7 +240,7 @@
                             <p class="text-center mt-2 text-muted">Password akan direset ke: <strong>password</strong></p>
                         </div>
                         <div class="modal-footer">
-                            <form action="{{ route('rt.resetPassword', $d->id) }}" method="POST">
+                            <form action="{{ route('rw.resetPassword', $d->id) }}" method="POST">
                                 @csrf
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                                 <button type="submit" class="btn btn-warning">Ya, Reset Sekarang</button>
