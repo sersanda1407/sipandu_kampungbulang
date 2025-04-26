@@ -118,15 +118,6 @@
             }, 300));
         });
     </script>
-
-
-
-
-
-
-
-
-
     {{-- END MODAL Tambah data RW --}}
 
     {{-- MODAL DELETE --}}

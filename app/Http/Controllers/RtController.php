@@ -11,51 +11,33 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class RtController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
-{
-    $user = Auth::user();
-    $rw = DataRw::where('user_id', $user->id)->first();
-    $rt = DataRt::where('user_id', $user->id)->first();
+    {
+        $user = Auth::user();
+        $rw = DataRw::where('user_id', $user->id)->first();
+        $rt = DataRt::where('user_id', $user->id)->first();
 
-    if ($user->hasRole('rw')) {
-        $data = DataRt::where('rw_id', '=', $user->Rw[0]->id)
-            ->orderBy('rt', 'asc') // Urutkan berdasarkan RT
-            ->get();
-    } else {
-        $data = DataRt::join('rw', 'rt.rw_id', '=', 'rw.id')
-    ->orderBy('rw.rw', 'asc') // Urutkan RW dulu
-    ->orderBy('rt.rt', 'asc') // Lalu RT
-    ->select('rt.*') // Penting: ambil kolom dari data_rt saja
-    ->get();
+        if ($user->hasRole('rw')) {
+            $data = DataRt::where('rw_id', '=', $user->Rw[0]->id)
+                ->orderBy('rt', 'asc')
+                ->get();
+        } else {
+            $data = DataRt::join('rw', 'rt.rw_id', '=', 'rw.id')
+                ->orderBy('rw.rw', 'asc')
+                ->orderBy('rt.rt', 'asc')
+                ->select('rt.*')
+                ->get();
+        }
 
+        $select = DataRw::get();
+        return view('rt.index', compact(['data', 'select', 'user']));
     }
 
-    $select = DataRw::get();
-    return view('rt.index', compact(['data', 'select', 'user']));
-}
-
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $dataRt = DataRw::where('id', $request->rw_id)->get();
@@ -72,6 +54,12 @@ class RtController extends Controller
         // ❗ Cek duplikat RT di RW yang sama
         if (DataRt::where('rt', $request->rt)->where('rw_id', $request->rw_id)->exists()) {
             Alert::error('Gagal!', 'RT ' . $request->rt . ' sudah terdaftar di RW tersebut.');
+            return redirect()->back();
+        }
+
+        // ❗ Cek duplikat no_hp
+        if (DataRt::where('no_hp', $request->no_hp)->exists()) {
+            Alert::error('Gagal!', 'Nomor HP sudah digunakan.');
             return redirect()->back();
         }
 
@@ -97,36 +85,16 @@ class RtController extends Controller
         return redirect()->back();
     }
 
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         $data = DataRt::where('id', $id)->first();
@@ -151,6 +119,16 @@ class RtController extends Controller
             return redirect()->back();
         }
 
+        // ❗ Cek duplikat no_hp selain dirinya sendiri
+        $duplicateHp = DataRt::where('no_hp', $request->no_hp)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($duplicateHp) {
+            Alert::error('Gagal!', 'Nomor HP sudah digunakan oleh RT lain.');
+            return redirect()->back();
+        }
+
         $data->nama = $request->nama;
         $data->no_hp = $request->no_hp;
         $data->rt = $request->rt;
@@ -168,22 +146,13 @@ class RtController extends Controller
         return redirect()->route('rt.index');
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $data = DataRt::find($id);
         User::where('id', '=', $data->user_id)->delete();
-        // dd($data);
         $data->delete();
 
         Alert::Success('Sukses!', 'Berhasil menghapus Data RT');
-
         return redirect()->route('rt.index');
     }
 
@@ -203,7 +172,4 @@ class RtController extends Controller
 
         return redirect()->route('rt.index');
     }
-
-
-
 }

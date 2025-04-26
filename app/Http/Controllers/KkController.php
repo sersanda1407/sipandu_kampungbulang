@@ -170,90 +170,63 @@ class KkController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function update(Request $request, $id)
-    {
-        $data = DataKk::findOrFail($id);
+     public function update(Request $request, $id)
+     {
+         $data = DataKk::findOrFail($id);
+     
+         $request->validate([
+             'kepala_keluarga' => 'required',
+             'no_kk' => 'required',
+             'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
+             'rt_id' => 'required',
+             'rw_id' => 'required',
+             'status_ekonomi' => 'required',
+         ]);
+     
+         // Cek kalau no_kk diinput berbeda dengan yang lama
+         if ($request->no_kk != $data->no_kk) {
+             // Cari apakah no_kk baru sudah ada di tabel data_kks
+             $existing = DataKk::where('no_kk', $request->no_kk)->first();
+     
+             if ($existing) {
+                 // Kalau sudah ada, kasih alert error dan balik
+                 Alert::error('Gagal!', 'No KK sudah terdaftar, tidak bisa diubah.');
+                 return redirect()->back()->withInput();
+             }
+         }
+     
+         if ($request->hasFile('image')) {
+             if ($data->image) {
+                 Storage::disk('public')->delete('foto_kk/' . $data->image);
+             }
+     
+             $filename = Str::uuid() . '.' . $request->file('image')->getClientOriginalExtension();
+             $request->file('image')->storeAs('foto_kk', $filename, 'public');
+     
+             $data->image = $filename;
+         }
+     
+         // Update data KK
+         $data->kepala_keluarga = $request->kepala_keluarga;
+         $data->no_kk = $request->no_kk;
+         $data->rt_id = $request->rt_id;
+         $data->rw_id = $request->rw_id;
+         $data->status_ekonomi = $request->status_ekonomi;
+         $data->save();
+     
+         // Update data User kalau ada
+         if ($data->user_id) {
+             User::where('id', $data->user_id)->update([
+                 'name' => $request->kepala_keluarga,
+                 'email' => $request->no_kk,
+             ]);
+         }
+     
+         Alert::success('Sukses!', 'Berhasil mengedit kartu keluarga');
+         return redirect()->back();
+     }
+     
 
-        $request->validate([
-            'kepala_keluarga' => 'required',
-            'no_kk' => 'required',
-            'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
-            'rt_id' => 'required',
-            'rw_id' => 'required',
-            'status_ekonomi' => 'required',
-        ]);
-
-        if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($data->image) {
-                Storage::disk('public')->delete('foto_kk/' . $data->image);
-            }
-
-            // Simpan gambar baru dengan nama unik
-            $filename = Str::uuid() . '.' . $request->file('image')->getClientOriginalExtension();
-            $request->file('image')->storeAs('foto_kk', $filename, 'public');
-
-            // Simpan nama file di database
-            $data->image = $filename;
-        }
-
-        // Update data KK
-        $data->update($request->only(['kepala_keluarga', 'no_kk', 'rt_id', 'rw_id', 'status_ekonomi']));
-
-        // Update data User jika ada
-        if ($data->user_id) {
-            User::where('id', $data->user_id)->update([
-                'name' => $request->kepala_keluarga,
-                'email' => $request->no_kk,
-            ]);
-        }
-
-        Alert::success('Sukses!', 'Berhasil mengedit kartu keluarga');
-
-        return redirect()->back();
-    }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $data = DataKk::where('id', $id)->firstOrFail();
-
-    //     $request->validate([
-    //         'kepala_keluarga' => 'required',
-    //         'no_kk' => 'required',
-    //         'image' => 'required|mimes:jpeg,jpg,png,gif,svg|max:3072',
-    //         'rt_id' => 'required',
-    //         'rw_id' => 'required',
-    //         'status_ekonomi' => 'required',
-    //     ]);
-
-    //     $img = $request->file('image');
-    //     $filename = $img->getClientOriginalName();
-
-    //     $data->image = $request->file('image')->getClientOriginalName();
-    //     if ($request->hasFile('image')) {
-    //         if ($request->oldImage) {
-    //             Storage::delete('/foto_kk/' . $request->oldImage);
-    //         }
-    //         $request->file('image')->storeAs('/foto_kk', $filename);
-    //     }
-
-    //     $data->kepala_keluarga = $request->kepala_keluarga;
-    //     $data->no_kk = $request->no_kk;
-    //     $data->rt_id = $request->rt_id;
-    //     $data->rw_id = $request->rw_id;
-    //     $data->status_ekonomi = $request->status_ekonomi;
-    //     $data->update();
-
-    //     $kk = User::where('id', $data->user_id)->update([
-    //         'name' => $request->kepala_keluarga,
-    //         'email' => $request->no_kk,
-    //     ]);
-    //     // dd($kk);
-
-    //     Alert::success('Sukses!', 'Berhasil mengedit kartu keluarga');
-
-    //     return redirect()->back();
-    // }
 
     /**
      * Remove the specified resource from storage.

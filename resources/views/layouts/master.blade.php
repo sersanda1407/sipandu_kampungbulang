@@ -145,14 +145,14 @@
                             </a>
                         </li>
 
-                        @hasrole('superadmin')
+                        <!-- @hasrole('superadmin')
                         <li class="sidebar-item {{ request()->is('histori*') ? 'active' : '' }}">
                             <a href="{{ url('/histori') }}" class="sidebar-link">
                                 <i class="fas fa-history"></i>
                                 <span>Histori Aktivitas</span>
                             </a>
                         </li>
-                        @endhasrole
+                        @endhasrole -->
 
 
                         <li class="sidebar-item ">
