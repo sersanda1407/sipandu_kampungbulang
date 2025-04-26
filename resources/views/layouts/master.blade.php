@@ -70,7 +70,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="title">
                             <h3>SIPANDU</h3>
-                            <p class="small" style="font-size: 10px;">Sistem Pendataan Kependudukan Area Kampung Bulang
+                            <p class="small" style="font-size: 10px;">Sistem Pendataan Penduduk Terpadu Kelurahan Kampung Bulang
                             </p>
                         </div>
                         <div class="theme-toggle d-flex gap-2 align-items-center mt-2">

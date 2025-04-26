@@ -140,9 +140,130 @@
             <h3>Ada Perlu apa hari ini ?</h3>
 
             @hasrole('warga')
-            <p>Kontak RT : sutarmi (RT 1) - 085264277766</p><br>
-            <p>Kontak RW : Tulus (RW 1) - 081231234411</p>
+            @php
+                $warga = \App\DataKK::where('user_id', Auth::id())->first();
+                $rt = $warga ? \App\DataRt::find($warga->rt_id) : null;
+                $rw = $rt ? \App\DataRw::find($rt->rw_id) : null;
+                $user = Auth::user();
+            @endphp
+
+            @if($warga && $rt && $rw)
+            <div class="card shadow mt-4" style="border-radius: 12px;">
+                <div class="card-body">
+                    <h5 class="mb-4" style="font-weight: 600; color: #333;">Kontak Penting</h5>
+
+                    <div class="mt-3">
+                        <h6 class="text-muted mb-1">Ketua RW {{ $rw->rw ?? '-' }} Kampung Bulang</h6>
+                        <p class="mb-0">Nama: <strong>{{ $rw->nama ?? '-' }}</strong></p>
+                        <p>No HP: 
+                            @if($rw && $rw->no_hp)
+                                <a href="https://wa.me/{{ preg_replace('/^0/', '62', $rw->no_hp) }}" target="_blank">
+                                    <strong>{{ $rw->no_hp }}</strong>
+                                </a>
+                            @else
+                                <strong>-</strong>
+                            @endif
+                        </p>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-1">Ketua RT {{ $rt->rt ?? '-' }} Kampung Bulang</h6>
+                        <p class="mb-0">Nama: <strong>{{ $rt->nama ?? '-' }}</strong></p>
+                        <p>No HP: 
+                        @if($rt && $rt->no_hp)
+                            <a href="https://wa.me/{{ preg_replace('/^0/', '62', $rt->no_hp) }}" target="_blank">
+                                <strong>{{ $rt->no_hp }}</strong>
+                            </a>
+                        @else
+                            <strong>-</strong>
+                        @endif
+                        <div class="mt-3">
+                        <label for="keperluan" class="form-label">Ada yang mau diurus?</label>
+                        <select class="form-select" id="keperluan">
+                            <option value="" selected>Pilih keperluan...</option>
+                            <option value="Surat Keterangan Domisili">Surat Keterangan Domisili</option>
+                            <option value="Surat Pengantar SKCK">Surat Pengantar SKCK</option>
+                            <option value="Pendaftaran/Perubahan KK">Pendaftaran/Perubahan KK</option>
+                            <option value="Pengurusan KTP Baru">Pengurusan KTP Baru</option>
+                            <option value="Izin Keramaian">Izin Keramaian</option>
+                            <option value="Pelaporan Warga Baru">Pelaporan Warga Baru</option>
+                            <option value="Pelaporan Warga Meninggal">Pelaporan Warga Meninggal</option>
+                        </select>
+                    </div>
+
+                    <!-- Modal Konfirmasi -->
+                    <div class="modal fade" id="modalKonfirmasi" tabindex="-1" aria-labelledby="modalKonfirmasiLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalKonfirmasiLabel">Konfirmasi</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        </div>
+
+                        <div class="modal-body" id="modalBodyContent">
+                            <!-- Isi akan diganti dinamis -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="button" class="btn btn-primary" id="btnKirimWA">Kirim</button>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    </p>
+
+                    </div>
+                    
+                </div>
+            </div>
+            <script>
+                const keperluanSelect = document.getElementById('keperluan');
+                const btnKirimWA = document.getElementById('btnKirimWA');
+                let selectedKeperluan = '';
+
+                const namaRt = "{{ $rt->nama ?? '' }}";
+                const rtId = "{{ $rt->rt ?? '' }}";
+
+                keperluanSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        selectedKeperluan = this.value;
+
+                        modalBodyContent.innerHTML = `Anda ingin mengirim pesan ke Ketua RT ${rtId} ${namaRt} untuk mengurus <strong>${selectedKeperluan}</strong>?`;
+
+                        var modal = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
+                        modal.show();
+                    }
+                });
+
+                btnKirimWA.addEventListener('click', function() {
+                    const now = new Date();
+                    const hour = now.getHours();
+                    let greeting = "Selamat pagi";
+
+                    if (hour >= 12 && hour < 15) {
+                        greeting = "Selamat siang";
+                    } else if (hour >= 15) {
+                        greeting = "Selamat sore";
+                    }
+
+                    const nama = "{{ Auth::user()->name ?? 'nama' }}";
+                    const namaRt = "{{ $rt->nama ?? '' }}";
+                    const rtId = "{{ $rt->rt ?? '' }}";
+                    const rwId = "{{ $rw->rw ?? '' }}";
+                    const noHpRt = "{{ preg_replace('/^0/', '62', $rt->no_hp) }}";
+                    const pesan = `[PESAN DARI APLIKASI SIPANDU]  \n\n\nAssalamualaikum\n${greeting}\n\nPerkenalkan, saya:\nNama : *${nama}*\nAlamat : (alamat) RT ${rtId} / RW ${rwId}\nKeperluan : *Ingin mengurus ${selectedKeperluan}*\n\nTerima kasih banyak atas perhatian dan waktunya. Semoga sehat selalu dan dilancarkan segala aktivitasnya. 🙏🏻\n\n\n_*Pesan ini dikirim secara otomatis_`;
+
+                    const url = `https://wa.me/${noHpRt}?text=${encodeURIComponent(pesan)}`;
+                    window.open(url, '_blank');
+                });
+            </script>
+            @endif
+
             @endhasrole
+
             @hasrole('rw')
             <p>Cek data warga di Lingkungan RW {{ \App\DataRw::where('user_id', Auth::id())->value('rw') ?? '' }}, Kelurahan Kampung Bulang</p>
             @endhasrole
