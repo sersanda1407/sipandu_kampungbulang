@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-    SIPEKA - 
+    SIPANDU - 
     @php
         $titleMap = [
             'dashboard' => 'Dashboard',
@@ -69,7 +69,7 @@
                 <div class="sidebar-header position-relative">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="title">
-                            <h3>SIPEKA</h3>
+                            <h3>SIPANDU</h3>
                             <p class="small" style="font-size: 10px;">Sistem Pendataan Kependudukan Area Kampung Bulang
                             </p>
                         </div>
@@ -186,7 +186,7 @@
             <footer>
                 <div class="footer clearfix mb-0 text-muted">
                     <div class="float-start">
-                        <p id="year">&copy; SIPEKA</p>
+                        <p id="year">&copy; SIPANDU</p>
                     </div>
                 </div>
             </footer>
@@ -197,7 +197,7 @@
     <script src={{ asset('assets/js/pages/dashboard.js') }}></script>
     <script src={{ asset('assets/js/extensions/simple-datatables.js') }}></script>
     <script>
-        document.getElementById("year").innerHTML = new Date().getFullYear() + " &copy; SIPEKA";
+        document.getElementById("year").innerHTML = new Date().getFullYear() + " &copy; SIPANDU";
     </script>
     
 

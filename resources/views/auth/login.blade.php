@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SIPEKA Kampung Bulang</title>
+    <title>Login - SIPANDU Kampung Bulang</title>
     <link rel="stylesheet" href="assets/css/main/app.css">
     <link rel="stylesheet" href="assets/css/pages/auth.css">
     <!-- <link rel="shortcut icon" href="assets/images/logo/favicon.svg" type="image/x-icon"> -->
@@ -135,7 +135,7 @@
                     <!-- Tulisan di sebelah kanan logo -->
                     <div class="overlay-text">
                         <!-- <h2>SIPEKA | Kampung Bulang</h2> -->
-                        <p>Sistem Informasi <br> Pendataan Kependudukan Area <br>Kampung Bulang</p>
+                        <p>Sistem Informasi <br> Pendataan Penduduk Terpadu <br>Kampung Bulang</p>
                     </div>
                 </div>
             </div>
@@ -146,13 +146,13 @@
     <div id="auth-left">
         <!-- Logo untuk Desktop -->
         <div class="auth-logo pc-only">
-            <h1>SIPEKA</h1>
-            <p>Sistem Informasi Pendataan Kependudukan Area</p>
+            <h1>SIPANDU</h1>
+            <p>Sistem Informasi Pendataan Penduduk Terpadu</p>
         </div>
 
         <!-- Logo untuk Mobile -->
         <div class="auth-logo mobile-only">
-            <img src="assets/images/logo/1.png" alt="Logo" class="logo">
+            <img src="assets/images/logo/logo_sipandu.png" alt="Logo" class="logo">
         </div>
 
         <!-- Card Login -->
@@ -220,7 +220,7 @@
         <!-- Footer -->
         <footer class="mt-4 text-center">
             <div class="footer clearfix mb-0 text-muted">
-                <span id="year"></span> <a href="https://www.instagram.com/sersandaabagas" target="_blank" class="text-decoration-none"> &copy;</a> SIPEKA | Kampung Bulang
+                <span id="year"></span> <a href="https://www.instagram.com/sersandaabagas" target="_blank" class="text-decoration-none"> &copy;</a> SIPANDU | Kampung Bulang
             </div>
         </footer>
 

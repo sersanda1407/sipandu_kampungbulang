@@ -1,4 +1,4 @@
-<title>SIPEKA - Dashboard</title>
+<title>SIPANDU - Dashboard</title>
 
 @extends('layouts.master')
 
@@ -144,12 +144,12 @@
             <p>Kontak RW : Tulus (RW 1) - 081231234411</p>
             @endhasrole
             @hasrole('rw')
-            <p>Cek data di Lingkungan RW {{ \App\DataRw::where('user_id', Auth::id())->value('rw') ?? '' }}, Kelurahan Kampung Bulang</p>
+            <p>Cek data warga di Lingkungan RW {{ \App\DataRw::where('user_id', Auth::id())->value('rw') ?? '' }}, Kelurahan Kampung Bulang</p>
             @endhasrole
 
             @hasrole('rt')
             <p>
-                Cek data di Lingkungan RT 
+                Cek data warga di Lingkungan RT 
                 {{ \App\DataRt::where('user_id', Auth::id())->value('rt') ?? '' }} / 
                 RW {{ \App\DataRw::where('id', \App\DataRt::where('user_id', Auth::id())->value('rw_id'))->value('rw') ?? '' }}, 
                 Kelurahan Kampung Bulang
