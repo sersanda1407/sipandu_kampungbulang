@@ -69,6 +69,7 @@ class KkController extends Controller
             'image' => 'required|mimes:jpeg,jpg,png,gif,svg|max:3072',
             'rt_id' => 'required',
             'rw_id' => 'required',
+            'alamat' => 'required',
             'status_ekonomi' => 'required',
         ]);
 
@@ -85,6 +86,7 @@ class KkController extends Controller
             $data->rt_id = $request->rt_id;
             $data->rw_id = $request->rw_id;
             $data->user_id = $kk->id;
+            $data->alamat = $request->alamat;
             $data->status_ekonomi = $request->status_ekonomi;
 
             $img = $request->file('image');
@@ -180,6 +182,7 @@ class KkController extends Controller
              'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
              'rt_id' => 'required',
              'rw_id' => 'required',
+             'alamat' => 'required',
              'status_ekonomi' => 'required',
          ]);
      
@@ -211,6 +214,7 @@ class KkController extends Controller
          $data->no_kk = $request->no_kk;
          $data->rt_id = $request->rt_id;
          $data->rw_id = $request->rw_id;
+         $data->alamat = $request->alamat;
          $data->status_ekonomi = $request->status_ekonomi;
          $data->save();
      

@@ -225,6 +225,7 @@
                 let selectedKeperluan = '';
 
                 const namaRt = "{{ $rt->nama ?? '' }}";
+                const alamatWarga = "{{ $warga->alamat ?? '' }}";
                 const rtId = "{{ $rt->rt ?? '' }}";
 
                 keperluanSelect.addEventListener('change', function() {
@@ -251,10 +252,11 @@
 
                     const nama = "{{ Auth::user()->name ?? 'nama' }}";
                     const namaRt = "{{ $rt->nama ?? '' }}";
+                    const alamatWarga = "{{ $warga->alamat ?? '' }}";
                     const rtId = "{{ $rt->rt ?? '' }}";
                     const rwId = "{{ $rw->rw ?? '' }}";
                     const noHpRt = "{{ preg_replace('/^0/', '62', $rt->no_hp) }}";
-                    const pesan = `[PESAN DARI APLIKASI SIPANDU]  \n\n\nAssalamualaikum\n${greeting}\n\nPerkenalkan, saya:\nNama : *${nama}*\nAlamat : (alamat) RT ${rtId} / RW ${rwId}\nKeperluan : *Ingin mengurus ${selectedKeperluan}*\n\nTerima kasih banyak atas perhatian dan waktunya. Semoga sehat selalu dan dilancarkan segala aktivitasnya. 🙏🏻\n\n\n_*Pesan ini dikirim secara otomatis_`;
+                    const pesan = `[PESAN DARI APLIKASI SIPANDU]  \n\n\nAssalamualaikum\n${greeting}\n\nPerkenalkan, saya:\nNama : *${nama}*\nAlamat : ${alamatWarga}, RT ${rtId} / RW ${rwId}\nKeperluan : *Ingin mengurus ${selectedKeperluan}*\n\nTerima kasih banyak atas perhatian dan waktunya. Semoga sehat selalu dan dilancarkan segala aktivitasnya. 🙏🏻\n\n\n_*Pesan ini dikirim secara otomatis_`;
 
                     const url = `https://wa.me/${noHpRt}?text=${encodeURIComponent(pesan)}`;
                     window.open(url, '_blank');

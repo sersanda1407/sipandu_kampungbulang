@@ -84,6 +84,11 @@
                             });
                         </script>
 
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Alamat</label>
+                            <input type="text" class="form-control" placeholder="alamat" name="alamat"
+                                id="exampleInputPassword1" required>
+                        </div>
 
                         <div class="mb-3">
                             <label for="exampleInputPassword1" class="form-label">Status Ekonomi</label>

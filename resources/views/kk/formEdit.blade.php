@@ -93,6 +93,10 @@
                         });
                         </script>
 
+                        <div class="mb-3">
+                            <label class="form-label">Alamat</label>
+                            <input type="text" class="form-control" value="{{ $d->alamat }}" name="alamat"  required>
+                        </div>
 
                         <div class="mb-3">
                             <label class="form-label">Status Ekonomi</label>

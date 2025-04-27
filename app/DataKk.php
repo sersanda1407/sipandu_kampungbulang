@@ -14,6 +14,7 @@ class DataKk extends Model
         'image',
         'rt_id',
         'rw_id',
+        'alamat',
         'jumlah_individu'
     ];
 

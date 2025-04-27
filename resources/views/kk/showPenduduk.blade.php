@@ -233,6 +233,10 @@
                                         <span class="text-break">{{ $data->no_kk }}</span>
                                     </div>
                                     <div class="col-12 col-md-6 d-flex">
+                                        <span class="fw-bold me-2">Alamat:</span>
+                                        <span>{{ $data->alamat }}</span>
+                                    </div>
+                                    <div class="col-12 col-md-6 d-flex">
                                         <span class="fw-bold me-2">RW / RT:</span>
                                         <span>{{ $data->rw->rw }} / {{ $data->rt->rt }}</span>
                                     </div>
