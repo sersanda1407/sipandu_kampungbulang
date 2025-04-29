@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DataRw;
 use Illuminate\Http\Request;
 use App\User;
+use App\Lurah;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Validation\Rule;
 
@@ -18,7 +19,8 @@ class RwController extends Controller
     public function index()
     {
         $data = DataRw::orderByRaw('CAST(rw AS UNSIGNED) ASC')->get();
-        return view('rw.index', compact('data'));
+        $lurah = Lurah::first();
+        return view('rw.index', compact('data','lurah'));
     }
 
 

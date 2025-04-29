@@ -202,7 +202,7 @@
                                             @endhasrole
                                             <td>
                                                 <a href="#"
-                                                    onclick="showImageModal('{{ asset('storage/foto_kk/' . ($d->image ?: 'default.jpg')) }}')">
+                                                    onclick="showImageModal('{{ asset('storage/foto_kk/' . ($d->image ?: 'default.jpg')) }}', '{{ $d->kepala_keluarga }}')">
                                                     <img src="{{ asset('storage/foto_kk/' . ($d->image ?: 'default.jpg')) }}"
                                                         alt="Foto KK" class="img-thumbnail"
                                                         style="width: 100%; height: 100%; object-fit: cover;">
@@ -282,7 +282,7 @@
                         <i class="fas fa-sync"></i> Rotasi 90°
                     </button>
                     <a id="downloadImageBtn" class="btn btn-success" download>
-                        <i class="fas fa-download"></i> Download Gambar
+                        <i class="fas fa-download"></i> Download
                     </a>
                     <button onclick="downloadAsPDF()" class="btn btn-danger">
                         <i class="fas fa-file-pdf"></i> Download as PDF
@@ -296,20 +296,23 @@
     <script>
         let rotationAngle = 0;
         let currentImageUrl = '';
+        let currentNamaKepalaKeluarga = '';
 
-        function showImageModal(imageUrl) {
+        function showImageModal(imageUrl, namaKepalaKeluarga) {
             const modalImage = document.getElementById("modalImage");
             rotationAngle = 0;
             modalImage.style.transform = "rotate(0deg)";
             modalImage.src = imageUrl;
             currentImageUrl = imageUrl;
+            currentNamaKepalaKeluarga = namaKepalaKeluarga;
 
             document.getElementById("downloadImageBtn").href = imageUrl;
-            document.getElementById("downloadImageBtn").setAttribute("download", "foto_kk.jpg");
+            document.getElementById("downloadImageBtn").setAttribute("download", `KK_Keluarga_${namaKepalaKeluarga}.png`);
 
             var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
             imageModal.show();
         }
+
 
         function rotateImage() {
             rotationAngle = (rotationAngle + 90) % 360;
@@ -325,11 +328,11 @@
             img.onload = function () {
                 const imgWidth = 180;
                 const imgHeight = (img.height / img.width) * imgWidth;
-
                 doc.addImage(img, 'JPEG', 15, 40, imgWidth, imgHeight);
-                doc.save('foto_kk.pdf');
+                doc.save(`KK_Keluarga_${currentNamaKepalaKeluarga}.pdf`);
             };
         }
+
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

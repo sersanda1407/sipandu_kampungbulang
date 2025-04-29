@@ -7,6 +7,7 @@ use App\DataPenduduk;
 use App\DataRt;
 use App\DataRw;
 use App\User;
+use App\Lurah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -40,9 +41,11 @@ class KkController extends Controller
         }
         // $data = DataKk::all();
 
+        $lurah = Lurah::first();
+
         $selectRt = DataRt::get();
         $selectRw = DataRw::get();
-        return view('kk.index', compact(['selectRt', 'selectRw', 'data']));
+        return view('kk.index', compact(['selectRt', 'selectRw', 'data','lurah']));
     }
 
     /**

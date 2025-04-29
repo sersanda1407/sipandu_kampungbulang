@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DataRt;
 use App\DataRw;
 use App\User;
+use App\Lurah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -29,8 +30,10 @@ class RtController extends Controller
                 ->get();
         }
 
+        $lurah = Lurah::first();
+
         $select = DataRw::get();
-        return view('rt.index', compact(['data', 'select', 'user']));
+        return view('rt.index', compact(['data', 'select', 'user','lurah']));
     }
 
     public function create()
@@ -172,4 +175,6 @@ class RtController extends Controller
 
         return redirect()->route('rt.index');
     }
+
+
 }

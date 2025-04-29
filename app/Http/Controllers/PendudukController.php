@@ -6,11 +6,16 @@ use App\DataKk;
 use App\DataPenduduk;
 use App\DataRt;
 use App\DataRw;
+use App\Lurah;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
+
+
 
 class PendudukController extends Controller
 {
@@ -20,27 +25,72 @@ class PendudukController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     
     public function index()
     {
-        
+        $user = Auth::user();
 
-        $user =  Auth::user();
-        // dd($user->Rw[0]);
-
-        if ($user->hasRole('rw') == true) {
-            $data = DataPenduduk::where('rw_id', '=', $user->Rw[0]->id)->get();
-        } elseif ($user->hasRole('rt') == true) {
+        if ($user->hasRole('rw')) {
+            $data = DataPenduduk::where('rw_id', $user->Rw[0]->id)->get();
+        } elseif ($user->hasRole('rt')) {
             $data = DataPenduduk::where('rt_id', $user->Rt[0]->id)->get();
         } else {
             $data = DataPenduduk::all();
         }
 
-        $selectRt = DataRt::get();
+        $data = $data->sort(function ($a, $b) {
+            if ($a->rt_id !== $b->rt_id) {
+                return $a->rt_id - $b->rt_id;
+            }
+
+            if ($a->rw_id !== $b->rw_id) {
+                return $a->rw_id - $b->rw_id;
+            }
+
+            $kkCompare = strcmp($a->kk->no_kk, $b->kk->no_kk);
+            if ($kkCompare !== 0)
+                return $kkCompare;
+
+            $statusOrder = [
+                'Kepala Rumah Tangga' => 1,
+                'Isteri' => 2,
+                'Anak' => 3,
+                'Lainnya' => 4,
+            ];
+
+            $aStatus = $statusOrder[$a->status_keluarga] ?? 99;
+            $bStatus = $statusOrder[$b->status_keluarga] ?? 99;
+
+            if ($aStatus !== $bStatus)
+                return $aStatus - $bStatus;
+
+            if ($aStatus === 3 && $bStatus === 3) {
+                return $b->usia - $a->usia;
+            }
+
+            return 0;
+        });
+
         $selectRw = DataRw::get();
+
+        // ✅ Ambil angka RT unik, sort dari kecil ke besar
+        $selectRt = DataRt::select('id', 'rt')
+            ->get()
+            ->map(function ($item) {
+                $item->rt = (int) $item->rt;
+                return $item;
+            })
+            ->unique('rt')
+            ->sortBy('rt')
+            ->values();
+
         $kk = DataKk::get();
-        return view('penduduk.index', compact('data', 'selectRt', 'selectRw', 'kk'));
+        $lurah = Lurah::first();
+
+        return view('penduduk.index', compact('data', 'selectRt', 'selectRw', 'kk', 'lurah'));
     }
+
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -97,27 +147,27 @@ class PendudukController extends Controller
         $data->pekerjaan = $request->pekerjaan;
         $data->no_hp = $request->no_hp;
         $img = $request->file('image_ktp');
-            $filename = $img->getClientOriginalName();
+        $filename = $img->getClientOriginalName();
 
-            $data->image_ktp = $filename;
-            if ($request->hasFile('image_ktp')) {
-                $request->file('image_ktp')->storeAs('/foto_ktp', $filename);
-            }
+        $data->image_ktp = $filename;
+        if ($request->hasFile('image_ktp')) {
+            $request->file('image_ktp')->storeAs('/foto_ktp', $filename);
+        }
 
         try {
             $data->save();
             Alert::success('Sukses!', 'Berhasil menambah Data Penduduk');
         } catch (\Illuminate\Database\QueryException $e) {
-        // Jika terjadi duplikasi NIK
-        if ($e->errorInfo[1] == 1062) { // Kode error untuk duplicate entry
-            Alert::error('Notifikasi', 'NIK Sudah Terdaftar');
-        } else {
-            Alert::error('Error', 'Terjadi kesalahan, silakan coba lagi.');
+            // Jika terjadi duplikasi NIK
+            if ($e->errorInfo[1] == 1062) { // Kode error untuk duplicate entry
+                Alert::error('Notifikasi', 'NIK Sudah Terdaftar');
+            } else {
+                Alert::error('Error', 'Terjadi kesalahan, silakan coba lagi.');
+            }
         }
-    }
 
-    return redirect()->back();
-}
+        return redirect()->back();
+    }
 
 
     /**
@@ -149,58 +199,78 @@ class PendudukController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-  
-public function update(Request $request, $id)
-{
-    $data = DataPenduduk::where('id', $id)->firstOrFail();
 
-    $request->validate([
-        'nama' => 'nullable',
-        'nik' => 'nullable',
-        'gender' => 'nullable',
-        'usia' => 'nullable',
-        'alamat' => 'nullable',
-        'tmp_lahir' => 'nullable',
-        'tgl_lahir' => 'nullable',
-        'agama' => 'nullable',
-        'status_pernikahan' => 'nullable',
-        'status_keluarga' => 'nullable',
-        'status_sosial' => 'nullable',
-        'pekerjaan' => 'nullable',
-        'image_ktp' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
-        'no_hp' => 'nullable',
-    ]);
-
-    // Periksa apakah ada file baru yang diunggah
-    if ($request->hasFile('image_ktp')) {
-        if ($data->image_ktp) {
-            Storage::delete('/foto_ktp/' . $data->image_ktp);
-        }
-        $filename = $request->file('image_ktp')->getClientOriginalName();
-        $request->file('image_ktp')->storeAs('/foto_ktp', $filename);
-        $data->image_ktp = $filename;
-    }
-
-    // Hanya update data yang diberikan dalam request
-    $data->fill($request->only([
-        'nama', 'nik', 'gender', 'usia', 'tmp_lahir', 'tgl_lahir',
-        'agama', 'alamat', 'status_pernikahan', 'status_keluarga',
-        'status_sosial', 'pekerjaan','no_hp'
-    ]));
-
-    $data->save();
-
-    Alert::success('Sukses!', 'Berhasil mengedit Data Penduduk');
-
-    return redirect()->back();
-}
+     public function update(Request $request, $id)
+     {
+         $data = DataPenduduk::findOrFail($id);
+     
+         $request->validate([
+             'nama' => 'required',
+             'nik' => 'required',
+             'gender' => 'required',
+             'usia' => 'required',
+             'alamat' => 'required',
+             'tmp_lahir' => 'required',
+             'tgl_lahir' => 'required',
+             'agama' => 'required',
+             'status_pernikahan' => 'required',
+             'status_keluarga' => 'required',
+             'status_sosial' => 'required',
+             'pekerjaan' => 'required',
+             'image_ktp' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
+             'no_hp' => 'required',
+         ]);
+     
+         // Cek kalau nik diinput berbeda dengan yang lama
+         if ($request->nik != $data->nik) {
+             $existing = DataPenduduk::where('nik', $request->nik)->first();
+     
+             if ($existing) {
+                 Alert::error('Gagal!', 'NIK sudah terdaftar, tidak bisa diubah.');
+                 return redirect()->back()->withInput();
+             }
+         }
+     
+         // Handle upload gambar jika ada file baru
+         if ($request->hasFile('image_ktp')) {
+             if ($data->image_ktp) {
+                 Storage::disk('public')->delete('foto_ktp/' . $data->image_ktp);
+             }
+     
+             $filename = Str::uuid() . '.' . $request->file('image_ktp')->getClientOriginalExtension();
+             $request->file('image_ktp')->storeAs('foto_ktp', $filename, 'public');
+     
+             $data->image_ktp = $filename;
+         }
+     
+         // Update data KTP
+         $data->nama = $request->nama;
+         $data->nik = $request->nik;
+         $data->gender = $request->gender;
+         $data->usia = $request->usia;
+         $data->tmp_lahir = $request->tmp_lahir;
+         $data->tgl_lahir = $request->tgl_lahir;
+         $data->agama = $request->agama;
+         $data->alamat = $request->alamat;
+         $data->status_pernikahan = $request->status_pernikahan;
+         $data->status_keluarga = $request->status_keluarga;
+         $data->status_sosial = $request->status_sosial;
+         $data->pekerjaan = $request->pekerjaan;
+         $data->no_hp = $request->no_hp;
+     
+         $data->save();
+     
+         Alert::success('Sukses!', 'Berhasil mengedit Data Penduduk');
+         return redirect()->back();
+     }
+     
 
 
 
     //  public function update(Request $request, $id)
     //  {
     //      $data = DataPenduduk::where('id', $id)->firstOrFail();
-     
+
     //      $request->validate([
     //          'nama' => 'required',
     //          'nik' => 'required',
@@ -239,17 +309,17 @@ public function update(Request $request, $id)
     //      $data->status_keluarga = $request->status_keluarga;
     //      $data->status_sosial = $request->status_sosial;
     //      $data->pekerjaan = $request->pekerjaan;
-     
+
     //      $data->save(); // Gunakan save() daripada update()
-     
+
     //      Alert::success('Sukses!', 'Berhasil mengedit Data Penduduk');
-     
+
     //      return redirect()->back();
     //  }
-     
-     
-    
-    
+
+
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -259,7 +329,7 @@ public function update(Request $request, $id)
      */
     public function destroy($id)
     {
-        
+
         $data = DataPenduduk::find($id);
         if ($data->image_ktp) {
             Storage::delete('/foto_ktp/' . $data->image_ktp);
@@ -271,61 +341,199 @@ public function update(Request $request, $id)
         return redirect()->back();
     }
 
-    public function export($id)
+    private function sortPenduduk($data)
     {
-        $data = DataKk::where('id', $id)->firstOrFail();
+        return $data->sort(function ($a, $b) {
+            // Urutkan berdasarkan RT terlebih dahulu
+            if ($a->rt_id !== $b->rt_id) {
+                return $a->rt_id - $b->rt_id;
+            }
+
+            // Lalu urutkan berdasarkan RW
+            if ($a->rw_id !== $b->rw_id) {
+                return $a->rw_id - $b->rw_id;
+            }
+
+            // Kemudian urutkan berdasarkan no_kk
+            $kkCompare = strcmp($a->kk->no_kk, $b->kk->no_kk);
+            if ($kkCompare !== 0)
+                return $kkCompare;
+
+            // Urutkan berdasarkan status keluarga
+            $statusOrder = [
+                'Kepala Rumah Tangga' => 1,
+                'Isteri' => 2,
+                'Anak' => 3,
+                'Lainnya' => 4,
+            ];
+
+            $aStatus = $statusOrder[$a->status_keluarga] ?? 99;
+            $bStatus = $statusOrder[$b->status_keluarga] ?? 99;
+
+            if ($aStatus !== $bStatus)
+                return $aStatus - $bStatus;
+
+            // Jika status sama-sama Anak, urutkan berdasarkan usia (anak tertua dulu)
+            if ($aStatus === 3 && $bStatus === 3) {
+                return $b->usia - $a->usia;
+            }
+
+            return 0;
+        });
+    }
+
+
+    public function export($encryptedId)
+    {
+        try {
+            $id = decrypt($encryptedId);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            abort(404, 'Data tidak valid atau rusak.');
+        }
+
+        $data = DataKk::findOrFail($id);
         $penduduk = DataPenduduk::where('kk_id', $data->id)->get();
-        // dd($penduduk);
-        // PDF::loadHTML($html)->setPaper('a4', 'landscape')->setWarnings(false)->save('myfile.pdf')
-        $pdf = PDF::loadview('penduduk.export', ['kk' => $penduduk], compact('penduduk'))->setPaper('a4', 'landscape')->setWarnings(false);
-        return $pdf->download('kk.pdf');
+        $penduduk = $this->sortPenduduk($penduduk);
+
+        $lurah = Lurah::first();
+
+        $pdf = PDF::loadView('penduduk.export', compact('penduduk', 'lurah'))
+            ->setPaper('a4', 'landscape')
+            ->setWarnings(false);
+        return $pdf->stream('kk.pdf');
     }
 
-    public function exportRt($id)
+
+    public function exportRt($encryptedId)
     {
-        $data = DataRt::where('id', $id)->firstOrFail();
-        // dd($data);
-        $penduduk = DataPenduduk::where('rt_id', $data->id)->get();
-        // dd($penduduk);
-        // PDF::loadHTML($html)->setPaper('a4', 'landscape')->setWarnings(false)->save('myfile.pdf')
-        $pdf = PDF::loadview('penduduk.exportRt', ['kk' => $penduduk], compact('penduduk'))->setPaper('a4', 'landscape')->setWarnings(false);
-        return $pdf->download('rt.pdf');
+        try {
+            $id = decrypt($encryptedId);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            abort(404, 'Data tidak valid atau rusak.');
+        }
+
+        $rt = DataRt::with('rw')->findOrFail($id);
+        $penduduk = DataPenduduk::where('rt_id', $rt->id)->get();
+        $penduduk = $this->sortPenduduk($penduduk);
+
+        $rw = $rt->rw;
+        $lurah = Lurah::first();
+
+        $pdf = PDF::loadView('penduduk.exportRt', compact('penduduk', 'rt', 'rw', 'lurah'))
+            ->setPaper('a4', 'landscape')
+            ->setWarnings(false);
+
+        return $pdf->stream('rt.pdf');
     }
 
-    public function exportRw($id)
+
+
+    public function exportRw($encryptedId)
     {
-        $data = DataRw::where('id', $id)->firstOrFail();
-        // dd($data);
-        $penduduk = DataPenduduk::where('rw_id', $data->id)->get();
-        // dd($penduduk);
-        // PDF::loadHTML($html)->setPaper('a4', 'landscape')->setWarnings(false)->save('myfile.pdf')
-        $pdf = PDF::loadview('penduduk.exportRw', ['kk' => $penduduk], compact('penduduk'))->setPaper('a4', 'landscape')->setWarnings(false);
-        return $pdf->download('rw.pdf');
+        try {
+            $id = decrypt($encryptedId);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            abort(404, 'Data tidak valid atau rusak.');
+        }
+
+        $rw = DataRw::findOrFail($id);
+        $penduduk = DataPenduduk::where('rw_id', $rw->id)->get();
+        $penduduk = $this->sortPenduduk($penduduk);
+
+        $lurah = Lurah::first();
+
+        $pdf = PDF::loadView('penduduk.exportRw', compact('penduduk', 'lurah', 'rw'))
+            ->setPaper('a4', 'landscape')
+            ->setWarnings(false);
+
+        return $pdf->stream('rw.pdf');
     }
 
-    public function exportAll($id)
+
+    public function exportAll()
     {
-        // $data = DataRt::where('id', $id)->firstOrFail();
-        // dd($data);
         $penduduk = DataPenduduk::all();
-        // dd($penduduk);
-        // PDF::loadHTML($html)->setPaper('a4', 'landscape')->setWarnings(false)->save('myfile.pdf')
-        $pdf = PDF::loadview('penduduk.exportAll', ['kk' => $penduduk], compact('penduduk'))->setPaper('a4', 'landscape')->setWarnings(false);
-        return $pdf->download('All.pdf');
+        $penduduk = $this->sortPenduduk($penduduk);
+
+        $lurah = Lurah::first();
+
+        $pdf = PDF::loadView('penduduk.exportAll', compact('penduduk', 'lurah'))
+            ->setPaper('a4', 'landscape')
+            ->setWarnings(false);
+        return $pdf->stream('Data_Seluruh_Warga_Kampung_Bulang.pdf');
     }
+
+    public function exportFiltered(Request $request)
+    {
+        $query = DataPenduduk::query();
+
+        $rt = null;
+        $rw = null;
+
+        try {
+            if ($request->filled('rw_id')) {
+                $rwId = decrypt($request->rw_id);
+                $query->where('rw_id', $rwId);
+                $rw = DataRw::find($rwId);
+            }
+
+            if ($request->filled('rt_id')) {
+                $rtId = decrypt($request->rt_id);
+                $query->where('rt_id', $rtId);
+                $rt = DataRt::find($rtId);
+            }
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            abort(404, 'ID tidak valid atau rusak.');
+        }
+
+        $penduduk = $query->get();
+        $penduduk = $this->sortPenduduk($penduduk);
+
+        $lurah = Lurah::first();
+
+        $pdf = PDF::loadView('penduduk.exportFiltered', compact('penduduk', 'lurah', 'rt', 'rw'))
+            ->setPaper('a4', 'landscape')
+            ->setWarnings(false);
+        return $pdf->stream('data_penduduk_filtered.pdf');
+    }
+
 
     public function filter(Request $request)
     {
-        $selectRt = DataRt::get();
-        $selectRw = DataRw::get();
-
-        if ($request) {
-            $data = DataPenduduk::where('rw_id', $request->rw_id)->where('rt_id', $request->rt_id)->get();
-        } else {
-            $data = DataPenduduk::all();
+        $selectRw = DataRw::all();
+    
+        $selectRt = DataRt::select('id', 'rt')
+            ->get()
+            ->map(function ($item) {
+                $item->rt = (int) $item->rt;
+                return $item;
+            })
+            ->unique('rt')
+            ->sortBy('rt')
+            ->values();
+    
+        if ($request->filled('rt_id') && !$request->filled('rw_id')) {
+            Alert::error('Filter Gagal', 'Silakan pilih RW terlebih dahulu jika ingin memfilter berdasarkan RT.');
+            return redirect()->back();
         }
-        return view('penduduk.index', compact(['data', 'selectRw', 'selectRt']));
+    
+        $query = DataPenduduk::query();
+    
+        if ($request->filled('rw_id')) {
+            $query->where('rw_id', $request->rw_id);
+        }
+    
+        if ($request->filled('rt_id')) {
+            $query->where('rt_id', $request->rt_id);
+        }
+    
+        $data = $query->get();
+    
+        return view('penduduk.index', compact('data', 'selectRw', 'selectRt'));
     }
+
+
+
 
     // public function expot()
     // {

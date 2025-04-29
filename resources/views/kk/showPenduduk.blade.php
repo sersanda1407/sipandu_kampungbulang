@@ -310,11 +310,11 @@
                                 <i class="fas fa-plus"></i> Tambah Data
                             </button>
 
-                            @if (count($penduduk) > 0)
-                                <a href="{{ url('/penduduk/export/' . $data->id) }}" class="btn btn-danger rounded-pill">
-                                    <i class="fas fa-file-pdf"></i> Export PDF
-                                </a>
-                            @endif
+                            <!-- @if (count($penduduk) > 0)
+                                        <a href="{{ url('penduduk/export/' . encrypt($data->id)) }}" class="btn btn-danger rounded-pill">
+                                            <i class="fas fa-file-pdf"></i> Export PDF
+                                        </a>
+                                    @endif -->
                         </div>
 
                         <!-- Tambahkan class 'table-responsive' untuk tampilan mobile -->
@@ -373,7 +373,7 @@
                                             <td>{{ $index + 1 }}</td>
                                             <td>
                                                 <a href="#"
-                                                    onclick="showImageModal('{{ asset('storage/foto_ktp/' . ($pd->image_ktp ?: 'default.jpg')) }}')">
+                                                    onclick="showImageModal('{{ asset('storage/foto_ktp/' . ($pd->image_ktp ?: 'default.jpg')) }}','{{ $pd->nama }}')">
                                                     <img src="{{ asset('storage/foto_ktp/' . ($pd->image_ktp ?: 'default.jpg')) }}"
                                                         alt="Foto KTP" class="img-thumbnail"
                                                         style="width: 100%; height: 100%; object-fit: cover;">
@@ -455,7 +455,7 @@
                                 <i class="fas fa-sync"></i> Rotasi 90°
                             </button>
                             <a id="downloadImageBtn" class="btn btn-success" download>
-                                <i class="fas fa-download"></i> Download Gambar
+                                <i class="fas fa-download"></i> Download
                             </a>
                             <button onclick="downloadAsPDF()" class="btn btn-danger">
                                 <i class="fas fa-file-pdf"></i> Download as PDF
@@ -469,20 +469,21 @@
             <script>
                 let rotationAngle = 0;
                 let currentImageUrl = '';
+                let currentNamaOrang = '';
 
-                function showImageModal(imageUrl) {
+                function showImageModal(imageUrl, namaOrang) {
                     const modalImage = document.getElementById("modalImage");
-                    rotationAngle = 0; // Reset rotasi saat modal dibuka
+                    rotationAngle = 0;
                     modalImage.style.transform = "rotate(0deg)";
                     modalImage.src = imageUrl;
                     currentImageUrl = imageUrl;
+                    currentNamaOrang = namaOrang;
 
-                    // Atur tombol download gambar
                     const downloadImageBtn = document.getElementById("downloadImageBtn");
                     downloadImageBtn.href = imageUrl;
-                    downloadImageBtn.setAttribute("download", "foto_ktp.jpg");
+                    downloadImageBtn.setAttribute("download", `KTP_${namaOrang}.png`);
 
-                    var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
                     imageModal.show();
                 }
 
@@ -500,11 +501,11 @@
                     img.onload = function () {
                         const imgWidth = 180;
                         const imgHeight = (img.height / img.width) * imgWidth;
-
                         doc.addImage(img, 'JPEG', 15, 40, imgWidth, imgHeight);
-                        doc.save('foto_ktp.pdf');
+                        doc.save(`KTP_${currentNamaOrang}.pdf`);
                     };
                 }
+
             </script>
 
             <!-- IMPORT LIBRARY jsPDF -->

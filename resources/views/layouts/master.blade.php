@@ -5,19 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-    SIPANDU - 
-    @php
-        $titleMap = [
-            'dashboard' => 'Dashboard',
-            'rw' => 'Data RW',
-            'rt' => 'Data RT',
-            'kk' => 'Data Kartu Keluarga',
-            'penduduk' => 'Data Penduduk',
-        ];
-        $segment = Request::segment(1);
-        echo $titleMap[$segment] ?? 'Dashboard';
-    @endphp
-</title>
+        SIPANDU -
+        @php
+            $titleMap = [
+                'dashboard' => 'Dashboard',
+                'rw' => 'Data RW',
+                'rt' => 'Data RT',
+                'kk' => 'Data Kartu Keluarga',
+                'penduduk' => 'Data Penduduk',
+            ];
+            $segment = Request::segment(1);
+            echo $titleMap[$segment] ?? 'Dashboard';
+        @endphp
+    </title>
 
 
     <link rel="stylesheet" href={{ asset('assets/css/main/app.css') }}>
@@ -63,6 +63,40 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="editLurahModal" tabindex="-1" aria-labelledby="editLurahModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('edit.lurah') }}">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editLurahModalLabel">Edit Data Lurah</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nama" class="form-label">Nama</label>
+                        <input type="text" name="nama" class="form-control" id="nama" value="{{ $lurah->nama ?? '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="jabatan" class="form-label">Jabatan</label>
+                        <input type="text" name="jabatan" class="form-control" id="jabatan" value="{{ $lurah->jabatan ?? '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nip" class="form-label">NIP</label>
+                        <input type="text" name="nip" class="form-control" id="nip" value="{{ $lurah->nip ?? '' }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
     <div id="app">
         <div id="sidebar" class="active">
             <div class="sidebar-wrapper active">
@@ -70,7 +104,8 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="title">
                             <h3>SIPANDU</h3>
-                            <p class="small" style="font-size: 10px;">Sistem Pendataan Penduduk Terpadu Kelurahan Kampung Bulang
+                            <p class="small" style="font-size: 10px;">Sistem Pendataan Penduduk Terpadu Kelurahan
+                                Kampung Bulang
                             </p>
                         </div>
                         <div class="theme-toggle d-flex gap-2 align-items-center mt-2">
@@ -130,7 +165,7 @@
 
                         @hasrole('superadmin|rw|rt')
                         <li class="sidebar-item {{ request()->is('penduduk*') ? 'active' : '' }}">
-                            <a href="{{ url('/penduduk') }}"  class='sidebar-link'>
+                            <a href="{{ url('/penduduk') }}" class='sidebar-link'>
                                 <i class="fas fa-users"></i>
                                 <span>Data Penduduk</span>
                             </a>
@@ -145,26 +180,26 @@
                             </a>
                         </li>
 
-                        <!-- @hasrole('superadmin')
-                        <li class="sidebar-item {{ request()->is('histori*') ? 'active' : '' }}">
-                            <a href="{{ url('/histori') }}" class="sidebar-link">
-                                <i class="fas fa-history"></i>
-                                <span>Histori Aktivitas</span>
+                        <!-- <li class="sidebar-item">
+                            <a href="#editLurahModal" class="sidebar-link" data-bs-toggle="modal"
+                                data-bs-target="#editLurahModal">
+                                <i class="fas fa-user-tie"></i>
+                                <span>Edit Data Lurah</span>
                             </a>
-                        </li>
-                        @endhasrole -->
+                        </li> -->
+
 
 
                         <li class="sidebar-item ">
-                                <a class="sidebar-link" href="{{ route('logout') }}" onclick="event.preventDefault();
+                            <a class="sidebar-link" href="{{ route('logout') }}" onclick="event.preventDefault();
                                     document.getElementById('logout-form').submit();">
-                                    <i class="fa fa-sign-out-alt "></i>
-                                    <span>Logout</span>
-                                </a>
+                                <i class="fa fa-sign-out-alt "></i>
+                                <span>Logout</span>
+                            </a>
 
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
 
                             </a>
                         </li>
@@ -199,7 +234,7 @@
     <script>
         document.getElementById("year").innerHTML = new Date().getFullYear() + " &copy; SIPANDU";
     </script>
-    
+
 
 
 </body>

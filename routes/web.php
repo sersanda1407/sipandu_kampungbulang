@@ -21,8 +21,13 @@ use Barryvdh\DomPDF\Facade\Pdf;
 */
 
 Route::get('/', function () {
-    return view('auth.login');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    } else {
+        return redirect()->route('login');
+    }
 });
+
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
@@ -56,6 +61,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/api/check-nohp', function (Illuminate\Http\Request $r) {
             return ['exists' => \App\DataRt::where('no_hp', $r->no_hp)->exists()];
         })->name('api.check-nohp');
+
     });
     Route::group(['prefix' => 'kk'], function () {
         Route::get('/', 'KkController@index')->name('kk.index');
@@ -74,11 +80,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/export/{id}', 'PendudukController@export')->name('penduduk.export');
         Route::get('/exportRt/{id}', 'PendudukController@exportRt')->name('penduduk.exportRt');
         Route::get('/exportRw/{id}', 'PendudukController@exportRw')->name('penduduk.exportRw');
-        Route::get('/exportAll/{id}', 'PendudukController@exportAll')->name('penduduk.exportAll');
+        Route::get('/exportAll', 'PendudukController@exportAll')->name('penduduk.exportAll');
         Route::get('/filter', 'PendudukController@filter')->name('filter.data');
+        Route::get('/penduduk/export-filtered', 'PendudukController@exportFiltered')->name('penduduk.exportFiltered');
+
     });
 
     Route::post('/edit-profile', 'DashboardController@editProfile')->name('profile.edit');
+    Route::put('/edit-lurah', 'DashboardController@editLurah')->name('edit.lurah');
     Route::get('/home', 'HomeController@index')->name('home');
 });
 

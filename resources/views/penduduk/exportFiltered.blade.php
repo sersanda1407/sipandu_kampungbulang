@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Data Warga RT / RW</title>
+  <title>Data Warga Kelurahan Kampung Bulang</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -34,6 +34,7 @@
 
   @php
     use Carbon\Carbon;
+
     Carbon::setLocale('id');
     $waktu = Carbon::now('Asia/Jakarta');
     $zona = [
@@ -55,17 +56,20 @@
   </div>
 
   <div class="mb-3">
-    <p>
-      Berikut ini adalah data lengkap warga yang berdomisili di wilayah Kelurahan Kampung Bulang khususnya di wilayah
-      @if ($rt && $rt->rw)
-        RT {{ $rt->rt }} / RW {{ $rt->rw->rw }}
-      @elseif ($rt)
-        RT {{ $rt->rt }}
-      @else
-        .
-      @endif
-      :
-    </p>
+  <p>
+  Berikut ini adalah data lengkap warga yang berdomisili di wilayah Kelurahan Kampung Bulang khususnya di wilayah
+  @if ($rt && $rw)
+    RT {{ $rt->rt }} / RW {{ $rw->rw }}
+  @elseif ($rw)
+    RW {{ $rw->rw }}
+  @elseif ($rt)
+    RT{{ $rt->rt }}
+  @else
+    .
+  @endif
+  :
+</p>
+
   </div>
 
   <table class="table table-bordered table-sm">
@@ -91,17 +95,17 @@
         <tr>
           <td class="text-center">{{ $loop->iteration }}</td>
           <td>{{ $pd->nama }}</td>
-          <td>{{ $pd->kk->no_kk ?? '-' }}</td>
+          <td>{{ $pd->kk->no_kk }}</td>
           <td>{{ $pd->nik }}</td>
           <td>{{ $pd->gender }}</td>
           <td>{{ $pd->alamat }}</td>
-          <td class="text-center">{{ $pd->rt->rt ?? '-' }} / {{ $pd->rw->rw ?? '-' }}</td>
+          <td class="text-center">{{ $pd->rt->rt }} / {{ $pd->rw->rw }}</td>
           <td>{{ $pd->tmp_lahir }}, {{ \Carbon\Carbon::parse($pd->tgl_lahir)->format('d-m-Y') }}</td>
           <td>{{ $pd->agama }}</td>
           <td class="text-center">{{ $pd->usia }}</td>
           <td>{{ $pd->status_pernikahan }}</td>
           <td>{{ $pd->pekerjaan }}</td>
-          <td>{{ $pd->kk->status_ekonomi ?? '-' }}</td>
+          <td>{{ $pd->kk->status_ekonomi }}</td>
         </tr>
       @endforeach
     </tbody>

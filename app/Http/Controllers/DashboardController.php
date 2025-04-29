@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DataPenduduk;
 use App\User;
+use App\Lurah;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $lurah = Lurah::first();
+
         $this_year = Carbon::now()->format('Y');
         $chart = DataPenduduk::where('created_at', 'like', $this_year . '%')->get();
         $gender_laki = DataPenduduk::where('gender', 'like', '%Laki-laki%')->count();
@@ -29,10 +32,9 @@ class DashboardController extends Controller
         }
         // dd($data_month);
 
+        
 
-
-
-        return view('dashboard', compact('data_month', 'gender_laki', 'gender_cewe', 'dewasa', 'anak_anak'));
+        return view('dashboard', compact('data_month', 'gender_laki', 'gender_cewe', 'dewasa', 'anak_anak','lurah'));
     }
 
     public function editProfile(Request $request)
@@ -53,4 +55,25 @@ class DashboardController extends Controller
 
         return redirect()->back();
     }
+
+    public function editLurah(Request $request)
+{
+    $request->validate([
+        'nama' => 'required|string|max:255',
+        'jabatan' => 'required|string|max:255',
+        'nip' => 'required|string|max:255',
+    ]);
+
+    $lurah = Lurah::first();
+
+    if ($lurah) {
+        $lurah->update($request->only(['nama', 'jabatan', 'nip']));
+    } else {
+        Lurah::create($request->only(['nama', 'jabatan', 'nip']));
+    }
+
+    Alert::success('Sukses!', 'Data Lurah berhasil diperbarui.');
+    return redirect()->back();
+}
+
 }
