@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 
 class LoginController extends Controller
@@ -48,21 +50,30 @@ class LoginController extends Controller
 
     public function authenticated(Request $request, $user)
     {
-        // $penduduk = DataPenduduk::get();
-        $penduduk = Auth::user();
-        // dd($user->Kk[0]->id);
-
+        Log::info('Login Berhasil', [
+            'user_id' => $user->id,
+            'nama' => $user->name,
+            'email' => $user->email,
+            'role' => $user->getRoleNames()->first(),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'waktu' => now()->toDateTimeString(),
+        ]);
+    
         if ($user->hasRole('superadmin')) {
-            return redirect()->route('dashboard')->with('toast_success', 'Welcome,' . '&nbsp;' . $user->name);
+            return redirect()->route('dashboard')->with('toast_success', 'Welcome, ' . $user->name);
         } elseif ($user->hasRole('rw')) {
-            return redirect()->route('dashboard')->with('toast_success', 'Welcome,' . '&nbsp;' . $user->name);
+            return redirect()->route('dashboard')->with('toast_success', 'Welcome, ' . $user->name);
         } elseif ($user->hasRole('rt')) {
-            return redirect()->route('dashboard')->with('toast_success', 'Welcome,' . '&nbsp;' . $user->name);
+            return redirect()->route('dashboard')->with('toast_success', 'Welcome, ' . $user->name);
         } elseif ($user->hasRole('warga')) {
-            return redirect()->route('dashboard')->with('toast_success', 'Welcome,' . '&nbsp;' . $user->name);
+            return redirect()->route('dashboard')->with('toast_success', 'Welcome, ' . $user->name);
         }
+        
+    
         return redirect()->route('login');
     }
+    
 
     /**
      * Create a new controller instance.

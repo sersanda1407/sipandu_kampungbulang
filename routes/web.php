@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\DataRt;
 use App\DataPenduduk;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Controllers\Auth\LoginController;
 
 
 
@@ -19,6 +20,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+
+Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1')->name('login');
 
 Route::get('/', function () {
     if (Auth::check()) {

@@ -64,37 +64,40 @@
         </div>
     </div>
     <div class="modal fade" id="editLurahModal" tabindex="-1" aria-labelledby="editLurahModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST" action="{{ route('edit.lurah') }}">
-                @csrf
-                @method('PUT')
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editLurahModalLabel">Edit Data Lurah</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nama" class="form-label">Nama</label>
-                        <input type="text" name="nama" class="form-control" id="nama" value="{{ $lurah->nama ?? '' }}" required>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('edit.lurah') }}">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editLurahModalLabel">Edit Data Lurah</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
-                    <div class="mb-3">
-                        <label for="jabatan" class="form-label">Jabatan</label>
-                        <input type="text" name="jabatan" class="form-control" id="jabatan" value="{{ $lurah->jabatan ?? '' }}" required>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="nama" class="form-label">Nama</label>
+                            <input type="text" name="nama" class="form-control" id="nama"
+                                value="{{ $lurah->nama ?? '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="jabatan" class="form-label">Jabatan</label>
+                            <input type="text" name="jabatan" class="form-control" id="jabatan"
+                                value="{{ $lurah->jabatan ?? '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nip" class="form-label">NIP</label>
+                            <input type="text" name="nip" class="form-control" id="nip" value="{{ $lurah->nip ?? '' }}"
+                                required>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="nip" class="form-label">NIP</label>
-                        <input type="text" name="nip" class="form-control" id="nip" value="{{ $lurah->nip ?? '' }}" required>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
 
     <div id="app">
@@ -187,7 +190,6 @@
                                 <span>Edit Data Lurah</span>
                             </a>
                         </li> -->
-
 
 
                         <li class="sidebar-item ">
