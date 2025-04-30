@@ -138,7 +138,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Yakin, Hapus Saja</button>
+                            <button type="submit" class="btn btn-primary">Hapus</button>
                         </form>
                     </div>
                 </div>
@@ -234,7 +234,7 @@
                             <form action="{{ route('rw.resetPassword', $d->id) }}" method="POST">
                                 @csrf
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-warning">Ya, Reset Sekarang</button>
+                                <button type="submit" class="btn btn-warning">Reset</button>
                             </form>
                         </div>
                     </div>

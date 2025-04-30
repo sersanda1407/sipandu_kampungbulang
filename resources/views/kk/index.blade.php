@@ -28,7 +28,7 @@
                             <input type="text" class="form-control" placeholder="Nomor Kartu Keluarga" name="no_kk"
                                 id="exampleInputPassword1" maxlength="16" minlength="16" required>
                             <span class="text-danger">
-                                <p>*No Kartu Keluarga ini nantinya akan menjadi username / email untuk login ke akun SIPEKA
+                                <p>*No Kartu Keluarga ini nantinya akan menjadi username / email untuk login ke akun SIPANDU
                                 </p>
                             </span>
                         </div>

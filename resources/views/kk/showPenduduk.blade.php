@@ -32,14 +32,14 @@
                     <div class="modal-body">
                         <i class="fas fa-exclamation-circle mb-2"
                             style="color: #e74a3b; font-size:120px; justify-content:center; display:flex"></i>
-                        <h5 class="text-center">Apakah anda yakin ingin menghapus Data {{ $r->nama }} Keluarga ini ?</h5>
+                        <h5 class="text-center">Apakah anda yakin ingin menghapus data {{ $r->nama }} dari data Kartu Keluarga ini ?</h5>
                     </div>
                     <div class="modal-footer">
                         <form action={{ url('kk/' . $r->id) . '/showPenduduk/delete' }} method="POST">
                             @csrf
                             @method('DELETE')
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Iya, Hapus Saja</button>
+                            <button type="submit" class="btn btn-primary">Hapus</button>
                         </form>
                     </div>
                 </div>
@@ -278,8 +278,7 @@
                                                         @csrf
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">Batal</button>
-                                                        <button type="submit" class="btn btn-warning">Ya, Reset
-                                                            Sekarang</button>
+                                                        <button type="submit" class="btn btn-warning">Reset</button>
                                                     </form>
                                                 </div>
                                             </div>
