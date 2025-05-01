@@ -75,14 +75,16 @@ class KkController extends Controller
             'alamat' => 'required',
             'status_ekonomi' => 'required',
         ]);
-
+    
         try {
+            // Membuat User untuk Kepala Keluarga
             $kk = User::create([
                 'name' => $request->kepala_keluarga,
                 'email' => $request->no_kk,
                 'password' => bcrypt('password'),
             ]);
-
+    
+            // Menyimpan data KK
             $data = new DataKk();
             $data->kepala_keluarga = $request->kepala_keluarga;
             $data->no_kk = $request->no_kk;
@@ -91,23 +93,25 @@ class KkController extends Controller
             $data->user_id = $kk->id;
             $data->alamat = $request->alamat;
             $data->status_ekonomi = $request->status_ekonomi;
-
-            $img = $request->file('image');
-            $filename = $img->getClientOriginalName();
-
-            $data->image = $filename;
+    
+            // Menyimpan Gambar dengan UUID
             if ($request->hasFile('image')) {
-                $request->file('image')->storeAs('/foto_kk', $filename);
+                $img = $request->file('image');
+                $filename = Str::uuid() . '.' . $img->getClientOriginalExtension(); // Menggunakan UUID untuk nama file gambar
+                $request->file('image')->storeAs('foto_kk', $filename, 'public'); // Menyimpan gambar ke folder 'foto_kk'
+                $data->image = $filename;
             }
-
+    
+            // Menyimpan data KK
             $data->save();
+    
+            // Memberikan role 'warga' ke user
             $kk->assignRole('warga');
-
+    
             Alert::success('Sukses!', 'Berhasil menambah kartu keluarga');
             return redirect()->back();
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->errorInfo[1] == 1062) {
-                // Menampilkan pesan No KK sudah terdaftar
                 Alert::error('Gagal!', 'No KK sudah terdaftar.');
                 return redirect()->back()->withInput();
             } else {
@@ -116,6 +120,7 @@ class KkController extends Controller
             }
         }
     }
+    
 
 
     public function resetPassword($id)

@@ -29,9 +29,24 @@
     <link rel="stylesheet" href={{ asset('assets/css/shared/iconly.css') }}>
     <link rel="stylesheet" href={{ asset('assets/css/pages/simple-datatables.css') }}>
     <link rel="stylesheet" href={{ asset('assets/css/pages/fontawesome.css') }}>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 180px;
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+</style>
 
 
 </head>
+
 
 <body>
     <div class="modal fade" id="edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -107,7 +122,8 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="title">
                             <h3>SIPANDU</h3>
-                            <p class="small" style="font-size: 10px;">Sistem Pendataan Penduduk Terpadu Kelurahan
+                            <p class="small" style="font-size: 10px;">Sistem Informasi Pendataan Penduduk Terpadu
+                                Kelurahan
                                 Kampung Bulang
                             </p>
                         </div>
@@ -124,7 +140,7 @@
                 </div>
                 <div class="sidebar-menu">
                     <ul class="menu">
-                        @hasrole('superadmin|rw|rt|warga')
+
                         <li class="sidebar-title">Dashboard</li>
 
                         <li class="sidebar-item {{ request()->is('dashboard*') ? 'active' : '' }} ">
@@ -135,15 +151,13 @@
                         </li>
 
 
-                        @endhasrole
-
                         <li class="sidebar-title">Menu</li>
 
                         @hasrole('superadmin')
                         <li class="sidebar-item {{ request()->is('rw*') ? 'active' : '' }}">
                             <a href={{ url('/rw') }} class='sidebar-link'>
                                 <i class="fas fa-user"></i>
-                                <span>Data RW</span>
+                                <span> Data RW</span>
                             </a>
                         </li>
                         @endhasrole
@@ -168,7 +182,7 @@
 
                         @hasrole('superadmin|rw|rt')
                         <li class="sidebar-item {{ request()->is('penduduk*') ? 'active' : '' }}">
-                            <a href="{{ url('/penduduk') }}" class='sidebar-link'>
+                            <a href={{ url('/penduduk') }} class='sidebar-link'>
                                 <i class="fas fa-users"></i>
                                 <span>Data Penduduk</span>
                             </a>
@@ -223,18 +237,19 @@
             <footer>
                 <div class="footer clearfix mb-0 text-muted">
                     <div class="float-start">
-                        <p id="year">&copy; SIPANDU</p>
+                        <p id="year">&copy; SIPANDU | Kampung Bulang</p>
                     </div>
                 </div>
             </footer>
         </div>
     </div>
     @include('sweetalert::alert')
+
     <script src={{ asset('assets/js/app.js') }}></script>
     <script src={{ asset('assets/js/pages/dashboard.js') }}></script>
     <script src={{ asset('assets/js/extensions/simple-datatables.js') }}></script>
     <script>
-        document.getElementById("year").innerHTML = new Date().getFullYear() + " &copy; SIPANDU";
+        document.getElementById("year").innerHTML = new Date().getFullYear() + " &copy; SIPANDU | Kampung Bulang";
     </script>
 
 

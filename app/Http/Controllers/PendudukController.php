@@ -111,7 +111,7 @@ class PendudukController extends Controller
     public function store(Request $request, $id)
     {
         $dataKk = DataKk::where('id', $id)->firstOrFail();
-
+    
         $this->validate($request, [
             'nama' => 'required',
             'nik' => 'required',
@@ -128,7 +128,7 @@ class PendudukController extends Controller
             'image_ktp' => 'required|mimes:jpeg,jpg,png,gif,svg|max:3072',
             'no_hp' => 'required',
         ]);
-
+    
         $data = new DataPenduduk();
         $data->nama = $request->nama;
         $data->nik = $request->nik;
@@ -146,28 +146,29 @@ class PendudukController extends Controller
         $data->status_sosial = $request->status_sosial;
         $data->pekerjaan = $request->pekerjaan;
         $data->no_hp = $request->no_hp;
-        $img = $request->file('image_ktp');
-        $filename = $img->getClientOriginalName();
-
-        $data->image_ktp = $filename;
+    
+        // Gunakan UUID untuk nama file gambar
         if ($request->hasFile('image_ktp')) {
-            $request->file('image_ktp')->storeAs('/foto_ktp', $filename);
+            $img = $request->file('image_ktp');
+            $filename = Str::uuid() . '.' . $img->getClientOriginalExtension();
+            $request->file('image_ktp')->storeAs('foto_ktp', $filename, 'public');
+            $data->image_ktp = $filename;
         }
-
+    
         try {
             $data->save();
             Alert::success('Sukses!', 'Berhasil menambah Data Penduduk');
         } catch (\Illuminate\Database\QueryException $e) {
-            // Jika terjadi duplikasi NIK
-            if ($e->errorInfo[1] == 1062) { // Kode error untuk duplicate entry
+            if ($e->errorInfo[1] == 1062) {
                 Alert::error('Notifikasi', 'NIK Sudah Terdaftar');
             } else {
                 Alert::error('Error', 'Terjadi kesalahan, silakan coba lagi.');
             }
         }
-
+    
         return redirect()->back();
     }
+    
 
 
     /**
@@ -423,7 +424,7 @@ class PendudukController extends Controller
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
 
-        return $pdf->stream('rt.pdf');
+        return $pdf->download('Data_seluruh_warga_kampung_bulang_RT.pdf');
     }
 
 
@@ -446,7 +447,7 @@ class PendudukController extends Controller
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
 
-        return $pdf->stream('rw.pdf');
+        return $pdf->download('Data_seluruh_warga_kampung_bulang_RW.pdf');
     }
 
 
@@ -460,7 +461,7 @@ class PendudukController extends Controller
         $pdf = PDF::loadView('penduduk.exportAll', compact('penduduk', 'lurah'))
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
-        return $pdf->stream('Data_Seluruh_Warga_Kampung_Bulang.pdf');
+        return $pdf->download('Data_Seluruh_Warga_Kampung_Bulang.pdf');
     }
 
     public function exportFiltered(Request $request)
@@ -494,7 +495,7 @@ class PendudukController extends Controller
         $pdf = PDF::loadView('penduduk.exportFiltered', compact('penduduk', 'lurah', 'rt', 'rw'))
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
-        return $pdf->stream('data_penduduk_filtered.pdf');
+        return $pdf->download('Data_seluruh_warga_kampung_bulang_Filter_rt&rw.pdf');
     }
 
 
