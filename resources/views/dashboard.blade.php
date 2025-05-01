@@ -6,25 +6,33 @@
 @section('master')
     <section>
         <div class="container-fluid">
-        <div class="page-heading d-flex justify-content-between align-items-center">
-    <h3>Dashboard</h3>
-    <div class="dropdown">
-        <a href="#" class="text-dark position-relative" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-bell fa-lg"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                0
-                <span class="visually-hidden">unread messages</span>
-            </span>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notifDropdown" style="width: 300px;">
-            <li class="dropdown-header fw-bold px-3 py-2">Notifikasi</li>
-            <li><hr class="dropdown-divider"></li>
-            <li><p class="text-center">Tidak ada notifikasi</p></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-center text-primary" href="#">Lihat semua</a></li>
-        </ul>
-    </div>
-</div>
+            <div class="page-heading d-flex justify-content-between align-items-center">
+                <h3>Dashboard</h3>
+                <div class="dropdown">
+                    <a href="#" class="text-dark position-relative" id="notifDropdown" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            0
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notifDropdown"
+                        style="width: 300px;">
+                        <li class="dropdown-header fw-bold px-3 py-2">Notifikasi</li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <p class="text-center">Tidak ada notifikasi</p>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-center text-primary" href="#">Lihat semua</a></li>
+                    </ul>
+                </div>
+            </div>
 
 
             @hasrole('superadmin')
@@ -109,41 +117,41 @@
                         </div>
                     </div>
                     <div class="row">
-    <!-- Grafik Pertambahan Warga -->
-    <div class="col-12 col-lg-9 mb-4">
-        <div class="card shadow h-100">
-            <div class="card-header">
-                <h4 class="mb-0">Pertambahan warga setiap bulan</h4>
-            </div>
-            <div class="card-body chart-container">
-                <canvas id="warga"></canvas>
-            </div>
-        </div>
-    </div>
+                        <!-- Grafik Pertambahan Warga -->
+                        <div class="col-12 col-lg-9 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header">
+                                    <h4 class="mb-0">Pertambahan warga setiap bulan</h4>
+                                </div>
+                                <div class="card-body chart-container">
+                                    <canvas id="warga"></canvas>
+                                </div>
+                            </div>
+                        </div>
 
-    <!-- Grafik Usia & Gender -->
-    <div class="col-12 col-lg-3">
-        <!-- Grafik Usia -->
-        <div class="card shadow mb-2">
-            <div class="card-header">
-                <h4 class="mb-0">Usia</h4>
-            </div>
-            <div class="card-body chart-container">
-                <canvas id="usia"></canvas>
-            </div>
-        </div>
+                        <!-- Grafik Usia & Gender -->
+                        <div class="col-12 col-lg-3">
+                            <!-- Grafik Usia -->
+                            <div class="card shadow mb-2">
+                                <div class="card-header">
+                                    <h4 class="mb-0">Usia</h4>
+                                </div>
+                                <div class="card-body chart-container">
+                                    <canvas id="usia"></canvas>
+                                </div>
+                            </div>
 
-        <!-- Grafik Gender -->
-        <div class="card shadow">
-            <div class="card-header">
-                <h4 class="mb-0">Gender</h4>
-            </div>
-            <div class="card-body chart-container">
-                <canvas id="gender"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
+                            <!-- Grafik Gender -->
+                            <div class="card shadow">
+                                <div class="card-header">
+                                    <h4 class="mb-0">Gender</h4>
+                                </div>
+                                <div class="card-body chart-container">
+                                    <canvas id="gender"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
             </div>
             @endhasrole
@@ -314,7 +322,9 @@
                                         </div>
                                         <div class="col-md-8">
                                             <h6 class="text-muted font-semibold"> Data RT</h6>
-                                            <h6 class="font-extrabold mb-0">{{ \App\DataRt::where('rw_id', \App\DataRw::where('user_id', Auth::id())->value('id'))->count() }}</h6>
+                                            <h6 class="font-extrabold mb-0">{{ \App\DataRt::where('rw_id',
+                                                \App\DataRw::where('user_id', Auth::id())->value('id'))->count() }}</h6>
+                                           
                                         </div>
                                     </div>
                                 </div>
@@ -335,7 +345,9 @@
                                         </div>
                                         <div class="col-md-8">
                                             <h6 class="text-muted font-semibold">Data KK</h6>
-                                            <h6 class="font-extrabold mb-0">{{ \App\DataKk::where('rw_id', \App\DataRw::where('user_id', Auth::id())->value('id'))->count() }}</h6>
+                                            <h6 class="font-extrabold mb-0">{{ \App\DataKk::where('rw_id',
+                                                \App\DataRw::where('user_id', Auth::id())->value('id'))->count() }}</h6>
+                                           
                                         </div>
                                     </div>
                                 </div>
@@ -355,7 +367,8 @@
                                         <div class="col-md-8">
                                             <h6 class="text-muted font-semibold">Total Warga</h6>
                                             <h6 class="font-extrabold mb-0">
-                                                {{ \App\DataPenduduk::where('rw_id', \App\DataRw::where('user_id', Auth::id())->value('id'))->count() }}
+                                                {{ \App\DataPenduduk::where('rw_id', \App\DataRw::where('user_id',
+                                                Auth::id())->value('id'))->count() }}
                                             </h6>
                                         </div>
                                     </div>
@@ -434,90 +447,90 @@
 
 
     <script>
-    // CHART GENDER
-    const chartGender = new Chart(
-        document.getElementById('gender'),
-        {
-            type: 'doughnut',
-            data: {
-                labels: ['Laki-Laki', 'Perempuan'],
-                datasets: [{
-                    label: 'Gender',
-                    data: [{{ $gender_laki }}, {{ $gender_cewe }}],
-                    backgroundColor: ['rgb(87, 202, 235)', 'rgb(255, 121, 118)'],
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
+        // CHART GENDER
+        const chartGender = new Chart(
+            document.getElementById('gender'),
+            {
+                type: 'doughnut',
+                data: {
+                    labels: ['Laki-Laki', 'Perempuan'],
+                    datasets: [{
+                        label: 'Gender',
+                        data: [{{ $gender_laki }}, {{ $gender_cewe }}],
+                        backgroundColor: ['rgb(87, 202, 235)', 'rgb(255, 121, 118)'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                    }
                 }
             }
-        }
-    );
+        );
 
-    // CHART USIA
-    const chartUsia = new Chart(
-        document.getElementById('usia'),
-        {
-            type: 'bar',
-            data: {
-                labels: ['Dewasa', 'Anak-anak'],
-                datasets: [{
-                    label: 'Usia',
-                    data: [{{ $dewasa }}, {{ $anak_anak }}],
-                    backgroundColor: ['rgb(87, 202, 235)', 'rgb(255, 121, 118)'],
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
+        // CHART USIA
+        const chartUsia = new Chart(
+            document.getElementById('usia'),
+            {
+                type: 'bar',
+                data: {
+                    labels: ['Dewasa', 'Anak-anak'],
+                    datasets: [{
+                        label: 'Usia',
+                        data: [{{ $dewasa }}, {{ $anak_anak }}],
+                        backgroundColor: ['rgb(87, 202, 235)', 'rgb(255, 121, 118)'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                    }
                 }
             }
-        }
-    );
+        );
 
-    // CHART WARGA
-    const chartWarga = new Chart(
-        document.getElementById('warga'),
-        {
-            type: 'line',
-            data: {
-                labels: ['Januari', 'Februari', 'Maret', 'April','Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
-                datasets: [{
-                    label: 'Warga',
-                    data: [
-                        @foreach ($data_month as $data)
-                            {{ $data }},
-                        @endforeach
-                    ],
-                    fill: true,
-                    borderColor: 'rgb(86, 182, 247)',
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
+        // CHART WARGA
+        const chartWarga = new Chart(
+            document.getElementById('warga'),
+            {
+                type: 'line',
+                data: {
+                    labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                    datasets: [{
+                        label: 'Warga',
+                        data: [
+                            @foreach ($data_month as $data)
+                                {{ $data }},
+                            @endforeach
+                        ],
+                        fill: true,
+                        borderColor: 'rgb(86, 182, 247)',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
             }
-        }
-    );
+        );
 
-    // Optional: Re-render on resize to ensure glitch-free display
-    window.addEventListener('resize', () => {
-        chartGender.resize();
-        chartUsia.resize();
-        chartWarga.resize();
-    });
-</script>
+        // Optional: Re-render on resize to ensure glitch-free display
+        window.addEventListener('resize', () => {
+            chartGender.resize();
+            chartUsia.resize();
+            chartWarga.resize();
+        });
+    </script>
 
 @endsection
