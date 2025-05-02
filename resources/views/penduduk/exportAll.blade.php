@@ -36,6 +36,23 @@
       font-size: 9pt;
       vertical-align: middle !important;
     }
+
+    .footer-section {
+      page-break-inside: avoid;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 50px;
+    }
+
+    .footer-left {
+      flex: 1;
+    }
+
+    .footer-right {
+      width: 200px;
+      float: right;
+      text-align: left;
+    }
   </style>
   @php
   use Carbon\Carbon;
@@ -53,7 +70,12 @@
   ];
 
   $zonaAktif = $zona[$waktu->timezoneName];
+
+  $jumlah_laki = $penduduk->where('gender', 'Laki-laki')->count();
+  $jumlah_perempuan = $penduduk->where('gender', 'Perempuan')->count();
 @endphp
+
+
 </head>
 
 <body>
@@ -118,22 +140,28 @@
 
   <div class="mb-3">
     <p>TOTAL : <br> <strong>{{ $penduduk->pluck('kk_id')->unique()->count() }} KK (Kartu Keluarga) dan
-        {{ $penduduk->count() }} warga.</strong> </p>
-    <p>
-      Data ini dicetak pada hari <strong>{{ $waktu->translatedFormat('l, d F Y') }}</strong>
-      pada jam <strong>{{ $waktu->format('H:i') }} {{ $zonaAktif }}</strong>
-    </p>
+        {{ $penduduk->count() }} warga. <br>Jumlah Laki-laki : {{ $jumlah_laki }} <br> Jumlah Perempuan :
+        {{ $jumlah_perempuan }} </strong> </p>
   </div>
-  <div style="width: 200px; float: right; text-align: left; margin-top: 50px;">
-    <p style="margin: 0;">
-      Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}<br>
-      Lurah Kampung Bulang
-      <br><br><br>
-      <strong>{{ $lurah->nama ?? '-' }}</strong><br>
-      {{ $lurah->jabatan ?? '-' }}<br>
-      NIP. {{ $lurah->nip ?? '-' }}
-    </p>
+  <div class="footer-section">
+    <div class="footer-left">
+      <p>
+        Data ini dicetak pada hari <strong>{{ $waktu->translatedFormat('l, d F Y') }}</strong>
+        pada jam <strong>{{ $waktu->format('H:i') }} {{ $zonaAktif }}</strong>
+      </p>
+    </div>
+    <div class="footer-right">
+      <p style="margin: 0;">
+        Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}<br>
+        Lurah Kampung Bulang
+        <br><br><br>
+        <strong>{{ $lurah->nama ?? '-' }}</strong><br>
+        {{ $lurah->jabatan ?? '-' }}<br>
+        NIP. {{ $lurah->nip ?? '-' }}
+      </p>
+    </div>
   </div>
+
 
 
 

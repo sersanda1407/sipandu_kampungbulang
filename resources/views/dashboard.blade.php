@@ -144,7 +144,7 @@
                             <!-- Grafik Gender -->
                             <div class="card shadow">
                                 <div class="card-header">
-                                    <h4 class="mb-0">Gender</h4>
+                                    <h4 class="mb-0">Jenis Kelamin</h4>
                                 </div>
                                 <div class="card-body chart-container">
                                     <canvas id="gender"></canvas>
@@ -455,7 +455,7 @@
                 data: {
                     labels: ['Laki-Laki', 'Perempuan'],
                     datasets: [{
-                        label: 'Gender',
+                        label: 'Jenis Kelamin',
                         data: [{{ $gender_laki }}, {{ $gender_cewe }}],
                         backgroundColor: ['rgb(87, 202, 235)', 'rgb(255, 121, 118)'],
                         hoverOffset: 4
@@ -475,29 +475,60 @@
 
         // CHART USIA
         const chartUsia = new Chart(
-            document.getElementById('usia'),
-            {
-                type: 'bar',
-                data: {
-                    labels: ['Dewasa', 'Anak-anak'],
-                    datasets: [{
-                        label: 'Usia',
-                        data: [{{ $dewasa }}, {{ $anak_anak }}],
-                        backgroundColor: ['rgb(87, 202, 235)', 'rgb(255, 121, 118)'],
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
+    document.getElementById('usia'),
+    {
+        type: 'bar',
+        data: {
+            labels: ['Newborn', 'Batita', 'Balita', 'Anak-anak', 'Remaja', 'Dewasa'],
+            datasets: [{
+                label: 'Kategori Usia',
+                data: [
+                    {{ $usia_counts['newborn'] ?? 0 }},
+                    {{ $usia_counts['batita'] ?? 0 }},
+                    {{ $usia_counts['balita'] ?? 0 }},
+                    {{ $usia_counts['anak_anak'] ?? 0 }},
+                    {{ $usia_counts['remaja'] ?? 0 }},
+                    {{ $usia_counts['dewasa'] ?? 0 }}
+                ],
+                backgroundColor: [
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(255, 159, 64, 0.6)'
+                ],
+                borderColor: 'rgba(0,0,0,0.1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    ticks: {
+                        autoSkip: false, // agar semua label ditampilkan
+                        maxRotation: 45,
+                        minRotation: 45
                     }
+                },
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    enabled: true
                 }
             }
-        );
+        }
+    }
+);
+
 
         // CHART WARGA
         const chartWarga = new Chart(

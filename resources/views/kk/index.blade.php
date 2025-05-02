@@ -131,7 +131,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Yakin, Hapus Saja</button>
+                            <button type="submit" class="btn btn-primary">Hapus</button>
                         </form>
                     </div>
                 </div>

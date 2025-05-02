@@ -461,7 +461,7 @@ class PendudukController extends Controller
         $pdf = PDF::loadView('penduduk.exportAll', compact('penduduk', 'lurah'))
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
-        return $pdf->download('Data_Seluruh_Warga_Kampung_Bulang.pdf');
+        return $pdf->stream('Data_Seluruh_Warga_Kampung_Bulang.pdf');
     }
 
     public function exportFiltered(Request $request)
@@ -495,7 +495,7 @@ class PendudukController extends Controller
         $pdf = PDF::loadView('penduduk.exportFiltered', compact('penduduk', 'lurah', 'rt', 'rw'))
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
-        return $pdf->download('Data_seluruh_warga_kampung_bulang_Filter_rt&rw.pdf');
+        return $pdf->stream('Data_seluruh_warga_kampung_bulang_Filter_rt&rw.pdf');
     }
 
 
