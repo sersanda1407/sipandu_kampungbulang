@@ -8,7 +8,7 @@
         <div class="container-fluid">
             <div class="page-heading d-flex justify-content-between align-items-center">
                 <h3>Dashboard</h3>
-                <div class="dropdown">
+                {{-- <div class="dropdown">
                     <a href="#" class="text-dark position-relative" id="notifDropdown" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         <i class="fas fa-bell fa-lg"></i>
@@ -31,7 +31,7 @@
                         </li>
                         <li><a class="dropdown-item text-center text-primary" href="#">Lihat semua</a></li>
                     </ul>
-                </div>
+                </div> --}}
             </div>
 
 
@@ -171,28 +171,13 @@
                 @endphp
 
                 @if($warga && $rt && $rw)
-                    <div class="card shadow mt-4" style="border-radius: 12px;">
-                        <div class="card-body">
-                            <h5 class="mb-4" style="font-weight: 600; color: #333;">Kontak Penting</h5>
-
-                            <div class="mt-3">
-                                <h6 class="text-muted mb-1">Ketua RW {{ $rw->rw ?? '-' }} Kampung Bulang</h6>
-                                <p class="mb-0">Nama: <strong>{{ $rw->nama ?? '-' }}</strong></p>
-                                <p>No HP:
-                                    @if($rw && $rw->no_hp)
-                                        <a href="https://wa.me/{{ preg_replace('/^0/', '62', $rw->no_hp) }}" target="_blank">
-                                            <strong>{{ $rw->no_hp }}</strong>
-                                        </a>
-                                    @else
-                                        <strong>-</strong>
-                                    @endif
-                                </p>
-
-                            </div>
-
-                            <hr>
-
-                            <div class="mb-3">
+                <div class="card shadow mt-4" style="border-radius: 12px;">
+                    <div class="card-body">
+                        <h5 class="mb-4" style="font-weight: 600; color: #333;">Kontak Penting</h5>
+                
+                        {{-- Ketua RT --}}
+                        <div class="mb-4 row align-items-start">
+                            <div class="col-md-9">
                                 <h6 class="text-muted mb-1">Ketua RT {{ $rt->rt ?? '-' }} Kampung Bulang</h6>
                                 <p class="mb-0">Nama: <strong>{{ $rt->nama ?? '-' }}</strong></p>
                                 <p>No HP:
@@ -203,6 +188,8 @@
                                     @else
                                         <strong>-</strong>
                                     @endif
+                                </p>
+                
                                 <div class="mt-3">
                                     <label for="keperluan" class="form-label">Ada yang mau diurus?</label>
                                     <select class="form-select" id="keperluan">
@@ -216,35 +203,65 @@
                                         <option value="Pelaporan Warga Meninggal">Pelaporan Warga Meninggal</option>
                                     </select>
                                 </div>
-
-                                <!-- Modal Konfirmasi -->
-                                <div class="modal fade" id="modalKonfirmasi" tabindex="-1"
-                                    aria-labelledby="modalKonfirmasiLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="modalKonfirmasiLabel">Konfirmasi</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Tutup"></button>
-                                            </div>
-
-                                            <div class="modal-body" id="modalBodyContent">
-                                                <!-- Isi akan diganti dinamis -->
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Batal</button>
-                                                <button type="button" class="btn btn-primary" id="btnKirimWA">Kirim</button>
-                                            </div>
-                                        </div>
+                            </div>
+                            <div class="col-md-3 mt-3 mt-md-0 text-md-end text-center">
+                                @if($rt && $rt->image_rt)
+                                    <img src="{{ asset('storage/foto_rt/' . $rt->image_rt) }}" alt="Foto Ketua RT"
+                                        class="img-fluid rounded shadow-sm" style="max-width: 150px;">
+                                @else
+                                    <p class="text-muted">Foto Ketua RT belum tersedia.</p>
+                                @endif
+                            </div>
+                        </div>
+                
+                        {{-- Modal Konfirmasi --}}
+                        <div class="modal fade" id="modalKonfirmasi" tabindex="-1" aria-labelledby="modalKonfirmasiLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalKonfirmasiLabel">Konfirmasi</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                                    </div>
+                                    <div class="modal-body" id="modalBodyContent"></div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                        <button type="button" class="btn btn-primary" id="btnKirimWA">Kirim</button>
                                     </div>
                                 </div>
-                                </p>
-
                             </div>
-
+                        </div>
+                
+                        <hr>
+                
+                        {{-- Ketua RW --}}
+                        <div class="row align-items-start">
+                            <div class="col-md-9">
+                                <h6 class="text-muted mb-1">Ketua RW {{ $rw->rw ?? '-' }} Kampung Bulang</h6>
+                                <p class="mb-0">Nama: <strong>{{ $rw->nama ?? '-' }}</strong></p>
+                                <p>No HP:
+                                    @if($rw && $rw->no_hp)
+                                        <a href="https://wa.me/{{ preg_replace('/^0/', '62', $rw->no_hp) }}" target="_blank">
+                                            <strong>{{ $rw->no_hp }}</strong>
+                                        </a>
+                                    @else
+                                        <strong>-</strong>
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="col-md-3 mt-3 mt-md-0 text-md-end text-center">
+                                @if($rw && $rw->image_rw)
+                                    <img src="{{ asset('storage/foto_rw/' . $rw->image_rw) }}" alt="Foto Ketua RW"
+                                        class="img-fluid rounded shadow-sm" style="max-width: 150px;">
+                                @else
+                                    <p class="text-muted">Foto Ketua RW belum tersedia.</p>
+                                @endif
+                            </div>
                         </div>
                     </div>
+                </div>
+                
+                
+
                     <script>
                         const keperluanSelect = document.getElementById('keperluan');
                         const btnKirimWA = document.getElementById('btnKirimWA');
@@ -322,9 +339,12 @@
                                         </div>
                                         <div class="col-md-8">
                                             <h6 class="text-muted font-semibold"> Data RT</h6>
-                                            <h6 class="font-extrabold mb-0">{{ \App\DataRt::where('rw_id',
-                                                \App\DataRw::where('user_id', Auth::id())->value('id'))->count() }}</h6>
-                                           
+                                            <h6 class="font-extrabold mb-0">{{ \App\DataRt::where(
+        'rw_id',
+        \App\DataRw::where('user_id', Auth::id())->value('id')
+    )->count() }}
+                                            </h6>
+
                                         </div>
                                     </div>
                                 </div>
@@ -345,9 +365,12 @@
                                         </div>
                                         <div class="col-md-8">
                                             <h6 class="text-muted font-semibold">Data KK</h6>
-                                            <h6 class="font-extrabold mb-0">{{ \App\DataKk::where('rw_id',
-                                                \App\DataRw::where('user_id', Auth::id())->value('id'))->count() }}</h6>
-                                           
+                                            <h6 class="font-extrabold mb-0">{{ \App\DataKk::where(
+        'rw_id',
+        \App\DataRw::where('user_id', Auth::id())->value('id')
+    )->count() }}
+                                            </h6>
+
                                         </div>
                                     </div>
                                 </div>
@@ -367,8 +390,10 @@
                                         <div class="col-md-8">
                                             <h6 class="text-muted font-semibold">Total Warga</h6>
                                             <h6 class="font-extrabold mb-0">
-                                                {{ \App\DataPenduduk::where('rw_id', \App\DataRw::where('user_id',
-                                                Auth::id())->value('id'))->count() }}
+                                                {{ \App\DataPenduduk::where('rw_id', \App\DataRw::where(
+        'user_id',
+        Auth::id()
+    )->value('id'))->count() }}
                                             </h6>
                                         </div>
                                     </div>
@@ -475,59 +500,59 @@
 
         // CHART USIA
         const chartUsia = new Chart(
-    document.getElementById('usia'),
-    {
-        type: 'bar',
-        data: {
-            labels: ['Newborn', 'Batita', 'Balita', 'Anak-anak', 'Remaja', 'Dewasa'],
-            datasets: [{
-                label: 'Kategori Usia',
-                data: [
-                    {{ $usia_counts['newborn'] ?? 0 }},
-                    {{ $usia_counts['batita'] ?? 0 }},
-                    {{ $usia_counts['balita'] ?? 0 }},
-                    {{ $usia_counts['anak_anak'] ?? 0 }},
-                    {{ $usia_counts['remaja'] ?? 0 }},
-                    {{ $usia_counts['dewasa'] ?? 0 }}
-                ],
-                backgroundColor: [
-                    'rgba(255, 206, 86, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(153, 102, 255, 0.6)',
-                    'rgba(75, 192, 192, 0.6)',
-                    'rgba(255, 159, 64, 0.6)'
-                ],
-                borderColor: 'rgba(0,0,0,0.1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    ticks: {
-                        autoSkip: false, // agar semua label ditampilkan
-                        maxRotation: 45,
-                        minRotation: 45
+            document.getElementById('usia'),
+            {
+                type: 'bar',
+                data: {
+                    labels: ['Newborn', 'Batita', 'Balita', 'Anak-anak', 'Remaja', 'Dewasa'],
+                    datasets: [{
+                        label: 'Kategori Usia',
+                        data: [
+                        {{ $usia_counts['newborn'] ?? 0 }},
+                        {{ $usia_counts['batita'] ?? 0 }},
+                        {{ $usia_counts['balita'] ?? 0 }},
+                        {{ $usia_counts['anak_anak'] ?? 0 }},
+                        {{ $usia_counts['remaja'] ?? 0 }},
+                            {{ $usia_counts['dewasa'] ?? 0 }}
+                        ],
+                        backgroundColor: [
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(255, 159, 64, 0.6)'
+                        ],
+                        borderColor: 'rgba(0,0,0,0.1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: {
+                                autoSkip: false, // agar semua label ditampilkan
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            enabled: true
+                        }
                     }
-                },
-                y: {
-                    beginAtZero: true
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                tooltip: {
-                    enabled: true
                 }
             }
-        }
-    }
-);
+        );
 
 
         // CHART WARGA
@@ -543,7 +568,7 @@
                             @foreach ($data_month as $data)
                                 {{ $data }},
                             @endforeach
-                        ],
+                            ],
                         fill: true,
                         borderColor: 'rgb(86, 182, 247)',
                         tension: 0.3

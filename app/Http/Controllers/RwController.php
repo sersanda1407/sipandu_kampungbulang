@@ -8,6 +8,9 @@ use App\User;
 use App\Lurah;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+
 
 class RwController extends Controller
 {
@@ -43,48 +46,72 @@ class RwController extends Controller
     public function store(Request $request)
     {
         // Validasi dasar tanpa unique untuk no_hp
-        $request->validate([
+        $this->validate($request, [
             'nama' => 'required',
             'no_hp' => ['required', 'digits_between:8,12'],
             'rw' => 'required',
+            'image_rw' => 'required|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
             'periode_awal' => 'required',
             'periode_akhir' => 'required',
         ]);
-
-        // Cek manual untuk no_hp duplicate
-        $existingNoHp = DataRw::where('no_hp', $request->no_hp)->first();
-        if ($existingNoHp) {
-            Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
-            return redirect()->back()->withInput();
+    
+        try {
+            // Cek manual untuk no_hp duplicate
+            $existingNoHp = DataRw::where('no_hp', $request->no_hp)->first();
+            if ($existingNoHp) {
+                Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
+                return redirect()->back()->withInput();
+            }
+    
+            // Cek manual untuk rw duplicate
+            if (DataRw::where('rw', $request->rw)->exists()) {
+                Alert::error('Gagal!', 'Nomor RW ' . $request->rw . ' sudah terdaftar.');
+                return redirect()->back()->withInput();
+            }
+    
+            // Membuat User untuk Ketua RW
+            $rw = User::create([
+                'name' => $request->nama,
+                'email' => 'ketua-rw' . $request->rw . '@kampungbulang',
+                'password' => bcrypt('password'),
+            ]);
+    
+            // Menyimpan data RW
+            $data = new DataRw();
+            $data->nama = $request->nama;
+            $data->no_hp = $request->no_hp;
+            $data->rw = $request->rw;
+            $data->periode_awal = $request->periode_awal;
+            $data->periode_akhir = $request->periode_akhir;
+            $data->user_id = $rw->id;
+    
+            // Menyimpan Gambar dengan UUID
+            if ($request->hasFile('image_rw')) {
+                $img = $request->file('image_rw');
+                $filename = Str::uuid() . '.' . $img->getClientOriginalExtension(); // Menggunakan UUID untuk nama file gambar
+                $request->file('image_rw')->storeAs('foto_rw', $filename, 'public'); // Menyimpan gambar ke folder 'foto_rw'
+                $data->image_rw = $filename;
+            }
+    
+            // Menyimpan data RW
+            $data->save();
+    
+            // Memberikan role 'rw' ke user
+            $rw->assignRole('rw');
+    
+            Alert::success('Sukses!', 'Berhasil menambah Data RW');
+            return redirect()->back();
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->errorInfo[1] == 1062) {
+                Alert::error('Gagal!', 'Nomor RW sudah terdaftar.');
+                return redirect()->back()->withInput();
+            } else {
+                Alert::error('Gagal!', 'Terjadi kesalahan.');
+                return redirect()->back()->withInput();
+            }
         }
-
-        // Cek manual untuk rw duplicate
-        if (DataRw::where('rw', $request->rw)->exists()) {
-            Alert::error('Gagal!', 'Nomor RW ' . $request->rw . ' sudah terdaftar.');
-            return redirect()->back()->withInput();
-        }
-
-        // Bila semua valid, buat user + data RW
-        $rw = User::create([
-            'name' => $request->nama,
-            'email' => 'ketua-rw' . $request->rw . '@kampungbulang',
-            'password' => bcrypt('password'),
-        ]);
-
-        $data = DataRw::create([
-            'nama' => $request->nama,
-            'no_hp' => $request->no_hp,
-            'rw' => $request->rw,
-            'periode_awal' => $request->periode_awal,
-            'periode_akhir' => $request->periode_akhir,
-            'user_id' => $rw->id,
-        ]);
-
-        $rw->assignRole('rw');
-
-        Alert::success('Sukses!', 'Berhasil menambah Data RW');
-        return redirect()->back();
     }
+    
 
 
 
@@ -122,43 +149,62 @@ class RwController extends Controller
         $data = DataRw::findOrFail($id);
     
         $request->validate([
-            'nama'           => 'required',
-            'no_hp'          => ['required','digits_between:8,12'],
-            'rw'             => 'required',
-            'periode_awal'   => 'required',
-            'periode_akhir'  => 'required',
+            'nama'          => 'required',
+            'no_hp'         => ['required','digits_between:8,12'],
+            'rw'            => 'required',
+            'image_rw' => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
+            'periode_awal'  => 'required',
+            'periode_akhir' => 'required',
         ]);
     
-        if (DataRw::where('no_hp', $request->no_hp)
-                  ->where('id','!=',$id)->exists()) {
-            Alert::error('Gagal!', 'Nomor Handphone sudah digunakan.');
-            return redirect()->back()->withInput();
+        // Cek jika no_hp diubah dan sudah ada di data lain
+        if ($request->no_hp != $data->no_hp) {
+            if (DataRw::where('no_hp', $request->no_hp)->exists()) {
+                Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
+                return redirect()->back()->withInput();
+            }
         }
     
-        if (DataRw::where('rw', $request->rw)
-                  ->where('id','!=',$id)->exists()) {
-            Alert::error('Gagal!', 'Nomor RW sudah digunakan.');
-            return redirect()->back()->withInput();
+        // Cek jika rw diubah dan sudah ada di data lain
+        if ($request->rw != $data->rw) {
+            if (DataRw::where('rw', $request->rw)->exists()) {
+                Alert::error('Gagal!', 'Nomor RW ' . $request->rw . ' sudah terdaftar.');
+                return redirect()->back()->withInput();
+            }
         }
     
-        // Update DataRw
-        $data->update([
-            'nama'           => $request->nama,
-            'no_hp'          => $request->no_hp,
-            'rw'             => $request->rw,
-            'periode_awal'   => $request->periode_awal,
-            'periode_akhir'  => $request->periode_akhir,
-        ]);
+        // Hapus dan ganti gambar jika ada file baru
+        if ($request->hasFile('image_rw')) {
+            if ($data->image_rw) {
+                Storage::disk('public')->delete('foto_rw/' . $data->image_rw);
+            }
     
-        // Update User model via instance
-        $user = User::find($data->user_id);
-        $user->name  = $request->nama;
-        $user->email = 'ketua-rw' . $request->rw . '@kampungbulang';
-        $user->save();
+            $img = $request->file('image_rw');
+            $filename = Str::uuid() . '.' . $img->getClientOriginalExtension();
+            $img->storeAs('foto_rw', $filename, 'public');
+            $data->image_rw = $filename;
+        }
+    
+        // Update data RW
+        $data->nama          = $request->nama;
+        $data->no_hp         = $request->no_hp;
+        $data->rw            = $request->rw;
+        $data->periode_awal  = $request->periode_awal;
+        $data->periode_akhir = $request->periode_akhir;
+        $data->save();
+    
+        // Update User jika ada
+        if ($data->user_id) {
+            User::where('id', $data->user_id)->update([
+                'name'  => $request->nama,
+                'email' => 'ketua-rw' . $request->rw . '@kampungbulang',
+            ]);
+        }
     
         Alert::success('Sukses!', 'Berhasil mengedit Data RW');
-        return redirect()->route('rw.index');
+        return redirect()->back();
     }
+    
     
 
 

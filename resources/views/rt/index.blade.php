@@ -11,7 +11,8 @@
                         <i class="fas fa-exclamation-circle mb-2"
                             style="color: #e74a3b; font-size:120px; justify-content:center; display:flex"></i>
                         <h5 class="text-center">Apakah anda yakin ingin menghapus Data Ketua RT {{ $r->rt }} / RW
-                            {{ $r->Rw->rw }} atas nama {{ $r->nama }} ?</h5>
+                            {{ $r->Rw->rw }} atas nama {{ $r->nama }} ?
+                        </h5>
                     </div>
                     <div class="modal-footer">
                         <form action={{ url('/rt/delete/' . $r->id) }} method="POST">
@@ -35,25 +36,28 @@
                     <h5 class="modal-title" id="exampleModalLabel">Tambah Data RT Baru</h5>
                     <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ url('rt/store') }}" method="POST">
+
+                <form action="{{ url('rt/store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="modal-body">
+                    <div class="modal-body overflow-auto" style="max-height: 70vh;">
                         <div class="form-group mb-3">
                             <label class="form-label">Nama Ketua RT</label>
                             <input type="text" class="form-control text-capitalize" placeholder="Nama Lengkap" name="nama"
                                 required>
                         </div>
+
                         <div class="form-group mb-3">
                             <label class="form-label">Nomor Telepon / WhatsApp</label>
-                            <input type="text" class="form-control" name="no_hp" id="no_hp"
+                            <input type="text" class="form-control" name="no_hp" id="no_hp_rt"
                                 placeholder="Masukkan No Telepon / WhatsApp" maxlength="12" minlength="8" required>
                         </div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label class="form-label">RT</label>
-                                    <input type="text" class="form-control" placeholder="No Wilayah RT" name="rt" id="rt"
-                                        maxlength="3" required>
+                                    <input type="text" class="form-control" placeholder="No Wilayah RT" name="rt"
+                                        id="rt_input" maxlength="3" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -73,15 +77,21 @@
                             <label class="form-label">Periode</label>
                             <div class="row">
                                 <div class="col-md-5">
-                                    <input type="text" class="form-control" name="periode_awal"
+                                    <input type="text" class="form-control" name="periode_awal" id="periode_awal"
                                         placeholder="Tahun Awal Menjabat" maxlength="4" required>
                                 </div>
                                 <div class="col-md-2 text-center">s/d</div>
                                 <div class="col-md-5">
-                                    <input type="text" class="form-control" name="periode_akhir"
+                                    <input type="text" class="form-control" name="periode_akhir" id="periode_akhir"
                                         placeholder="Tahun Akhir Menjabat" maxlength="4" required>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Foto Ketua RT</label>
+                            <input type="file" class="form-control" name="image_rt" required accept="image/*">
+                            <small class="text-muted">Upload foto Ketua RT</small>
                         </div>
                     </div>
 
@@ -101,8 +111,8 @@
     {{-- Script Validasi Nomor HP dan RT --}}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const hpInput = document.getElementById('no_hp');
-            const rtInput = document.getElementById('rt');
+            const hpInput = document.getElementById('no_hp_rt');
+            const rtInput = document.getElementById('rt_input');
             if (!hpInput || !rtInput) return;
 
             // Buat elemen feedback
@@ -138,20 +148,20 @@
                     return val.length >= 8 && !(await (await fetch(`{{ route('api.check-nohp') }}?no_hp=${val}`)).json()).exists;
                 });
             }, 300));
-
         });
     </script>
 
     {{-- Script untuk angka saja --}}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll("#no_hp, #rt, #periode_awal, #periode_akhir").forEach(function (input) {
+            document.querySelectorAll("#no_hp_rt, #rt_input, #periode_awal, #periode_akhir").forEach(function (input) {
                 input.addEventListener("input", function () {
                     this.value = this.value.replace(/[^0-9]/g, '');
                 });
             });
         });
     </script>
+
     {{-- END MODAL ADD --}}
 
     <div class="container-fluid">
@@ -170,6 +180,7 @@
                             <thead>
                                 <tr>
                                     <th>No.</th>
+                                    <th>Foto RT</th>
                                     <th>Nama Ketua RT</th>
                                     <th>No Telepon</th>
                                     <th>RT</th>
@@ -182,11 +193,19 @@
                                 @foreach ($data as $d)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $d->nama }}</td>
+                                        <td>
+                                            <a href="#"
+                                                onclick="showImageModal('{{ asset('storage/foto_rt/' . ($d->image_rt ?: 'default.jpg')) }}', '{{ $d->nama }}')">
+                                                <img src="{{ asset('storage/foto_rt/' . ($d->image_rt ?: 'default.jpg')) }}"
+                                                    alt="Foto RT" class="img-thumbnail"
+                                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                            </a>
+                                        </td>
+                                        <td style="min-width: 200px;">{{ $d->nama }}</td>
                                         <td>{{ $d->no_hp }}</td>
                                         <td>{{ $d->rt }}</td>
                                         <td>{{ $d->Rw->rw }}</td>
-                                        <td>{{ $d->periode_awal }} / {{ $d->periode_akhir }}</td>
+                                        <td style="min-width: 150px;">{{ $d->periode_awal }} / {{ $d->periode_akhir }}</td>
                                         <td>
                                             <div class="dropdown">
                                                 <button class="btn btn-info dropdown-toggle" type="button"
@@ -224,6 +243,80 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- MODAL UNTUK PREVIEW GAMBAR -->
+                <div id="imageModal" class="modal fade" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Preview Foto RT</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div id="imageContainer" class="d-inline-block"
+                                    style="max-width: 100%; max-height: 80vh; overflow: hidden;">
+                                    <img id="modalImage" src="" class="img-fluid" style="max-width: 100%; height: auto;">
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-center">
+                                <button onclick="rotateImage()" class="btn btn-primary">
+                                    <i class="fas fa-sync"></i> Rotasi 90°
+                                </button>
+                                <a id="downloadImageBtn" class="btn btn-success" download>
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                                <button onclick="downloadAsPDF()" class="btn btn-danger">
+                                    <i class="fas fa-file-pdf"></i> Download as PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    let rotationAngle = 0;
+                    let currentImageUrl = '';
+                    let currentNamaRT = '';
+
+                    function showImageModal(imageUrl, namaRT) {
+                        const modalImage = document.getElementById("modalImage");
+                        rotationAngle = 0;
+                        modalImage.style.transform = "rotate(0deg)";
+                        modalImage.src = imageUrl;
+                        currentImageUrl = imageUrl;
+                        currentNamaRT = namaRT;
+
+                        const sanitizedName = namaRT.replace(/\s+/g, "_");
+                        document.getElementById("downloadImageBtn").href = imageUrl;
+                        document.getElementById("downloadImageBtn").setAttribute("download", `FOTO_RT_${sanitizedName}.jpg`);
+
+                        var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                        imageModal.show();
+                    }
+
+                    function rotateImage() {
+                        rotationAngle = (rotationAngle + 90) % 360;
+                        document.getElementById("modalImage").style.transform = `rotate(${rotationAngle}deg)`;
+                    }
+
+                    function downloadAsPDF() {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF();
+                        const img = new Image();
+                        img.crossOrigin = "Anonymous";
+                        img.src = currentImageUrl;
+
+                        img.onload = function () {
+                            const imgWidth = 180;
+                            const imgHeight = (img.height / img.width) * imgWidth;
+                            doc.addImage(img, 'JPEG', 15, 40, imgWidth, imgHeight);
+                            const sanitizedName = currentNamaRT.replace(/\s+/g, "_");
+                            doc.save(`FOTO_RT_${sanitizedName}.pdf`);
+                        };
+                    }
+                </script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 
                 {{-- MODAL RESET PASSWORD RT --}}
                 @foreach ($data as $d)

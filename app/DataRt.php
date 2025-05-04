@@ -13,6 +13,7 @@ class DataRt extends Model
         'no_hp',
         'rt',
         'rw_id',
+        'image_rt',
         'periode_awal',
         'periode_akhir'
     ];

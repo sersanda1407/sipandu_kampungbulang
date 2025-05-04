@@ -69,7 +69,7 @@ class KkController extends Controller
         $this->validate($request, [
             'kepala_keluarga' => 'required',
             'no_kk' => 'required',
-            'image' => 'required|mimes:jpeg,jpg,png,gif,svg|max:3072',
+            'image' => 'required|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
             'rt_id' => 'required',
             'rw_id' => 'required',
             'alamat' => 'required',
@@ -187,7 +187,7 @@ class KkController extends Controller
          $request->validate([
              'kepala_keluarga' => 'required',
              'no_kk' => 'required',
-             'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
+             'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
              'rt_id' => 'required',
              'rw_id' => 'required',
              'alamat' => 'required',

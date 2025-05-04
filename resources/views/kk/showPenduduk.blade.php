@@ -357,8 +357,8 @@
                                         }
 
                                         // Sorting Anak & Lainnya berdasarkan umur tertua
-                                        $sortedPenduduk['Anak'] = $sortedPenduduk['Anak']->sortBy('tanggal_lahir');
-                                        $sortedPenduduk['Lainnya'] = $sortedPenduduk['Lainnya']->sortBy('tanggal_lahir');
+                                        $sortedPenduduk['Anak'] = $sortedPenduduk['Anak']->sortBy('tgl_lahir');
+                                        $sortedPenduduk['Lainnya'] = $sortedPenduduk['Lainnya']->sortBy('tgl_lahir');
 
                                         // Gabungkan data secara berurutan
                                         $finalSorted = $sortedPenduduk['Kepala Rumah Tangga']
