@@ -25,7 +25,7 @@ class RwController extends Controller
         // $data = DataRw::orderByRaw('CAST(rw AS UNSIGNED) ASC')->get();
         $data = DataRw::with('user')->orderByRaw('CAST(rw AS UNSIGNED) ASC')->get();
         $lurah = Lurah::first();
-        return view('rw.index', compact('data','lurah'));
+        return view('rw.index', compact('data', 'lurah'));
     }
 
 
@@ -53,12 +53,13 @@ class RwController extends Controller
             'nama' => 'required',
             'no_hp' => ['required', 'digits_between:8,12'],
             'rw' => 'required',
+            'alamat_rw' => 'required',
             'gmail_rw' => 'required',
             'image_rw' => 'required|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
             'periode_awal' => 'required',
             'periode_akhir' => 'required',
         ]);
-    
+
         try {
             // Cek manual untuk no_hp duplicate
             $existingNoHp = DataRw::where('no_hp', $request->no_hp)->first();
@@ -66,30 +67,31 @@ class RwController extends Controller
                 Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
                 return redirect()->back()->withInput();
             }
-    
+
             // Cek manual untuk rw duplicate
             if (DataRw::where('rw', $request->rw)->exists()) {
                 Alert::error('Gagal!', 'Nomor RW ' . $request->rw . ' sudah terdaftar.');
                 return redirect()->back()->withInput();
             }
-    
+
             // Membuat User untuk Ketua RW
             $rw = User::create([
                 'name' => $request->nama,
                 'email' => 'ketua-rw' . $request->rw . '@kampungbulang',
                 'password' => bcrypt('password'),
             ]);
-    
+
             // Menyimpan data RW
             $data = new DataRw();
             $data->nama = $request->nama;
             $data->no_hp = $request->no_hp;
             $data->rw = $request->rw;
+            $data->alamat_rw = $request->alamat_rw;
             $data->gmail_rw = $request->gmail_rw;
             $data->periode_awal = $request->periode_awal;
             $data->periode_akhir = $request->periode_akhir;
             $data->user_id = $rw->id;
-    
+
             // Menyimpan Gambar dengan UUID
             if ($request->hasFile('image_rw')) {
                 $img = $request->file('image_rw');
@@ -97,13 +99,13 @@ class RwController extends Controller
                 $request->file('image_rw')->storeAs('foto_rw', $filename, 'public'); // Menyimpan gambar ke folder 'foto_rw'
                 $data->image_rw = $filename;
             }
-    
+
             // Menyimpan data RW
             $data->save();
-    
+
             // Memberikan role 'rw' ke user
             $rw->assignRole('rw');
-    
+
             Alert::success('Sukses!', 'Berhasil menambah Data RW');
             return redirect()->back();
         } catch (\Illuminate\Database\QueryException $e) {
@@ -116,7 +118,7 @@ class RwController extends Controller
             }
         }
     }
-    
+
 
 
 
@@ -127,12 +129,12 @@ class RwController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($encryptedId)
-{
-    $id = Crypt::decryptString($encryptedId);
-    $data = DataRw::with('user')->findOrFail($id);
+    {
+        $id = Crypt::decryptString($encryptedId);
+        $data = DataRw::with('user')->findOrFail($id);
 
-    return view('rw.showRW', compact('data'));
-}
+        return view('rw.showRW', compact('data'));
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -155,17 +157,18 @@ class RwController extends Controller
     public function update(Request $request, $id)
     {
         $data = DataRw::findOrFail($id);
-    
+
         $request->validate([
-            'nama'          => 'required',
-            'no_hp'         => ['required','digits_between:8,12'],
-            'rw'            => 'required',
-            'gmail_rw'      => 'required',            
+            'nama' => 'required',
+            'no_hp' => ['required', 'digits_between:8,12'],
+            'rw' => 'required',
+            'alamat_rw' => 'required',
+            'gmail_rw' => 'required',
             'image_rw' => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
-            'periode_awal'  => 'required',
+            'periode_awal' => 'required',
             'periode_akhir' => 'required',
         ]);
-    
+
         // Cek jika no_hp diubah dan sudah ada di data lain
         if ($request->no_hp != $data->no_hp) {
             if (DataRw::where('no_hp', $request->no_hp)->exists()) {
@@ -173,7 +176,7 @@ class RwController extends Controller
                 return redirect()->back()->withInput();
             }
         }
-    
+
         // Cek jika rw diubah dan sudah ada di data lain
         if ($request->rw != $data->rw) {
             if (DataRw::where('rw', $request->rw)->exists()) {
@@ -181,41 +184,42 @@ class RwController extends Controller
                 return redirect()->back()->withInput();
             }
         }
-    
+
         // Hapus dan ganti gambar jika ada file baru
         if ($request->hasFile('image_rw')) {
             if ($data->image_rw) {
                 Storage::disk('public')->delete('foto_rw/' . $data->image_rw);
             }
-    
+
             $img = $request->file('image_rw');
             $filename = Str::uuid() . '.' . $img->getClientOriginalExtension();
             $img->storeAs('foto_rw', $filename, 'public');
             $data->image_rw = $filename;
         }
-    
+
         // Update data RW
-        $data->nama          = $request->nama;
-        $data->no_hp         = $request->no_hp;
-        $data->rw            = $request->rw;
-        $data->gmail_rw      = $request->gmail_rw;
-        $data->periode_awal  = $request->periode_awal;
+        $data->nama = $request->nama;
+        $data->no_hp = $request->no_hp;
+        $data->rw = $request->rw;
+        $data->alamat_rw = $request->alamat_rw;
+        $data->gmail_rw = $request->gmail_rw;
+        $data->periode_awal = $request->periode_awal;
         $data->periode_akhir = $request->periode_akhir;
         $data->save();
-    
+
         // Update User jika ada
         if ($data->user_id) {
             User::where('id', $data->user_id)->update([
-                'name'  => $request->nama,
+                'name' => $request->nama,
                 'email' => 'ketua-rw' . $request->rw . '@kampungbulang',
             ]);
         }
-    
+
         Alert::success('Sukses!', 'Berhasil mengedit Data RW');
         return redirect()->back();
     }
-    
-    
+
+
 
 
     /**
@@ -237,26 +241,26 @@ class RwController extends Controller
         return redirect()->route('rw.index');
     }
 
-   public function resetPassword($id)
-{
-    // Ambil data RW, atau 404 jika tidak ada
-    $data = DataRw::findOrFail($id);
+    public function resetPassword($id)
+    {
+        // Ambil data RW, atau 404 jika tidak ada
+        $data = DataRw::findOrFail($id);
 
-    // Pastikan ada user terkait
-    $user = User::find($data->user_id);
-    if (!$user) {
-        Alert::error('Gagal!', 'User RW tidak ditemukan.');
+        // Pastikan ada user terkait
+        $user = User::find($data->user_id);
+        if (!$user) {
+            Alert::error('Gagal!', 'User RW tidak ditemukan.');
+            return redirect()->route('rw.index');
+        }
+
+        // Reset password ke string 'password'
+        $user->password = bcrypt('password');
+        $user->save();
+
+        Alert::success('Sukses!', 'Password berhasil direset ke: password');
+
+        // Kembalikan ke halaman indeks RW, bukan RT
         return redirect()->route('rw.index');
     }
-
-    // Reset password ke string 'password'
-    $user->password = bcrypt('password');
-    $user->save();
-
-    Alert::success('Sukses!', 'Password berhasil direset ke: password');
-
-    // Kembalikan ke halaman indeks RW, bukan RT
-    return redirect()->route('rw.index');
-}
 
 }

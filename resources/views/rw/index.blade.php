@@ -21,6 +21,15 @@
                             <input type="text" class="form-control text-capitalize" placeholder="Nama Lengkap" name="nama"
                                 required>
                         </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">RW</label>
+                            <input type="text" class="form-control" name="rw" id="rw" placeholder="No Wilayah RW"
+                                maxlength="3" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Alamat</label>
+                            <input type="text" class="form-control" name="alamat_rw"  placeholder="Alamat tinggal Ketua RW" required>
+                        </div>
 
                         <div class="form-group mb-3">
                             <label class="form-label">Nomor Telepon / WhatsApp</label>
@@ -29,15 +38,8 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="gmail_rw"
-                                placeholder="Email aktif" required>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label">RW</label>
-                            <input type="text" class="form-control" name="rw" id="rw" placeholder="No Wilayah RW"
-                                maxlength="3" required>
+                            <label class="form-label">Email Pribadi</label>
+                            <input type="email" class="form-control" name="gmail_rw" placeholder="Email aktif" required>
                         </div>
 
                         <div class="form-group mb-3">
@@ -178,13 +180,11 @@
                                 <tr>
                                     <th>No.</th>
                                     <th>Foto RW</th>
-                                    <th>Ketua RW</th>
-                                    <th>No Telepon</th>
-                                    <th>Email akun</th>
-                                    <th>Email aktif</th>
+                                    <th>Nama Ketua RW</th>
                                     <th>RW</th>
+                                    <th>No Telepon</th>
                                     <th>Periode</th>
-                                    <th>Action</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -200,10 +200,8 @@
                                             </a>
                                         </td>
                                         <td style="min-width: 200px;">{{ $d->nama }}</td>
-                                        <td>{{ $d->no_hp }}</td>
-                                        <td>{{ $d->user ? $d->user->email : 'User tidak ditemukan' }}</td>
-                                        <td>{{ $d->gmail_rw }}</td>
                                         <td>{{ $d->rw }}</td>
+                                        <td>{{ $d->no_hp }}</td>
                                         <td style="min-width: 180px;">{{ $d->periode_awal }} - {{ $d->periode_akhir }}</td>
                                         <td>
                                             <div class="dropdown">
@@ -232,6 +230,7 @@
                                                         </button>
                                                     </li>
                                                     @hasrole('superadmin')
+                                                    <hr>
                                                     <li>
                                                         <button class="dropdown-item text-warning" data-bs-toggle="modal"
                                                             data-bs-target="#modalResetPasswordRW{{ $d->id }}">

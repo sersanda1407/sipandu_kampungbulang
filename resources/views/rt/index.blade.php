@@ -46,12 +46,6 @@
                                 required>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="form-label">Nomor Telepon / WhatsApp</label>
-                            <input type="text" class="form-control" name="no_hp" id="no_hp_rt"
-                                placeholder="Masukkan No Telepon / WhatsApp" maxlength="12" minlength="8" required>
-                        </div>
-
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
@@ -71,6 +65,24 @@
                                     </select>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Alamat</label>
+                            <input type="text" class="form-control" name="alamat_rt" 
+                                placeholder="Alamat tinggal ketua RT" minlength="8" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Nomor Telepon / WhatsApp</label>
+                            <input type="text" class="form-control" name="no_hp" id="no_hp_rt"
+                                placeholder="Masukkan No Telepon / WhatsApp" maxlength="12" minlength="8" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Email Pribadi</label>
+                            <input type="email" class="form-control" name="gmail_rt"
+                                placeholder="Email aktif" required>
                         </div>
 
                         <div class="form-group mb-3">
@@ -186,7 +198,7 @@
                                     <th>RT</th>
                                     <th>RW</th>
                                     <th>Periode</th>
-                                    <th>Action</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -215,6 +227,12 @@
                                                 </button>
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuRT{{ $d->id }}">
                                                     <li>
+                                                        <a class="dropdown-item d-flex align-items-center"
+                                                            href="{{ url('/rt/' . Crypt::encryptString($d->id) . '/showRT') }}">
+                                                            <i class="fas fa-eye text-info me-2"></i> Lihat
+                                                        </a>
+                                                    </li>
+                                                    <li>
                                                         <button class="dropdown-item text-success" data-bs-toggle="modal"
                                                             data-bs-target="#editData{{ $d->id }}">
                                                             <i class="fas fa-edit"></i> Edit
@@ -227,6 +245,7 @@
                                                         </button>
                                                     </li>
                                                     @hasrole('superadmin')
+                                                    <hr>
                                                     <li>
                                                         <button class="dropdown-item text-warning" data-bs-toggle="modal"
                                                             data-bs-target="#modalResetPasswordRT{{ $d->id }}">

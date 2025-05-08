@@ -18,12 +18,6 @@
                             value="{{ old('nama', $d->nama) }}" required>
                     </div>
 
-                    <div class="form-group mb-3">
-                        <label class="form-label">Nomor Telepon / WhatsApp</label>
-                        <input type="text" class="form-control" name="no_hp" id="no_hp_rt_{{ $d->id }}"
-                            maxlength="12" minlength="8" value="{{ old('no_hp', $d->no_hp) }}" required>
-                    </div>
-
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
@@ -45,6 +39,23 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Alamat</label>
+                        <input type="text" class="form-control" name="alamat_rt"
+                             value="{{ old('alamat_rt', $d->alamat_rt) }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Nomor Telepon / WhatsApp</label>
+                        <input type="text" class="form-control" name="no_hp" id="no_hp_rt_{{ $d->id }}"
+                            maxlength="12" minlength="8" value="{{ old('no_hp', $d->no_hp) }}" required>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Email Pribadi</label>
+                        <input type="email" class="form-control" name="gmail_rt" 
+                            value="{{ old('gmail_rt', $d->gmail_rt) }}" required>
                     </div>
 
                     <div class="form-group mb-3">

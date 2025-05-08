@@ -17,6 +17,16 @@
                         <input type="text" class="form-control text-capitalize" name="nama"
                             value="{{ old('nama', $d->nama) }}" required>
                     </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">RW</label>
+                        <input type="text" class="form-control" name="rw" id="rw_{{ $d->id }}" maxlength="3"
+                            value="{{ old('rw', $d->rw) }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Alamat</label>
+                        <input type="text" class="form-control" name="alamat_rw"
+                            value="{{ old('alamat_rw', $d->alamat_rw) }}" required>
+                    </div>
 
                     <div class="form-group mb-3">
                         <label class="form-label">Nomor Telepon / WhatsApp</label>
@@ -28,12 +38,6 @@
                         <label class="form-label">Email</label>
                         <input type="email" class="form-control" name="gmail_rw" placeholder="Email aktif"
                              value="{{ old('gmail_rw', $d->gmail_rw) }}" required>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label class="form-label">RW</label>
-                        <input type="text" class="form-control" name="rw" id="rw_{{ $d->id }}" maxlength="3"
-                            value="{{ old('rw', $d->rw) }}" required>
                     </div>
 
                     <div class="form-group mb-3">

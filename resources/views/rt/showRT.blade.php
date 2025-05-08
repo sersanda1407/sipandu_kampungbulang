@@ -57,31 +57,35 @@
     <div class="container py-4">
         <div class="card shadow">
             <div class="card-body">
-                <h4 class="card-title mb-4 text-center text-md-start">Data Singkat Ketua RW</h4>
+                <h4 class="card-title mb-4 text-center text-md-start">Data Singkat Ketua RT</h4>
                 <div class="row align-items-start g-4">
                     <div class="col-md-4 text-center">
-                        @if ($data->image_rw)
+                        @if ($data->image_rt)
                             <a href="#"
-                                onclick="downloadImageAsPNG('{{ asset('storage/foto_rw/' . $data->image_rw) }}', '{{ $data->nama }}')">
-                                <img src="{{ asset('storage/foto_rw/' . $data->image_rw) }}" alt="Foto RW"
+                                onclick="downloadImageAsPNG('{{ asset('storage/foto_rt/' . $data->image_rt) }}', '{{ $data->nama }}')">
+                                <img src="{{ asset('storage/foto_rt/' . $data->image_rt) }}" alt="Foto RT"
                                     class="image-preview img-fluid">
                             </a>
                         @else
-                            <img src="{{ asset('storage/foto_rw/default.png') }}" alt="Foto RW" class="image-preview img-fluid">
+                            <img src="{{ asset('storage/foto_rt/default.png') }}" alt="Foto RT" class="image-preview img-fluid">
                         @endif
                     </div>
                     <div class="col-md-8">
                         <div class="row mb-3">
-                            <div class="col-sm-5 info-label">Nama Ketua RW:</div>
+                            <div class="col-sm-5 info-label">Nama Ketua RT:</div>
                             <div class="col-sm-7 info-value">{{ $data->nama }}</div>
                         </div>
                         <div class="row mb-3">
+                            <div class="col-sm-5 info-label">No Wilayah RT:</div>
+                            <div class="col-sm-7 info-value">{{ $data->rt }}</div>
+                        </div>
+                        <div class="row mb-3">
                             <div class="col-sm-5 info-label">No Wilayah RW:</div>
-                            <div class="col-sm-7 info-value">{{ $data->rw }}</div>
+                            <div class="col-sm-7 info-value">{{ $data->Rw->rw }}</div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-sm-5 info-label">Alamat:</div>
-                            <div class="col-sm-7 info-value">{{ $data->alamat_rw }}</div>
+                            <div class="col-sm-7 info-value">{{ $data->alamat_rt }}</div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-sm-5 info-label">No HP / WhatsApp:</div>
@@ -93,7 +97,7 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-sm-5 info-label">Email Pribadi:</div>
-                            <div class="col-sm-7 info-value">{{ $data->gmail_rw }}</div>
+                            <div class="col-sm-7 info-value">{{ $data->gmail_rt }}</div>
                         </div>
 
                         <div class="row mb-3">
@@ -103,7 +107,7 @@
                     </div>
                 </div>
                 <div class="text-center text-md-end mt-4">
-                    <a href="{{ route('rw.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('rt.index') }}" class="btn btn-secondary">
                         Kembali
                     </a>
                 </div>

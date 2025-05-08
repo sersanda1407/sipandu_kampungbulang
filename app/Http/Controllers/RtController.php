@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Crypt;
 
 class RtController extends Controller
 {
@@ -49,6 +50,8 @@ class RtController extends Controller
             'nama' => 'required',
             'no_hp' => ['required', 'digits_between:8,12'],
             'rt' => 'required',
+            'alamat_rt' => 'required',
+            'gmail_rt' => 'required',
             'rw_id' => 'required',
             'image_rt' => 'required|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
             'periode_awal' => 'required',
@@ -82,6 +85,8 @@ class RtController extends Controller
             $data->nama = $request->nama;
             $data->no_hp = $request->no_hp;
             $data->rt = $request->rt;
+            $data->alamat_rt = $request->alamat_rt;
+            $data->gmail_rt = $request->gmail_rt;
             $data->rw_id = $request->rw_id;
             $data->periode_awal = $request->periode_awal;
             $data->periode_akhir = $request->periode_akhir;
@@ -107,9 +112,12 @@ class RtController extends Controller
     }
     
 
-    public function show($id)
+    public function show($encryptedId)
     {
-        //
+        $id = Crypt::decryptString($encryptedId);
+        $data = DataRt::with('user')->findOrFail($id);
+
+        return view('rt.showRT', compact('data'));
     }
 
     public function edit($id)
@@ -125,6 +133,8 @@ class RtController extends Controller
             'nama'          => 'required',
             'no_hp'         => ['required', 'digits_between:8,12'],
             'rt'            => 'required',
+            'alamat_rt'            => 'required',
+            'gmail_rt'            => 'required',
             'rw_id'         => 'required',
             'image_rt'      => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
             'periode_awal'  => 'required',
@@ -168,6 +178,8 @@ class RtController extends Controller
         $data->nama          = $request->nama;
         $data->no_hp         = $request->no_hp;
         $data->rt            = $request->rt;
+        $data->alamat_rt            = $request->alamat_rt;
+        $data->gmail_rt            = $request->gmail_rt;
         $data->rw_id         = $request->rw_id;
         $data->periode_awal  = $request->periode_awal;
         $data->periode_akhir = $request->periode_akhir;

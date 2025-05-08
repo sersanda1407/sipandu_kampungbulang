@@ -12,6 +12,7 @@ class DataRw extends Model
         'nama',
         'no_hp',
         'rw',
+        'alamat_rw',
         'gmail_rw',
         'image_rw',
         'periode_awal',

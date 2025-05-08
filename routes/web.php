@@ -67,6 +67,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/api/check-nohp', function (Illuminate\Http\Request $r) {
             return ['exists' => \App\DataRt::where('no_hp', $r->no_hp)->exists()];
         })->name('api.check-nohp');
+        Route::get('/{id}/showRT', 'RtController@show')->name('rt.show');
 
     });
     Route::group(['prefix' => 'kk'], function () {

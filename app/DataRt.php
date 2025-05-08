@@ -12,6 +12,8 @@ class DataRt extends Model
         'nama',
         'no_hp',
         'rt',
+        'alamat_rt',
+        'gmail_rt',
         'rw_id',
         'image_rt',
         'periode_awal',
