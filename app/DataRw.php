@@ -12,20 +12,32 @@ class DataRw extends Model
         'nama',
         'no_hp',
         'rw',
+        'gmail_rw',
         'image_rw',
         'periode_awal',
-        'periode_akhir'
+        'periode_akhir',
+        'user_id'
     ];
 
-    public function rt () {
-        return $this->hasMany('App\DataRt','rw_id');
+    public function rt()
+    {
+        return $this->hasMany('App\DataRt', 'rw_id');
     }
 
-    public function kk () {
-        return $this->hasMany('App\DataKk','rw_id');
+    public function kk()
+    {
+        return $this->hasMany('App\DataKk', 'rw_id');
     }
 
-    public function pdd () {
-        return $this->hasMany('App\DataPenduduk','rw_id');
+    public function pdd()
+    {
+        return $this->hasMany('App\DataPenduduk', 'rw_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+
 }

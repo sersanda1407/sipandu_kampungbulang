@@ -54,6 +54,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/api/check-rw', function (Illuminate\Http\Request $r) {
             return ['exists' => \App\DataRw::where('rw', $r->rw)->exists()];
         })->name('api.check-rw');
+        Route::get('/{id}/showRW', 'RwController@show')->name('rw.show');
+
 
     });
     Route::group(['prefix' => 'rt'], function () {

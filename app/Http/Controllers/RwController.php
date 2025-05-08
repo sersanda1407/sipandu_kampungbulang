@@ -10,6 +10,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Crypt;
 
 
 class RwController extends Controller
@@ -21,10 +22,12 @@ class RwController extends Controller
      */
     public function index()
     {
-        $data = DataRw::orderByRaw('CAST(rw AS UNSIGNED) ASC')->get();
+        // $data = DataRw::orderByRaw('CAST(rw AS UNSIGNED) ASC')->get();
+        $data = DataRw::with('user')->orderByRaw('CAST(rw AS UNSIGNED) ASC')->get();
         $lurah = Lurah::first();
         return view('rw.index', compact('data','lurah'));
     }
+
 
 
     /**
@@ -50,6 +53,7 @@ class RwController extends Controller
             'nama' => 'required',
             'no_hp' => ['required', 'digits_between:8,12'],
             'rw' => 'required',
+            'gmail_rw' => 'required',
             'image_rw' => 'required|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
             'periode_awal' => 'required',
             'periode_akhir' => 'required',
@@ -81,6 +85,7 @@ class RwController extends Controller
             $data->nama = $request->nama;
             $data->no_hp = $request->no_hp;
             $data->rw = $request->rw;
+            $data->gmail_rw = $request->gmail_rw;
             $data->periode_awal = $request->periode_awal;
             $data->periode_akhir = $request->periode_akhir;
             $data->user_id = $rw->id;
@@ -121,10 +126,13 @@ class RwController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
-    }
+    public function show($encryptedId)
+{
+    $id = Crypt::decryptString($encryptedId);
+    $data = DataRw::with('user')->findOrFail($id);
+
+    return view('rw.showRW', compact('data'));
+}
 
     /**
      * Show the form for editing the specified resource.
@@ -152,6 +160,7 @@ class RwController extends Controller
             'nama'          => 'required',
             'no_hp'         => ['required','digits_between:8,12'],
             'rw'            => 'required',
+            'gmail_rw'      => 'required',            
             'image_rw' => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
             'periode_awal'  => 'required',
             'periode_akhir' => 'required',
@@ -189,6 +198,7 @@ class RwController extends Controller
         $data->nama          = $request->nama;
         $data->no_hp         = $request->no_hp;
         $data->rw            = $request->rw;
+        $data->gmail_rw      = $request->gmail_rw;
         $data->periode_awal  = $request->periode_awal;
         $data->periode_akhir = $request->periode_akhir;
         $data->save();

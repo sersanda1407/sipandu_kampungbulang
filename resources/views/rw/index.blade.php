@@ -29,6 +29,12 @@
                         </div>
 
                         <div class="form-group mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="gmail_rw"
+                                placeholder="Email aktif" required>
+                        </div>
+
+                        <div class="form-group mb-3">
                             <label class="form-label">RW</label>
                             <input type="text" class="form-control" name="rw" id="rw" placeholder="No Wilayah RW"
                                 maxlength="3" required>
@@ -174,6 +180,8 @@
                                     <th>Foto RW</th>
                                     <th>Ketua RW</th>
                                     <th>No Telepon</th>
+                                    <th>Email akun</th>
+                                    <th>Email aktif</th>
                                     <th>RW</th>
                                     <th>Periode</th>
                                     <th>Action</th>
@@ -193,6 +201,8 @@
                                         </td>
                                         <td style="min-width: 200px;">{{ $d->nama }}</td>
                                         <td>{{ $d->no_hp }}</td>
+                                        <td>{{ $d->user ? $d->user->email : 'User tidak ditemukan' }}</td>
+                                        <td>{{ $d->gmail_rw }}</td>
                                         <td>{{ $d->rw }}</td>
                                         <td style="min-width: 180px;">{{ $d->periode_awal }} - {{ $d->periode_akhir }}</td>
                                         <td>
@@ -203,6 +213,12 @@
                                                     Aksi
                                                 </button>
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $d->id }}">
+                                                    <li>
+                                                        <a class="dropdown-item d-flex align-items-center"
+                                                            href="{{ url('/rw/' . Crypt::encryptString($d->id) . '/showRW') }}">
+                                                            <i class="fas fa-eye text-info me-2"></i> Lihat
+                                                        </a>
+                                                    </li>
                                                     <li>
                                                         <button class="dropdown-item text-success" data-bs-toggle="modal"
                                                             data-bs-target="#editData{{ $d->id }}">

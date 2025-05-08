@@ -25,6 +25,12 @@
                     </div>
 
                     <div class="form-group mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="gmail_rw" placeholder="Email aktif"
+                             value="{{ old('gmail_rw', $d->gmail_rw) }}" required>
+                    </div>
+
+                    <div class="form-group mb-3">
                         <label class="form-label">RW</label>
                         <input type="text" class="form-control" name="rw" id="rw_{{ $d->id }}" maxlength="3"
                             value="{{ old('rw', $d->rw) }}" required>
