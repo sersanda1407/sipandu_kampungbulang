@@ -328,7 +328,7 @@
                                         <th>Telepon</th>
                                         <th class="d-none d-lg-table-cell">Alamat</th>
                                         <th class="d-none d-md-table-cell">RT/RW</th>
-                                        <th> </th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
 

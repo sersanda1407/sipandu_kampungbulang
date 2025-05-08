@@ -191,7 +191,7 @@
                                         <th class="d-none d-md-table-cell">RT/RW</th>
                                         <th class="d-none d-md-table-cell">Status Ekonomi</th>
                                         <th class="d-none d-md-table-cell">Jumlah Individu</th>
-                                        <th> </th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
