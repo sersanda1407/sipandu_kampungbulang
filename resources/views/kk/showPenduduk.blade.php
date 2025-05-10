@@ -32,7 +32,8 @@
                     <div class="modal-body">
                         <i class="fas fa-exclamation-circle mb-2"
                             style="color: #e74a3b; font-size:120px; justify-content:center; display:flex"></i>
-                        <h5 class="text-center">Apakah anda yakin ingin menghapus data {{ $r->nama }} dari data Kartu Keluarga ini ?</h5>
+                        <h5 class="text-center">Apakah anda yakin ingin menghapus data {{ $r->nama }} dari data Kartu Keluarga
+                            ini ?</h5>
                     </div>
                     <div class="modal-footer">
                         <form action={{ url('kk/' . $r->id) . '/showPenduduk/delete' }} method="POST">
@@ -76,8 +77,6 @@
                             <input class="form-control" type="text" placeholder="No Telepon / WhatsApp" name="no_hp"
                                 id="no_hp" maxlength="12" minlength="8" required>
                         </div>
-
-
 
                         <div class="row mb-3">
                             <div class="col-sm-4">
@@ -154,6 +153,10 @@
                             <label for="">Pekerjaan <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="pekerjaan" id="exampleInputPassword1" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="gaji" class="form-label">Pendapatan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="gaji" placeholder="Pendapatan" id="gaji" required>
+                        </div>
                         <div class="row">
                             <div class="col-auto">
                                 <div class="mb-3">
@@ -207,6 +210,10 @@
                         document.getElementById("no_hp").addEventListener("input", function (e) {
                             this.value = this.value.replace(/[^0-9]/g, ''); // Menghapus karakter non-angka
                         });
+
+                        document.getElementById("gaji").addEventListener("input", function (e) {
+                            this.value = this.value.replace(/[^0-9]/g, ''); // Menghapus karakter non-angka
+                        });
                     </script>
 
                 </form>
@@ -240,10 +247,38 @@
                                         <span class="fw-bold me-2">RW / RT:</span>
                                         <span>{{ $data->rw->rw }} / {{ $data->rt->rt }}</span>
                                     </div>
+                                    @php
+                                        $totalGaji = $penduduk->sum('gaji');
+                                        $jumlah = $penduduk->count();
+                                        $rataRata = $jumlah > 0 ? $totalGaji / $jumlah : 0;
+                                    @endphp
+
+                                    <div class="col-12 col-md-6 d-flex">
+                                        <span class="fw-bold me-2">Rata-rata Pendapatan:</span>
+                                        <span>Rp.{{ number_format($rataRata, 0, ',', '.') }},-</span>
+                                    </div>
+
+                                    @php
+                                        if ($rataRata < 500000) {
+                                            $statusEkonomi = 'Sangat Tidak Mampu';
+                                        } elseif ($rataRata <= 1500000) {
+                                            $statusEkonomi = 'Tidak Mampu';
+                                        } elseif ($rataRata <= 3000000) {
+                                            $statusEkonomi = 'Menengah ke Bawah';
+                                        } elseif ($rataRata <= 5000000) {
+                                            $statusEkonomi = 'Menengah';
+                                        } elseif ($rataRata <= 10000000) {
+                                            $statusEkonomi = 'Menengah ke Atas';
+                                        } else {
+                                            $statusEkonomi = 'Mampu';
+                                        }
+                                    @endphp
+
                                     <div class="col-12 col-md-6 d-flex">
                                         <span class="fw-bold me-2">Status Ekonomi:</span>
-                                        <span>{{ $data->status_ekonomi }}</span>
+                                        <span>{{ $statusEkonomi }}</span>
                                     </div>
+
                                     <div class="col-12 col-md-6 d-flex">
                                         <span class="fw-bold me-2">Jumlah Individu:</span>
                                         <span>{{ \App\DataPenduduk::where('kk_id', $data->id)->count() }}</span>
@@ -310,10 +345,10 @@
                             </button>
 
                             <!-- @if (count($penduduk) > 0)
-                                        <a href="{{ url('penduduk/export/' . encrypt($data->id)) }}" class="btn btn-danger rounded-pill">
-                                            <i class="fas fa-file-pdf"></i> Export PDF
-                                        </a>
-                                    @endif -->
+                                                        <a href="{{ url('penduduk/export/' . encrypt($data->id)) }}" class="btn btn-danger rounded-pill">
+                                                            <i class="fas fa-file-pdf"></i> Export PDF
+                                                        </a>
+                                                    @endif -->
                         </div>
 
                         <!-- Tambahkan class 'table-responsive' untuk tampilan mobile -->
@@ -326,8 +361,9 @@
                                         <th>Nama</th>
                                         <th class="d-none d-md-table-cell">NIK</th>
                                         <th>Telepon</th>
-                                        <th class="d-none d-lg-table-cell">Alamat</th>
+                                        {{-- <th class="d-none d-lg-table-cell">Alamat</th> --}}
                                         <th class="d-none d-md-table-cell">RT/RW</th>
+                                        {{-- <th class="d-none d-md-table-cell">Pendapatan</th> --}}
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -381,8 +417,10 @@
                                             <td>{{ $pd->nama }}</td>
                                             <td class="d-none d-md-table-cell">{{ $pd->nik }}</td>
                                             <td>{{ $pd->no_hp }}</td>
-                                            <td class="d-none d-lg-table-cell">{{ $pd->alamat }}</td>
+                                            {{-- <td class="d-none d-lg-table-cell">{{ $pd->alamat }}</td> --}}
                                             <td class="d-none d-md-table-cell">{{ $pd->rt->rt }} / {{ $pd->rw->rw }}</td>
+                                            {{-- <td class="d-none d-lg-table-cell">Rp.{{ number_format($pd->gaji, 0, '.', '.') }},-
+                                            </td> --}}
                                             <td>
                                                 <div class="dropdown">
                                                     <button class="btn btn-info dropdown-toggle btn-sm" type="button"

@@ -99,16 +99,6 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Status Ekonomi</label>
-                            <select class="form-select" name="status_ekonomi">
-                                <option value="">-- Pilih Status Ekonomi --</option>
-                                <option value="Mampu" {{ $d->status_ekonomi == 'Mampu' ? 'selected' : '' }}>Mampu</option>
-                                <option value="Tidak Mampu" {{ $d->status_ekonomi == 'Tidak Mampu' ? 'selected' : '' }}>Tidak Mampu</option>
-                            </select>
-                        </div>
-                       
-
-                        <div class="mb-3">
                             <label class="form-label">Foto KK</label>
                             <input type="file" class="form-control" name="image">
                             <small class="text-muted">Kosongkan jika tidak ingin mengganti foto</small>

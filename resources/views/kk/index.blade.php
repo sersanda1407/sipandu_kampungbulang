@@ -91,15 +91,6 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Status Ekonomi</label>
-                            <select class="form-select" name="status_ekonomi" id="rw_id">
-                                <option value="">-- Pilih Status Ekonomi --</option>
-                                <option value="Mampu">Mampu</option>
-                                <option value="Tidak Mampu">Tidak Mampu</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
                             <label for="exampleInputPassword1" class="form-label">Foto KK</label>
                             <input type="file" class="form-control" name="image" id="exampleInputPassword1" required>
                         </div>
@@ -211,7 +202,30 @@
                                             <td>{{ $d->kepala_keluarga }}</td>
                                             <td>{{ $d->no_kk }}</td>
                                             <td class="d-none d-md-table-cell">{{ $d->Rt->rt }} / {{ $d->Rw->rw }}</td>
-                                            <td class="d-none d-md-table-cell">{{ $d->status_ekonomi }}</td>
+                                            <td class="d-none d-md-table-cell">
+                                                @php
+                                                    $pendudukKK = \App\DataPenduduk::where('kk_id', $d->id)->get();
+                                                    $totalGaji = $pendudukKK->sum('gaji');
+                                                    $jumlahOrang = $pendudukKK->count();
+                                                    $rataRata = $jumlahOrang > 0 ? $totalGaji / $jumlahOrang : 0;
+
+                                                    if ($rataRata < 500000) {
+                                                        $statusEkonomi = 'Sangat Tidak Mampu';
+                                                    } elseif ($rataRata <= 1500000) {
+                                                        $statusEkonomi = 'Tidak Mampu';
+                                                    } elseif ($rataRata <= 3000000) {
+                                                        $statusEkonomi = 'Menengah ke Bawah';
+                                                    } elseif ($rataRata <= 5000000) {
+                                                        $statusEkonomi = 'Menengah';
+                                                    } elseif ($rataRata <= 10000000) {
+                                                        $statusEkonomi = 'Menengah ke Atas';
+                                                    } else {
+                                                        $statusEkonomi = 'Mampu';
+                                                    }
+                                                @endphp
+                                                {{ $statusEkonomi }}
+                                            </td>
+
                                             <td class="d-none d-md-table-cell">
                                                 {{ \App\DataPenduduk::where('kk_id', $d->id)->count() }}
                                             </td>

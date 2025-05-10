@@ -23,6 +23,7 @@ class DataPenduduk extends Model
         'status_pernikahan',
         'status_keluarga',
         'pekerjaan',
+        'gaji',
         'no_hp',
     ];
 

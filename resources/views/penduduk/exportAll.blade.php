@@ -73,6 +73,40 @@
 
   $jumlah_laki = $penduduk->where('gender', 'Laki-laki')->count();
   $jumlah_perempuan = $penduduk->where('gender', 'Perempuan')->count();
+
+  $statusCounts = [
+    'Sangat Tidak Mampu' => 0,
+    'Tidak Mampu' => 0,
+    'Menengah ke Bawah' => 0,
+    'Menengah' => 0,
+    'Menengah ke Atas' => 0,
+    'Mampu' => 0,
+  ];
+
+  $uniqueKks = $penduduk->pluck('kk_id')->unique();
+
+  foreach ($uniqueKks as $kk_id) {
+    $anggotaKK = $penduduk->where('kk_id', $kk_id);
+    $totalGaji = $anggotaKK->sum('gaji');
+    $jumlahOrang = $anggotaKK->count();
+    $rataRata = $jumlahOrang > 0 ? $totalGaji / $jumlahOrang : 0;
+
+    if ($rataRata < 500000) {
+    $status = 'Sangat Tidak Mampu';
+    } elseif ($rataRata <= 1500000) {
+    $status = 'Tidak Mampu';
+    } elseif ($rataRata <= 3000000) {
+    $status = 'Menengah ke Bawah';
+    } elseif ($rataRata <= 5000000) {
+    $status = 'Menengah';
+    } elseif ($rataRata <= 10000000) {
+    $status = 'Menengah ke Atas';
+    } else {
+    $status = 'Mampu';
+    }
+
+    $statusCounts[$status]++;
+  }
 @endphp
 
 
@@ -107,12 +141,12 @@
         <th>Jenis Kelamin</th>
         <th>Alamat</th>
         <th>RT/RW</th>
+        <th>Usia</th>
         <th>Tempat & Tanggal Lahir</th>
         <th>Agama</th>
-        <th>Usia</th>
         <th>Status Pernikahan</th>
         <th>Pekerjaan</th>
-        <th>Status Ekonomi</th>
+        <th>Status Ekonomi<br>(rata-rata)</th>
       </tr>
     </thead>
     <tbody>
@@ -125,25 +159,58 @@
       <td>{{ $pd->gender }}</td>
       <td>{{ $pd->alamat }}</td>
       <td class="text-center">{{ $pd->rt->rt }} / {{ $pd->rw->rw }}</td>
-      <td>{{ $pd->tmp_lahir }}, {{ \Carbon\Carbon::parse($pd->tgl_lahir)->format('d-m-Y') }}</td>
       <td class="text-center">{{ $pd->usia }}</td>
+      <td>{{ $pd->tmp_lahir }}, {{ \Carbon\Carbon::parse($pd->tgl_lahir)->format('d-m-Y') }}</td>
       <td>{{ $pd->agama }}</td>
       <td>{{ $pd->status_pernikahan }}</td>
       <td>{{ $pd->pekerjaan }}</td>
-      <td>{{ $pd->kk->status_ekonomi }}</td>
+      <td>
+        @php
+      $pendudukKK = \App\DataPenduduk::where('kk_id', $pd->kk_id)->get();
+      $totalGaji = $pendudukKK->sum('gaji');
+      $jumlahOrang = $pendudukKK->count();
+      $rataRata = $jumlahOrang > 0 ? $totalGaji / $jumlahOrang : 0;
+
+      if ($rataRata < 500000) {
+      $statusEkonomi = 'Sangat Tidak Mampu';
+      } elseif ($rataRata <= 1500000) {
+      $statusEkonomi = 'Tidak Mampu';
+      } elseif ($rataRata <= 3000000) {
+      $statusEkonomi = 'Menengah ke Bawah';
+      } elseif ($rataRata <= 5000000) {
+      $statusEkonomi = 'Menengah';
+      } elseif ($rataRata <= 10000000) {
+      $statusEkonomi = 'Menengah ke Atas';
+      } else {
+      $statusEkonomi = 'Mampu';
+      }
+    @endphp
+        {{ $statusEkonomi }}
+        <br>
+        <small class="text-muted">Rp.{{ number_format($rataRata, 0, ',', '.') }}</small>
+      </td>
       </tr>
     @endforeach
     </tbody>
   </table>
 
-
-
-  <div class="mb-3">
-    <p>TOTAL : <br> <strong>{{ $penduduk->pluck('kk_id')->unique()->count() }} KK (Kartu Keluarga) dan
-        {{ $penduduk->count() }} warga. <br>Jumlah Laki-laki : {{ $jumlah_laki }} <br> Jumlah Perempuan :
-        {{ $jumlah_perempuan }} </strong> </p>
-  </div>
   <div class="footer-section">
+    <div style="font-size: 14px; line-height: 1.4;">
+      <p><strong>Total:</strong></p>
+      <ul>
+        <li>Jumlah Laki-laki = {{ $jumlah_laki }}</li>
+        <li>Jumlah Perempuan = {{ $jumlah_perempuan }}</li>
+      </ul>
+
+      <p><strong>Status Ekonomi Keluarga:</strong></p>
+      <ul>
+        @foreach ($statusCounts as $label => $jumlah)
+      <li>{{ $label }}: {{ $jumlah }} KK</li>
+    @endforeach
+      </ul>
+    </div>
+
+
     <div class="footer-left">
       <p>
         Data ini dicetak pada hari <strong>{{ $waktu->translatedFormat('l, d F Y') }}</strong>

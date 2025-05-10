@@ -73,7 +73,6 @@ class KkController extends Controller
             'rt_id' => 'required',
             'rw_id' => 'required',
             'alamat' => 'required',
-            'status_ekonomi' => 'required',
         ]);
     
         try {
@@ -92,7 +91,6 @@ class KkController extends Controller
             $data->rw_id = $request->rw_id;
             $data->user_id = $kk->id;
             $data->alamat = $request->alamat;
-            $data->status_ekonomi = $request->status_ekonomi;
     
             // Menyimpan Gambar dengan UUID
             if ($request->hasFile('image')) {
@@ -191,7 +189,6 @@ class KkController extends Controller
              'rt_id' => 'required',
              'rw_id' => 'required',
              'alamat' => 'required',
-             'status_ekonomi' => 'required',
          ]);
      
          // Cek kalau no_kk diinput berbeda dengan yang lama
@@ -223,7 +220,6 @@ class KkController extends Controller
          $data->rt_id = $request->rt_id;
          $data->rw_id = $request->rw_id;
          $data->alamat = $request->alamat;
-         $data->status_ekonomi = $request->status_ekonomi;
          $data->save();
      
          // Update data User kalau ada

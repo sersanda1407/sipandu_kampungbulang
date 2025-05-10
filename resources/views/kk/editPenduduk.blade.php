@@ -124,6 +124,14 @@
                             <input type="text" class="form-control" name="pekerjaan" value="{{$d->pekerjaan}}"
                                 id="exampleInputPassword1" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Pendapatan</label>
+                            <input type="text" class="form-control"
+                            value="Rp.{{ number_format($d->gaji, 0, '.', '.') }},-"
+                            name="gaji" id="gaji{{ $d->id }}"
+                            oninput="formatCurrencyRealtime(this)"
+                            required>
+                        </div>
                         <label>Status</label>
                         <div class="mb-3">
                             <select class="form-select" name="status_sosial" required>
@@ -177,12 +185,35 @@
                 }
 
                 // Menyeleksi semua input dengan nama 'nik' dan 'no_hp'
-                document.querySelectorAll("input[name='nik'], input[name='no_hp']").forEach(function (input) {
+                document.querySelectorAll("input[name='nik'], input[name='no_hp'], input[name='gaji']").forEach(function (input) {
                     input.addEventListener("input", function () {
                         onlyNumbers(this);
                     });
                 });
             });
         </script>
+        <script>
+            function formatCurrencyRealtime(el) {
+                // Simpan posisi kursor
+                let cursorPos = el.selectionStart;
+                let originalLength = el.value.length;
+        
+                // Ambil hanya digit angka
+                let number = el.value.replace(/[^\d]/g, '');
+        
+                // Format dengan koma ribuan
+                let formatted = number.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        
+                // Set nilai yang telah diformat
+                el.value = formatted;
+        
+                // Perbaiki posisi kursor setelah format
+                let newLength = formatted.length;
+                cursorPos = cursorPos + (newLength - originalLength);
+                el.setSelectionRange(cursorPos, cursorPos);
+            }
+        </script>
+        
+        
     </div>
 @endforeach

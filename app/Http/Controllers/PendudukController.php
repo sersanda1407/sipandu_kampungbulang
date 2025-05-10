@@ -125,6 +125,7 @@ class PendudukController extends Controller
             'status_keluarga' => 'required',
             'status_sosial' => 'required',
             'pekerjaan' => 'required',
+            'gaji' => 'required',
             'image_ktp' => 'required|mimes:jpeg,jpg,png,gif,svg|max:3072',
             'no_hp' => 'required',
         ]);
@@ -145,6 +146,7 @@ class PendudukController extends Controller
         $data->status_keluarga = $request->status_keluarga;
         $data->status_sosial = $request->status_sosial;
         $data->pekerjaan = $request->pekerjaan;
+        $data->gaji = (int) str_replace('.', '', $request->gaji);
         $data->no_hp = $request->no_hp;
     
         // Gunakan UUID untuk nama file gambar
@@ -218,6 +220,7 @@ class PendudukController extends Controller
              'status_keluarga' => 'required',
              'status_sosial' => 'required',
              'pekerjaan' => 'required',
+             'gaji' => 'required',
              'image_ktp' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
              'no_hp' => 'required',
          ]);
@@ -257,6 +260,7 @@ class PendudukController extends Controller
          $data->status_keluarga = $request->status_keluarga;
          $data->status_sosial = $request->status_sosial;
          $data->pekerjaan = $request->pekerjaan;
+         $data->gaji = (int) str_replace('.', '', $request->gaji);
          $data->no_hp = $request->no_hp;
      
          $data->save();
@@ -265,62 +269,6 @@ class PendudukController extends Controller
          return redirect()->back();
      }
      
-
-
-
-    //  public function update(Request $request, $id)
-    //  {
-    //      $data = DataPenduduk::where('id', $id)->firstOrFail();
-
-    //      $request->validate([
-    //          'nama' => 'required',
-    //          'nik' => 'required',
-    //          'gender' => 'required',
-    //          'usia' => 'required',
-    //          'alamat' => 'required',
-    //          'tmp_lahir' => 'required',
-    //          'tgl_lahir' => 'required',
-    //          'agama' => 'required',
-    //          'status_pernikahan' => 'required',
-    //          'status_keluarga' => 'required',
-    //          'status_sosial' => 'required',
-    //          'pekerjaan' => 'required',
-    //          'image_ktp' => 'required|mimes:jpeg,jpg,png,gif,svg|max:3072',
-    //      ]);
-
-    //      $img = $request->file('image_ktp');
-    //     $filename = $img->getClientOriginalName();
-
-    //     $data->image_ktp = $request->file('image_ktp')->getClientOriginalName();
-    //     if ($request->hasFile('image_ktp')) {
-    //         if ($request->oldImage) {
-    //             Storage::delete('/foto_ktp/' . $request->oldImage);
-    //         }
-    //         $request->file('image_ktp')->storeAs('/foto_ktp', $filename);
-    //     }
-    //      $data->nama = $request->nama;
-    //      $data->nik = $request->nik;
-    //      $data->gender = $request->gender;
-    //      $data->usia = $request->usia;
-    //      $data->tmp_lahir = $request->tmp_lahir;
-    //      $data->tgl_lahir = $request->tgl_lahir;
-    //      $data->agama = $request->agama;
-    //      $data->alamat = $request->alamat;
-    //      $data->status_pernikahan = $request->status_pernikahan;
-    //      $data->status_keluarga = $request->status_keluarga;
-    //      $data->status_sosial = $request->status_sosial;
-    //      $data->pekerjaan = $request->pekerjaan;
-
-    //      $data->save(); // Gunakan save() daripada update()
-
-    //      Alert::success('Sukses!', 'Berhasil mengedit Data Penduduk');
-
-    //      return redirect()->back();
-    //  }
-
-
-
-
 
     /**
      * Remove the specified resource from storage.
@@ -424,7 +372,7 @@ class PendudukController extends Controller
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
 
-        return $pdf->download('Data_seluruh_warga_kampung_bulang_RT.pdf');
+        return $pdf->stream('Data_seluruh_warga_kampung_bulang_RT.pdf');
     }
 
 
@@ -447,7 +395,7 @@ class PendudukController extends Controller
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
 
-        return $pdf->download('Data_seluruh_warga_kampung_bulang_RW.pdf');
+        return $pdf->stream('Data_seluruh_warga_kampung_bulang_RW.pdf');
     }
 
 
