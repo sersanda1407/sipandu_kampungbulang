@@ -14,21 +14,52 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-
         $tahun_terpilih = $request->get('tahun', date('Y'));
-        $list_tahun = range(2020, date('Y')); // Bisa diatur dinamis
+        $list_tahun = range(0001, date('Y'));
 
-        $data_month = $this->getDataPertambahanWargaPerBulan($tahun_terpilih);
+        // Cek apakah user adalah RW atau RT (memiliki relasi ke DataRw / relasi ke DataRt)
+        $rw_user_id = \App\DataRw::where('user_id', Auth::id())->value('id');
+        $rt_user_id = \App\DataRt::where('user_id', Auth::id())->value('id');
+
+        // Ambil filter dari request
+        $filter_rw = $request->get('rw');
+        $filter_rt = $request->get('rt');
+
+        // Jika user RW, pakai rw_id-nya
+        if ($rw_user_id) {
+            $filter_rw = $rw_user_id;
+        }
+
+        // Jika user RW, pakai rt_id-nya
+        if ($rt_user_id) {
+            $filter_rt = $rt_user_id;
+        }
+
+        // Query penduduk dengan filter
+        $query = DataPenduduk::query();
+
+        if ($filter_rw) {
+            $query->where('rw_id', $filter_rw);
+        }
+
+        if ($filter_rt) {
+            $query->where('rt_id', $filter_rt);
+        }
+
+        $dataPenduduk = $query->get();
+
+        // Ambil data pertambahan per bulan
+        $data_pertambahan = $this->getDataPertambahanWargaPerBulan($tahun_terpilih, $filter_rw, $filter_rt);
+        $data_month = $data_pertambahan['bulanan'];
+        $total_pertambahan = $data_pertambahan['total'];
 
         $lurah = Lurah::first();
-        $this_year = Carbon::now()->format('Y');
-        $chart = DataPenduduk::whereYear('created_at', $this_year)->get();
 
-        $gender_laki = DataPenduduk::where('gender', 'like', '%Laki-laki%')->count();
-        $gender_cewe = DataPenduduk::where('gender', 'like', '%Perempuan%')->count();
+        // Hitung gender (lebih fleksibel & tahan variasi data)
+        $gender_laki = $dataPenduduk->filter(fn($p) => stripos($p->gender, 'laki') !== false)->count();
+        $gender_cewe = $dataPenduduk->filter(fn($p) => stripos($p->gender, 'perempuan') !== false)->count();
 
-
-        // Usia
+        // Hitung usia berdasarkan kategori
         $now = Carbon::now();
         $usia_counts = [
             'newborn' => 0,
@@ -38,7 +69,7 @@ class DashboardController extends Controller
             'remaja' => 0,
             'dewasa' => 0
         ];
-        $dataPenduduk = DataPenduduk::all();
+
         foreach ($dataPenduduk as $data) {
             if (!$data->tgl_lahir)
                 continue;
@@ -58,22 +89,19 @@ class DashboardController extends Controller
                 $usia_counts['dewasa']++;
         }
 
-        $data_pekerjaan = DataPenduduk::whereNotNull('pekerjaan')
-            ->where('pekerjaan', '!=', '')
-            ->select('pekerjaan', \DB::raw('count(*) as total'))
+        // Data pekerjaan
+        $data_pekerjaan = $dataPenduduk->whereNotNull('pekerjaan')
             ->groupBy('pekerjaan')
-            ->pluck('total', 'pekerjaan')
+            ->map(fn($group) => $group->count())
             ->toArray();
 
-
-        $data_pernikahan = DataPenduduk::whereNotNull('status_pernikahan')
-            ->select('status_pernikahan', \DB::raw('count(*) as total'))
+        // Data status pernikahan
+        $data_pernikahan = $dataPenduduk->whereNotNull('status_pernikahan')
             ->groupBy('status_pernikahan')
-            ->pluck('total', 'status_pernikahan')
+            ->map(fn($group) => $group->count())
             ->toArray();
 
-
-        // Status Ekonomi Berdasarkan Penghasilan
+        // Data status ekonomi
         $data_ekonomi = [
             'Sangat Tidak Mampu' => 0,
             'Tidak Mampu' => 0,
@@ -82,6 +110,7 @@ class DashboardController extends Controller
             'Menengah ke Atas' => 0,
             'Mampu' => 0,
         ];
+
         foreach ($dataPenduduk as $data) {
             if (!$data->jumlah_penghasilan)
                 continue;
@@ -111,29 +140,50 @@ class DashboardController extends Controller
             'data_ekonomi',
             'data_pernikahan',
             'dataPenduduk',
-            'data_month',
             'tahun_terpilih',
             'list_tahun',
+            'total_pertambahan',
+            'filter_rw',
+            'filter_rt'
         ));
     }
 
-    private function getDataPertambahanWargaPerBulan($tahun)
-    {
-        $data = DataPenduduk::selectRaw('MONTH(created_at) as bulan, COUNT(*) as jumlah')
-            ->whereYear('created_at', $tahun)
-            ->groupBy('bulan')
-            ->pluck('jumlah', 'bulan')
-            ->toArray();
 
-        // Susun dari Januari-Desember
+    private function getDataPertambahanWargaPerBulan($tahun, $rw_id = null, $rt_id = null)
+    {
+        $query = DataPenduduk::selectRaw('MONTH(created_at) as bulan, COUNT(*) as jumlah')
+            ->whereYear('created_at', $tahun);
+
+        // Cek jika user RW, override rw_id
+        $rw_user_id = \App\DataRw::where('user_id', Auth::id())->value('id');
+        $rt_user_id = \App\DataRt::where('user_id', Auth::id())->value('id');
+        if ($rw_user_id) {
+            $rw_id = $rw_user_id;
+        }
+        if ($rt_user_id) {
+            $rt_id = $rt_user_id;
+        }
+
+        if ($rw_id) {
+            $query->where('rw_id', $rw_id);
+        }
+
+        if ($rt_id) {
+            $query->where('rt_id', $rt_id);
+        }
+
+        $data = $query->groupBy('bulan')->pluck('jumlah', 'bulan')->toArray();
+
         $result = [];
         for ($i = 1; $i <= 12; $i++) {
             $result[$i - 1] = $data[$i] ?? 0;
         }
 
-        return $result;
+        return [
+            'bulanan' => $result,
+            'total' => array_sum($result),
+        ];
     }
-
 
 
     public function editProfile(Request $request)

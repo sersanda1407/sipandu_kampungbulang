@@ -153,7 +153,7 @@
                                                 <button class="accordion-button collapsed" type="button"
                                                     data-bs-toggle="collapse" data-bs-target="#collapseKeterangan"
                                                     aria-expanded="false" aria-controls="collapseKeterangan">
-                                                    Keterangan Bulanan
+                                                    Keterangan Pertambahan Warga Bulanan
                                                 </button>
                                             </h2>
                                             <div id="collapseKeterangan" class="accordion-collapse collapse"
@@ -167,6 +167,9 @@
                                                             <li>{{ $namaBulan }} : {{ $data_month[$index] ?? 0 }} orang</li>
                                                         @endforeach
                                                     </ul>
+                                                    <hr>
+                                                    <strong>Total Pertambahan Warga Tahun {{ $tahun_terpilih }}:
+                                                        {{ $total_pertambahan }} orang</strong>
                                                 </div>
                                             </div>
                                         </div>
@@ -607,7 +610,7 @@
                                             <button class="accordion-button collapsed" type="button"
                                                 data-bs-toggle="collapse" data-bs-target="#collapseKeterangan"
                                                 aria-expanded="false" aria-controls="collapseKeterangan">
-                                                Keterangan Bulanan
+                                                Keterangan Petambahan Warga Bulanan
                                             </button>
                                         </h2>
                                         <div id="collapseKeterangan" class="accordion-collapse collapse"
@@ -621,6 +624,9 @@
                                                         <li>{{ $namaBulan }} : {{ $data_month[$index] ?? 0 }} orang</li>
                                                     @endforeach
                                                 </ul>
+                                                <hr>
+                                                <strong>Total Pertambahan Warga Tahun {{ $tahun_terpilih }}:
+                                                    {{ $total_pertambahan }} orang</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -853,7 +859,8 @@
                                 <h4 class="mb-0">Pertambahan Warga RT
                                     {{ \App\DataRt::where('user_id', Auth::id())->value('rt') ?? '' }} / RW
                                     {{ \App\DataRw::where('id', \App\DataRt::where('user_id', Auth::id())->value('rw_id'))->value('rw') ?? '' }}
-                                    Setiap Bulan</h4>
+                                    Setiap Bulan
+                                </h4>
                                 <form method="GET" action="{{ route('dashboard') }}" class="w-100">
                                     <div class="d-flex justify-content-end mb-2">
                                         <div style="max-width: 200px; width: 100%;">
@@ -881,7 +888,7 @@
                                             <button class="accordion-button collapsed" type="button"
                                                 data-bs-toggle="collapse" data-bs-target="#collapseKeterangan"
                                                 aria-expanded="false" aria-controls="collapseKeterangan">
-                                                Keterangan Bulanan
+                                                Keterangan Pertambahan Warga Bulanan
                                             </button>
                                         </h2>
                                         <div id="collapseKeterangan" class="accordion-collapse collapse"
@@ -895,6 +902,9 @@
                                                         <li>{{ $namaBulan }} : {{ $data_month[$index] ?? 0 }} orang</li>
                                                     @endforeach
                                                 </ul>
+                                                <hr>
+                                                <strong>Total Pertambahan Warga Tahun {{ $tahun_terpilih }}:
+                                                    {{ $total_pertambahan }} orang</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -1094,11 +1104,11 @@
                 datasets: [{
                     label: 'Kategori Usia',
                     data: [
-                                                                {{ $usia_counts['newborn'] ?? 0 }},
-                                                                {{ $usia_counts['batita'] ?? 0 }},
-                                                                {{ $usia_counts['balita'] ?? 0 }},
-                                                                {{ $usia_counts['anak_anak'] ?? 0 }},
-                                                                {{ $usia_counts['remaja'] ?? 0 }},
+                                                                            {{ $usia_counts['newborn'] ?? 0 }},
+                                                                            {{ $usia_counts['batita'] ?? 0 }},
+                                                                            {{ $usia_counts['balita'] ?? 0 }},
+                                                                            {{ $usia_counts['anak_anak'] ?? 0 }},
+                                                                            {{ $usia_counts['remaja'] ?? 0 }},
                         {{ $usia_counts['dewasa'] ?? 0 }}
                     ],
                     backgroundColor: [
@@ -1140,7 +1150,7 @@
                         @foreach ($data_month as $data)
                             {{ $data }},
                         @endforeach
-                                                            ],
+                                                                        ],
                     fill: true,
                     borderColor: '#56b6f7',
                     tension: 0.3
