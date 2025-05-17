@@ -111,7 +111,7 @@ class PendudukController extends Controller
     public function store(Request $request, $id)
     {
         $dataKk = DataKk::where('id', $id)->firstOrFail();
-    
+
         $this->validate($request, [
             'nama' => 'required',
             'nik' => 'required',
@@ -129,7 +129,7 @@ class PendudukController extends Controller
             'image_ktp' => 'required|mimes:jpeg,jpg,png,gif,svg|max:3072',
             'no_hp' => 'required',
         ]);
-    
+
         $data = new DataPenduduk();
         $data->nama = $request->nama;
         $data->nik = $request->nik;
@@ -148,7 +148,7 @@ class PendudukController extends Controller
         $data->pekerjaan = $request->pekerjaan;
         $data->gaji = (int) str_replace('.', '', $request->gaji);
         $data->no_hp = $request->no_hp;
-    
+
         // Gunakan UUID untuk nama file gambar
         if ($request->hasFile('image_ktp')) {
             $img = $request->file('image_ktp');
@@ -156,7 +156,7 @@ class PendudukController extends Controller
             $request->file('image_ktp')->storeAs('foto_ktp', $filename, 'public');
             $data->image_ktp = $filename;
         }
-    
+
         try {
             $data->save();
             Alert::success('Sukses!', 'Berhasil menambah Data Penduduk');
@@ -167,10 +167,10 @@ class PendudukController extends Controller
                 Alert::error('Error', 'Terjadi kesalahan, silakan coba lagi.');
             }
         }
-    
+
         return redirect()->back();
     }
-    
+
 
 
     /**
@@ -203,72 +203,72 @@ class PendudukController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     public function update(Request $request, $id)
-     {
-         $data = DataPenduduk::findOrFail($id);
-     
-         $request->validate([
-             'nama' => 'required',
-             'nik' => 'required',
-             'gender' => 'required',
-             'usia' => 'required',
-             'alamat' => 'required',
-             'tmp_lahir' => 'required',
-             'tgl_lahir' => 'required',
-             'agama' => 'required',
-             'status_pernikahan' => 'required',
-             'status_keluarga' => 'required',
-             'status_sosial' => 'required',
-             'pekerjaan' => 'required',
-             'gaji' => 'required',
-             'image_ktp' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
-             'no_hp' => 'required',
-         ]);
-     
-         // Cek kalau nik diinput berbeda dengan yang lama
-         if ($request->nik != $data->nik) {
-             $existing = DataPenduduk::where('nik', $request->nik)->first();
-     
-             if ($existing) {
-                 Alert::error('Gagal!', 'NIK sudah terdaftar, tidak bisa diubah.');
-                 return redirect()->back()->withInput();
-             }
-         }
-     
-         // Handle upload gambar jika ada file baru
-         if ($request->hasFile('image_ktp')) {
-             if ($data->image_ktp) {
-                 Storage::disk('public')->delete('foto_ktp/' . $data->image_ktp);
-             }
-     
-             $filename = Str::uuid() . '.' . $request->file('image_ktp')->getClientOriginalExtension();
-             $request->file('image_ktp')->storeAs('foto_ktp', $filename, 'public');
-     
-             $data->image_ktp = $filename;
-         }
-     
-         // Update data KTP
-         $data->nama = $request->nama;
-         $data->nik = $request->nik;
-         $data->gender = $request->gender;
-         $data->usia = $request->usia;
-         $data->tmp_lahir = $request->tmp_lahir;
-         $data->tgl_lahir = $request->tgl_lahir;
-         $data->agama = $request->agama;
-         $data->alamat = $request->alamat;
-         $data->status_pernikahan = $request->status_pernikahan;
-         $data->status_keluarga = $request->status_keluarga;
-         $data->status_sosial = $request->status_sosial;
-         $data->pekerjaan = $request->pekerjaan;
-         $data->gaji = (int) str_replace('.', '', $request->gaji);
-         $data->no_hp = $request->no_hp;
-     
-         $data->save();
-     
-         Alert::success('Sukses!', 'Berhasil mengedit Data Penduduk');
-         return redirect()->back();
-     }
-     
+    public function update(Request $request, $id)
+    {
+        $data = DataPenduduk::findOrFail($id);
+
+        $request->validate([
+            'nama' => 'required',
+            'nik' => 'required',
+            'gender' => 'required',
+            'usia' => 'required',
+            'alamat' => 'required',
+            'tmp_lahir' => 'required',
+            'tgl_lahir' => 'required',
+            'agama' => 'required',
+            'status_pernikahan' => 'required',
+            'status_keluarga' => 'required',
+            'status_sosial' => 'required',
+            'pekerjaan' => 'required',
+            'gaji' => 'required',
+            'image_ktp' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
+            'no_hp' => 'required',
+        ]);
+
+        // Cek kalau nik diinput berbeda dengan yang lama
+        if ($request->nik != $data->nik) {
+            $existing = DataPenduduk::where('nik', $request->nik)->first();
+
+            if ($existing) {
+                Alert::error('Gagal!', 'NIK sudah terdaftar, tidak bisa diubah.');
+                return redirect()->back()->withInput();
+            }
+        }
+
+        // Handle upload gambar jika ada file baru
+        if ($request->hasFile('image_ktp')) {
+            if ($data->image_ktp) {
+                Storage::disk('public')->delete('foto_ktp/' . $data->image_ktp);
+            }
+
+            $filename = Str::uuid() . '.' . $request->file('image_ktp')->getClientOriginalExtension();
+            $request->file('image_ktp')->storeAs('foto_ktp', $filename, 'public');
+
+            $data->image_ktp = $filename;
+        }
+
+        // Update data KTP
+        $data->nama = $request->nama;
+        $data->nik = $request->nik;
+        $data->gender = $request->gender;
+        $data->usia = $request->usia;
+        $data->tmp_lahir = $request->tmp_lahir;
+        $data->tgl_lahir = $request->tgl_lahir;
+        $data->agama = $request->agama;
+        $data->alamat = $request->alamat;
+        $data->status_pernikahan = $request->status_pernikahan;
+        $data->status_keluarga = $request->status_keluarga;
+        $data->status_sosial = $request->status_sosial;
+        $data->pekerjaan = $request->pekerjaan;
+        $data->gaji = (int) str_replace('.', '', $request->gaji);
+        $data->no_hp = $request->no_hp;
+
+        $data->save();
+
+        Alert::success('Sukses!', 'Berhasil mengedit Data Penduduk');
+        return redirect()->back();
+    }
+
 
     /**
      * Remove the specified resource from storage.
@@ -450,7 +450,7 @@ class PendudukController extends Controller
     public function filter(Request $request)
     {
         $selectRw = DataRw::all();
-    
+
         $selectRt = DataRt::select('id', 'rt')
             ->get()
             ->map(function ($item) {
@@ -460,24 +460,24 @@ class PendudukController extends Controller
             ->unique('rt')
             ->sortBy('rt')
             ->values();
-    
+
         if ($request->filled('rt_id') && !$request->filled('rw_id')) {
             Alert::error('Filter Gagal', 'Silakan pilih RW terlebih dahulu jika ingin memfilter berdasarkan RT.');
             return redirect()->back();
         }
-    
+
         $query = DataPenduduk::query();
-    
+
         if ($request->filled('rw_id')) {
             $query->where('rw_id', $request->rw_id);
         }
-    
+
         if ($request->filled('rt_id')) {
             $query->where('rt_id', $request->rt_id);
         }
-    
+
         $data = $query->get();
-    
+
         return view('penduduk.index', compact('data', 'selectRw', 'selectRt'));
     }
 

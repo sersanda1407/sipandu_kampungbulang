@@ -45,7 +45,7 @@ class KkController extends Controller
 
         $selectRt = DataRt::get();
         $selectRw = DataRw::get();
-        return view('kk.index', compact(['selectRt', 'selectRw', 'data','lurah']));
+        return view('kk.index', compact(['selectRt', 'selectRw', 'data', 'lurah']));
     }
 
     /**
@@ -74,7 +74,7 @@ class KkController extends Controller
             'rw_id' => 'required',
             'alamat' => 'required',
         ]);
-    
+
         try {
             // Membuat User untuk Kepala Keluarga
             $kk = User::create([
@@ -82,7 +82,7 @@ class KkController extends Controller
                 'email' => $request->no_kk,
                 'password' => bcrypt('password'),
             ]);
-    
+
             // Menyimpan data KK
             $data = new DataKk();
             $data->kepala_keluarga = $request->kepala_keluarga;
@@ -91,7 +91,7 @@ class KkController extends Controller
             $data->rw_id = $request->rw_id;
             $data->user_id = $kk->id;
             $data->alamat = $request->alamat;
-    
+
             // Menyimpan Gambar dengan UUID
             if ($request->hasFile('image')) {
                 $img = $request->file('image');
@@ -99,13 +99,13 @@ class KkController extends Controller
                 $request->file('image')->storeAs('foto_kk', $filename, 'public'); // Menyimpan gambar ke folder 'foto_kk'
                 $data->image = $filename;
             }
-    
+
             // Menyimpan data KK
             $data->save();
-    
+
             // Memberikan role 'warga' ke user
             $kk->assignRole('warga');
-    
+
             Alert::success('Sukses!', 'Berhasil menambah kartu keluarga');
             return redirect()->back();
         } catch (\Illuminate\Database\QueryException $e) {
@@ -118,7 +118,7 @@ class KkController extends Controller
             }
         }
     }
-    
+
 
 
     public function resetPassword($id)
@@ -178,62 +178,62 @@ class KkController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     public function update(Request $request, $id)
-     {
-         $data = DataKk::findOrFail($id);
-     
-         $request->validate([
-             'kepala_keluarga' => 'required',
-             'no_kk' => 'required',
-             'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
-             'rt_id' => 'required',
-             'rw_id' => 'required',
-             'alamat' => 'required',
-         ]);
-     
-         // Cek kalau no_kk diinput berbeda dengan yang lama
-         if ($request->no_kk != $data->no_kk) {
-             // Cari apakah no_kk baru sudah ada di tabel data_kks
-             $existing = DataKk::where('no_kk', $request->no_kk)->first();
-     
-             if ($existing) {
-                 // Kalau sudah ada, kasih alert error dan balik
-                 Alert::error('Gagal!', 'No KK sudah terdaftar, tidak bisa diubah.');
-                 return redirect()->back()->withInput();
-             }
-         }
-     
-         if ($request->hasFile('image')) {
-             if ($data->image) {
-                 Storage::disk('public')->delete('foto_kk/' . $data->image);
-             }
-     
-             $filename = Str::uuid() . '.' . $request->file('image')->getClientOriginalExtension();
-             $request->file('image')->storeAs('foto_kk', $filename, 'public');
-     
-             $data->image = $filename;
-         }
-     
-         // Update data KK
-         $data->kepala_keluarga = $request->kepala_keluarga;
-         $data->no_kk = $request->no_kk;
-         $data->rt_id = $request->rt_id;
-         $data->rw_id = $request->rw_id;
-         $data->alamat = $request->alamat;
-         $data->save();
-     
-         // Update data User kalau ada
-         if ($data->user_id) {
-             User::where('id', $data->user_id)->update([
-                 'name' => $request->kepala_keluarga,
-                 'email' => $request->no_kk,
-             ]);
-         }
-     
-         Alert::success('Sukses!', 'Berhasil mengedit kartu keluarga');
-         return redirect()->back();
-     }
-     
+    public function update(Request $request, $id)
+    {
+        $data = DataKk::findOrFail($id);
+
+        $request->validate([
+            'kepala_keluarga' => 'required',
+            'no_kk' => 'required',
+            'image' => 'nullable|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
+            'rt_id' => 'required',
+            'rw_id' => 'required',
+            'alamat' => 'required',
+        ]);
+
+        // Cek kalau no_kk diinput berbeda dengan yang lama
+        if ($request->no_kk != $data->no_kk) {
+            // Cari apakah no_kk baru sudah ada di tabel data_kks
+            $existing = DataKk::where('no_kk', $request->no_kk)->first();
+
+            if ($existing) {
+                // Kalau sudah ada, kasih alert error dan balik
+                Alert::error('Gagal!', 'No KK sudah terdaftar, tidak bisa diubah.');
+                return redirect()->back()->withInput();
+            }
+        }
+
+        if ($request->hasFile('image')) {
+            if ($data->image) {
+                Storage::disk('public')->delete('foto_kk/' . $data->image);
+            }
+
+            $filename = Str::uuid() . '.' . $request->file('image')->getClientOriginalExtension();
+            $request->file('image')->storeAs('foto_kk', $filename, 'public');
+
+            $data->image = $filename;
+        }
+
+        // Update data KK
+        $data->kepala_keluarga = $request->kepala_keluarga;
+        $data->no_kk = $request->no_kk;
+        $data->rt_id = $request->rt_id;
+        $data->rw_id = $request->rw_id;
+        $data->alamat = $request->alamat;
+        $data->save();
+
+        // Update data User kalau ada
+        if ($data->user_id) {
+            User::where('id', $data->user_id)->update([
+                'name' => $request->kepala_keluarga,
+                'email' => $request->no_kk,
+            ]);
+        }
+
+        Alert::success('Sukses!', 'Berhasil mengedit kartu keluarga');
+        return redirect()->back();
+    }
+
 
 
     /**
