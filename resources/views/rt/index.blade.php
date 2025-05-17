@@ -69,8 +69,8 @@
 
                         <div class="form-group mb-3">
                             <label class="form-label">Alamat</label>
-                            <input type="text" class="form-control" name="alamat_rt" 
-                                placeholder="Alamat tinggal ketua RT" minlength="8" required>
+                            <input type="text" class="form-control" name="alamat_rt" placeholder="Alamat tinggal ketua RT"
+                                minlength="8" required>
                         </div>
 
                         <div class="form-group mb-3">
@@ -81,8 +81,7 @@
 
                         <div class="form-group mb-3">
                             <label class="form-label">Email Pribadi</label>
-                            <input type="email" class="form-control" name="gmail_rt"
-                                placeholder="Email aktif" required>
+                            <input type="email" class="form-control" name="gmail_rt" placeholder="Email aktif" required>
                         </div>
 
                         <div class="form-group mb-3">
@@ -184,10 +183,12 @@
             <section class="section">
                 <div class="card shadow mb-5">
                     <div class="card-body">
+                        @hasrole('superadmin')
                         <button class="btn btn-primary rounded-pill mb-3" data-bs-toggle="modal"
                             data-bs-target="#exampleModal">
                             <i class="fas fa-plus"></i> Tambah Data
                         </button>
+                        @endhasrole
                         <table class="table table-striped" id="table1">
                             <thead>
                                 <tr>
@@ -238,13 +239,14 @@
                                                             <i class="fas fa-edit"></i> Edit
                                                         </button>
                                                     </li>
+                                                    @hasrole('superadmin')
                                                     <li>
                                                         <button class="dropdown-item text-danger" data-bs-toggle="modal"
                                                             data-bs-target="#modalDelete{{ $d->id }}">
                                                             <i class="fas fa-trash"></i> Hapus
                                                         </button>
                                                     </li>
-                                                    @hasrole('superadmin')
+
                                                     <hr>
                                                     <li>
                                                         <button class="dropdown-item text-warning" data-bs-toggle="modal"
