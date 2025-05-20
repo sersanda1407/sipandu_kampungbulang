@@ -28,7 +28,8 @@
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Alamat</label>
-                            <input type="text" class="form-control" name="alamat_rw"  placeholder="Alamat tinggal Ketua RW" required>
+                            <input type="text" class="form-control" name="alamat_rw" placeholder="Alamat tinggal Ketua RW"
+                                required>
                         </div>
 
                         <div class="form-group mb-3">
@@ -192,12 +193,22 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>
-                                            <a href="#"
-                                                onclick="showImageModal('{{ asset('storage/foto_rw/' . ($d->image_rw ?: 'default.jpg')) }}', '{{ $d->nama }}')">
-                                                <img src="{{ asset('storage/foto_rw/' . ($d->image_rw ?: 'default.jpg')) }}"
-                                                    alt="Foto RW" class="img-thumbnail"
+                                            @php
+                                            $imageSrc = 'storage/foto_rw/default.jpg';
+                                            if ($d->image_rw) {
+                                            if (Str::startsWith($d->image_rw, ['data:image', 'http', 'https'])) {
+                                            $imageSrc = $d->image_rw;
+                                            } elseif (file_exists(public_path('storage/foto_rw/' . $d->image_rw))) {
+                                            $imageSrc = 'storage/foto_rw/' . $d->image_rw;
+                                            }
+                                            }
+                                            @endphp
+
+                                            <a href="#" onclick="showImageModal('{{ asset($imageSrc) }}', '{{ $d->nama }}')">
+                                                <img src="{{ asset($imageSrc) }}" alt="Foto RW" class="img-thumbnail"
                                                     style="width: 100%; height: 100%; object-fit: cover;">
                                             </a>
+
                                         </td>
                                         <td style="min-width: 200px;">{{ $d->nama }}</td>
                                         <td>{{ $d->rw }}</td>

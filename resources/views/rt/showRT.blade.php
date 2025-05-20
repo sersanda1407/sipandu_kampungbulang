@@ -59,17 +59,25 @@
             <div class="card-body">
                 <h4 class="card-title mb-4 text-center text-md-start">Data Singkat Ketua RT</h4>
                 <div class="row align-items-start g-4">
+                    @php
+
+                        $imageSrc = 'storage/foto_rt/default.png';
+
+                        if ($data->image_rt) {
+                            if (Str::startsWith($data->image_rt, ['data:image', 'http', 'https'])) {
+                                $imageSrc = $data->image_rt;
+                            } elseif (file_exists(public_path('storage/foto_rt/' . $data->image_rt))) {
+                                $imageSrc = 'storage/foto_rt/' . $data->image_rt;
+                            }
+                        }
+                    @endphp
+
                     <div class="col-md-4 text-center">
-                        @if ($data->image_rt)
-                            <a href="#"
-                                onclick="downloadImageAsPNG('{{ asset('storage/foto_rt/' . $data->image_rt) }}', '{{ $data->nama }}')">
-                                <img src="{{ asset('storage/foto_rt/' . $data->image_rt) }}" alt="Foto RT"
-                                    class="image-preview img-fluid">
-                            </a>
-                        @else
-                            <img src="{{ asset('storage/foto_rt/default.png') }}" alt="Foto RT" class="image-preview img-fluid">
-                        @endif
+                        <a href="#" onclick="downloadImageAsPNG('{{ asset($imageSrc) }}', '{{ $data->nama }}')">
+                            <img src="{{ asset($imageSrc) }}" alt="Foto RT" class="image-preview img-fluid">
+                        </a>
                     </div>
+
                     <div class="col-md-8">
                         <div class="row mb-3">
                             <div class="col-sm-5 info-label">Nama Ketua RT:</div>

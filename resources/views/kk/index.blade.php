@@ -192,12 +192,25 @@
                                             <td>{{ $loop->iteration }}</td>
                                             @endhasrole
                                             <td>
+                                                @php
+
+                                                $imageSrc = 'storage/foto_kk/default.jpg';
+
+                                                if ($d->image) {
+                                                if (Str::startsWith($d->image, ['data:image', 'http', 'https'])) {
+                                                $imageSrc = $d->image;
+                                                } elseif (file_exists(public_path('storage/foto_kk/' . $d->image))) {
+                                                $imageSrc = 'storage/foto_kk/' . $d->image;
+                                                }
+                                                }
+                                                @endphp
+
                                                 <a href="#"
-                                                    onclick="showImageModal('{{ asset('storage/foto_kk/' . ($d->image ?: 'default.jpg')) }}', '{{ $d->kepala_keluarga }}')">
-                                                    <img src="{{ asset('storage/foto_kk/' . ($d->image ?: 'default.jpg')) }}"
-                                                        alt="Foto KK" class="img-thumbnail"
+                                                    onclick="showImageModal('{{ asset($imageSrc) }}', '{{ $d->kepala_keluarga }}')">
+                                                    <img src="{{ asset($imageSrc) }}" alt="Foto KK" class="img-thumbnail"
                                                         style="width: 100%; height: 100%; object-fit: cover;">
                                                 </a>
+
                                             </td>
                                             <td>{{ $d->kepala_keluarga }}</td>
                                             <td>{{ $d->no_kk }}</td>

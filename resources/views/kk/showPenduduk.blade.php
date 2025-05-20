@@ -345,10 +345,10 @@
                             </button>
 
                             <!-- @if (count($penduduk) > 0)
-                                                        <a href="{{ url('penduduk/export/' . encrypt($data->id)) }}" class="btn btn-danger rounded-pill">
-                                                            <i class="fas fa-file-pdf"></i> Export PDF
-                                                        </a>
-                                                    @endif -->
+                                                            <a href="{{ url('penduduk/export/' . encrypt($data->id)) }}" class="btn btn-danger rounded-pill">
+                                                                <i class="fas fa-file-pdf"></i> Export PDF
+                                                            </a>
+                                                        @endif -->
                         </div>
 
                         <!-- Tambahkan class 'table-responsive' untuk tampilan mobile -->
@@ -407,19 +407,33 @@
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
                                             <td>
+                                                @php
+
+                                                $imageKtpSrc = 'storage/foto_ktp/default.jpg';
+
+                                                if ($pd->image_ktp) {
+                                                if (Str::startsWith($pd->image_ktp, ['data:image', 'http', 'https'])) {
+                                                $imageKtpSrc = $pd->image_ktp;
+                                                } elseif (file_exists(public_path('storage/foto_ktp/' . $pd->image_ktp))) {
+                                                $imageKtpSrc = 'storage/foto_ktp/' . $pd->image_ktp;
+                                                }
+                                                }
+                                                @endphp
+
                                                 <a href="#"
-                                                    onclick="showImageModal('{{ asset('storage/foto_ktp/' . ($pd->image_ktp ?: 'default.jpg')) }}','{{ $pd->nama }}')">
-                                                    <img src="{{ asset('storage/foto_ktp/' . ($pd->image_ktp ?: 'default.jpg')) }}"
-                                                        alt="Foto KTP" class="img-thumbnail"
+                                                    onclick="showImageModal('{{ asset($imageKtpSrc) }}','{{ $pd->nama }}')">
+                                                    <img src="{{ asset($imageKtpSrc) }}" alt="Foto KTP" class="img-thumbnail"
                                                         style="width: 100%; height: 100%; object-fit: cover;">
                                                 </a>
+
                                             </td>
                                             <td>{{ $pd->nama }}</td>
                                             <td class="d-none d-md-table-cell">{{ $pd->nik }}</td>
                                             <td>{{ $pd->no_hp }}</td>
                                             {{-- <td class="d-none d-lg-table-cell">{{ $pd->alamat }}</td> --}}
                                             <td class="d-none d-md-table-cell">{{ $pd->rt->rt }} / {{ $pd->rw->rw }}</td>
-                                            {{-- <td class="d-none d-lg-table-cell">Rp.{{ number_format($pd->gaji, 0, '.', '.') }},-
+                                            {{-- <td class="d-none d-lg-table-cell">Rp.{{ number_format($pd->gaji, 0, '.', '.')
+                                                }},-
                                             </td> --}}
                                             <td>
                                                 <div class="dropdown">

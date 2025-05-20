@@ -207,12 +207,24 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>
-                                            <a href="#"
-                                                onclick="showImageModal('{{ asset('storage/foto_rt/' . ($d->image_rt ?: 'default.jpg')) }}', '{{ $d->nama }}')">
-                                                <img src="{{ asset('storage/foto_rt/' . ($d->image_rt ?: 'default.jpg')) }}"
-                                                    alt="Foto RT" class="img-thumbnail"
+                                            @php
+
+                                            $imageSrc = 'storage/foto_rt/default.jpg';
+
+                                            if ($d->image_rt) {
+                                            if (Str::startsWith($d->image_rt, ['data:image', 'http', 'https'])) {
+                                            $imageSrc = $d->image_rt;
+                                            } elseif (file_exists(public_path('storage/foto_rt/' . $d->image_rt))) {
+                                            $imageSrc = 'storage/foto_rt/' . $d->image_rt;
+                                            }
+                                            }
+                                            @endphp
+
+                                            <a href="#" onclick="showImageModal('{{ asset($imageSrc) }}', '{{ $d->nama }}')">
+                                                <img src="{{ asset($imageSrc) }}" alt="Foto RT" class="img-thumbnail"
                                                     style="width: 100%; height: 100%; object-fit: cover;">
                                             </a>
+
                                         </td>
                                         <td style="min-width: 200px;">{{ $d->nama }}</td>
                                         <td>{{ $d->no_hp }}</td>
@@ -233,13 +245,13 @@
                                                             <i class="fas fa-eye text-info me-2"></i> Lihat
                                                         </a>
                                                     </li>
+                                                    @hasrole('superadmin')
                                                     <li>
                                                         <button class="dropdown-item text-success" data-bs-toggle="modal"
                                                             data-bs-target="#editData{{ $d->id }}">
                                                             <i class="fas fa-edit"></i> Edit
                                                         </button>
                                                     </li>
-                                                    @hasrole('superadmin')
                                                     <li>
                                                         <button class="dropdown-item text-danger" data-bs-toggle="modal"
                                                             data-bs-target="#modalDelete{{ $d->id }}">

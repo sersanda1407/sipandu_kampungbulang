@@ -143,7 +143,7 @@
 
 
                                 </div>
-                                <div class="card-body chart-container">
+                                <div class="card-body chart-container" style="height: 300px;">
                                     <canvas id="warga"></canvas>
                                 </div>
                                 <div class="p-3">
@@ -194,7 +194,7 @@
                                     </h2>
                                     <div id="collapseUsia" class="accordion-collapse collapse" aria-labelledby="headingUsia"
                                         data-bs-parent="#grafikAccordion">
-                                        <div class="accordion-body chart-container">
+                                        <div class="accordion-body chart-container" style="height: 300px;">
                                             <canvas id="usia"></canvas>
                                         </div>
                                     </div>
@@ -235,7 +235,7 @@
                                     </h2>
                                     <div id="collapsePekerjaan" class="accordion-collapse collapse"
                                         aria-labelledby="headingPekerjaan" data-bs-parent="#grafikAccordion">
-                                        <div class="accordion-body chart-container">
+                                        <div class="accordion-body chart-container" style="height: 300px;">
                                             <canvas id="pekerjaan"></canvas>
                                         </div>
                                         <div class="p-3">
@@ -370,26 +370,46 @@
 
                                     <div class="mt-3">
                                         <label for="keperluan" class="form-label">Ada yang mau diurus?</label>
-                                        <select class="form-select" id="keperluan">
+                                        <select class="form-select" id="keperluan" onchange="toggleInput(this)">
                                             <option value="" selected>Pilih keperluan...</option>
                                             <option value="Surat Keterangan Domisili">Surat Keterangan Domisili</option>
-                                            <option value="Surat Pengantar SKCK">Surat Pengantar SKCK</option>
-                                            <option value="Pendaftaran/Perubahan KK">Pendaftaran/Perubahan KK</option>
+                                            <option value="Pendaftaran/Perubahan KTP">Pendaftaran/Perubahan KK</option>
                                             <option value="Pengurusan KTP Baru">Pengurusan KTP Baru</option>
                                             <option value="Izin Keramaian">Izin Keramaian</option>
                                             <option value="Pelaporan Warga Baru">Pelaporan Warga Baru</option>
                                             <option value="Pelaporan Warga Meninggal">Pelaporan Warga Meninggal</option>
+                                            <option value="lainnya">Lainnya...</option>
                                         </select>
                                     </div>
+                                    <div class="mt-3" id="keperluan-lainnya" style="display: none;">
+                                        <label for="keperluan_custom" class="form-label">Tuliskan keperluan Anda:</label>
+                                        <input type="text" class="form-control" id="keperluan_custom"
+                                            placeholder="Masukkan keperluan lainnya">
+                                    </div>
+
+                                    <div class="mt-3">
+                                        <button type="button" class="btn btn-primary" onclick="bukaModal()">Lanjutkan</button>
+                                    </div>
+
                                 </div>
                                 <div class="col-md-3 mt-3 mt-md-0 text-md-end text-center">
                                     @if($rt && $rt->image_rt)
-                                        <img src="{{ asset('storage/foto_rt/' . $rt->image_rt) }}" alt="Foto Ketua RT"
-                                            class="img-fluid rounded shadow-sm" style="max-width: 150px;">
+                                        {{-- Cek apakah isinya berupa base64 atau URL langsung dari database --}}
+                                        @if(Str::startsWith($rt->image_rt, ['data:image', 'http', 'https']))
+                                            <img src="{{ $rt->image_rt }}" alt="Foto Ketua RT" class="img-fluid rounded shadow-sm"
+                                                style="max-width: 150px;">
+                                        @elseif(file_exists(public_path('storage/foto_rt/' . $rt->image_rt)))
+                                            {{-- Fallback: ambil dari storage jika nama file tersimpan --}}
+                                            <img src="{{ asset('storage/foto_rt/' . $rt->image_rt) }}" alt="Foto Ketua RT"
+                                                class="img-fluid rounded shadow-sm" style="max-width: 150px;">
+                                        @else
+                                            <p class="text-muted">Foto Ketua RT tidak ditemukan.</p>
+                                        @endif
                                     @else
                                         <p class="text-muted">Foto Ketua RT belum tersedia.</p>
                                     @endif
                                 </div>
+
                             </div>
 
                             {{-- Modal Konfirmasi --}}
@@ -431,68 +451,108 @@
                                 </div>
                                 <div class="col-md-3 mt-3 mt-md-0 text-md-end text-center">
                                     @if($rw && $rw->image_rw)
-                                        <img src="{{ asset('storage/foto_rw/' . $rw->image_rw) }}" alt="Foto Ketua RW"
-                                            class="img-fluid rounded shadow-sm" style="max-width: 150px;">
+                                        @if(Str::startsWith($rw->image_rw, ['data:image', 'http', 'https']))
+                                            <img src="{{ $rw->image_rw }}" alt="Foto Ketua RW" class="img-fluid rounded shadow-sm"
+                                                style="max-width: 150px;">
+                                        @elseif(file_exists(public_path('storage/foto_rw/' . $rw->image_rw)))
+                                            <img src="{{ asset('storage/foto_rw/' . $rw->image_rw) }}" alt="Foto Ketua RW"
+                                                class="img-fluid rounded shadow-sm" style="max-width: 150px;">
+                                        @else
+                                            <p class="text-muted">Foto Ketua RW tidak ditemukan.</p>
+                                        @endif
                                     @else
                                         <p class="text-muted">Foto Ketua RW belum tersedia.</p>
                                     @endif
                                 </div>
+
                             </div>
                         </div>
                     </div>
-
-
-
-                    <script>
-                        const keperluanSelect = document.getElementById('keperluan');
-                        const btnKirimWA = document.getElementById('btnKirimWA');
-                        let selectedKeperluan = '';
-
-                        const namaRt = "{{ $rt->nama ?? '' }}";
-                        const alamatWarga = "{{ $warga->alamat ?? '' }}";
-                        const rtId = "{{ $rt->rt ?? '' }}";
-
-                        keperluanSelect.addEventListener('change', function () {
-                            if (this.value) {
-                                selectedKeperluan = this.value;
-
-                                modalBodyContent.innerHTML = `Anda ingin mengirim pesan ke Ketua RT ${rtId} ${namaRt} untuk mengurus <strong>${selectedKeperluan}</strong>?`;
-
-                                var modal = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
-                                modal.show();
-                            }
-                        });
-
-                        btnKirimWA.addEventListener('click', function () {
-                            const now = new Date();
-                            const hour = now.getHours();
-                            let greeting = "Selamat pagi";
-
-                            if (hour >= 12 && hour < 15) {
-                                greeting = "Selamat siang";
-                            } else if (hour >= 15) {
-                                greeting = "Selamat sore";
-                            }
-
-                            const nama = "{{ Auth::user()->name ?? 'nama' }}";
-                            const namaRt = "{{ $rt->nama ?? '' }}";
-                            const alamatWarga = "{{ $warga->alamat ?? '' }}";
-                            const rtId = "{{ $rt->rt ?? '' }}";
-                            const rwId = "{{ $rw->rw ?? '' }}";
-                            const noHpRt = "{{ preg_replace('/^0/', '62', $rt->no_hp) }}";
-                            const pesan = `[PESAN DARI APLIKASI SIPANDU]  \n\n\nAssalamualaikum\n${greeting}\n\nPerkenalkan, saya:\nNama : *${nama}*\nAlamat : ${alamatWarga}, RT ${rtId} / RW ${rwId}\nKeperluan : *Ingin mengurus ${selectedKeperluan}*\n\nTerima kasih banyak atas perhatian dan waktunya. Semoga sehat selalu dan dilancarkan segala aktivitasnya. 🙏🏻\n\n\n_*Pesan ini dikirim secara otomatis_`;
-
-                            const url = `https://wa.me/${noHpRt}?text=${encodeURIComponent(pesan)}`;
-                            window.open(url, '_blank');
-                        });
-                    </script>
                 @endif
+
+                <script>
+                    const keperluanSelect = document.getElementById('keperluan');
+                    const customInput = document.getElementById('keperluan_custom');
+                    const modalBodyContent = document.getElementById('modalBodyContent');
+                    const btnKirimWA = document.getElementById('btnKirimWA');
+                    const keperluanLainnyaDiv = document.getElementById('keperluan-lainnya');
+
+                    let selectedKeperluan = '';
+
+                    const nama = "{{ Auth::user()->name ?? 'nama' }}";
+                    const namaRt = "{{ $rt->nama ?? '' }}";
+                    const alamatWarga = "{{ $warga->alamat ?? '' }}";
+                    const rtId = "{{ $rt->rt ?? '' }}";
+                    const rwId = "{{ $rw->rw ?? '' }}";
+                    const noHpRt = "{{ preg_replace('/^0/', '62', $rt->no_hp) }}";
+
+                    // Tampilkan input jika pilih 'lainnya'
+                    keperluanSelect.addEventListener('change', function () {
+                        if (this.value === 'lainnya') {
+                            keperluanLainnyaDiv.style.display = 'block';
+                        } else {
+                            keperluanLainnyaDiv.style.display = 'none';
+                        }
+                    });
+
+                    function bukaModal() {
+                        const selectedValue = keperluanSelect.value;
+                        const customValue = customInput.value.trim();
+
+                        // Validasi input
+                        if (!selectedValue) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Keperluan belum dipilih',
+                                text: 'Silakan pilih keperluan terlebih dahulu.',
+                            });
+                            return;
+                        }
+
+                        if (selectedValue === 'lainnya') {
+                            if (!customValue) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Keperluan belum diisi',
+                                    text: 'Silakan tuliskan keperluan Anda terlebih dahulu.',
+                                });
+                                return;
+                            }
+                            selectedKeperluan = customValue;
+                        } else {
+                            selectedKeperluan = selectedValue;
+                        }
+
+                        // Tampilkan konfirmasi di modal
+                        modalBodyContent.innerHTML = `Anda ingin mengirim pesan ke Ketua RT ${rtId} ${namaRt} untuk mengurus <strong>${selectedKeperluan}</strong>?`;
+
+                        const modal = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
+                        modal.show();
+                    }
+
+                    btnKirimWA.addEventListener('click', function () {
+                        const now = new Date();
+                        const hour = now.getHours();
+                        let greeting = "Selamat pagi";
+
+                        if (hour >= 12 && hour < 15) {
+                            greeting = "Selamat siang";
+                        } else if (hour >= 15) {
+                            greeting = "Selamat sore";
+                        }
+
+                        const pesan = `[PESAN DARI APLIKASI SIPANDU]  \n\n\nAssalamualaikum\n${greeting}\n\nPerkenalkan, saya:\nNama : *${nama}*\nAlamat : ${alamatWarga}, RT ${rtId} / RW ${rwId}\nKeperluan : *Ingin mengurus ${selectedKeperluan}*\n\nTerima kasih banyak atas perhatian dan waktunya. Semoga sehat selalu dan dilancarkan segala aktivitasnya. 🙏🏻\n\n\n_*Pesan ini dikirim secara otomatis_`;
+
+                        const url = `https://wa.me/${noHpRt}?text=${encodeURIComponent(pesan)}`;
+                        window.open(url, '_blank');
+                    });
+                </script>
 
                 @endhasrole
 
                 @hasrole('rw')
                 <p>Cek data warga di Lingkungan RW {{ \App\DataRw::where('user_id', Auth::id())->value('rw') ?? '' }},
-                    Kelurahan Kampung Bulang</p>
+                    Kelurahan Kampung Bulang tahun {{ $currentYear }}</p>
                 <div class="row">
                     <div class="col-12 col-sm-6 col-lg-3 mb-3">
                         <a href="{{ url('/rt') }}">
@@ -600,7 +660,7 @@
 
 
                             </div>
-                            <div class="card-body chart-container">
+                            <div class="card-body chart-container" style="height: 300px;">
                                 <canvas id="warga"></canvas>
                             </div>
                             <div class="p-3">
@@ -650,7 +710,7 @@
                                 </h2>
                                 <div id="collapseUsia" class="accordion-collapse collapse" aria-labelledby="headingUsia"
                                     data-bs-parent="#grafikAccordion">
-                                    <div class="accordion-body chart-container">
+                                    <div class="accordion-body chart-container" style="height: 300px;">
                                         <canvas id="usia"></canvas>
                                     </div>
                                 </div>
@@ -691,7 +751,7 @@
                                 </h2>
                                 <div id="collapsePekerjaan" class="accordion-collapse collapse"
                                     aria-labelledby="headingPekerjaan" data-bs-parent="#grafikAccordion">
-                                    <div class="accordion-body chart-container">
+                                    <div class="accordion-body chart-container" style="height: 300px;">
                                         <canvas id="pekerjaan"></canvas>
                                     </div>
                                     <div class="p-3">
@@ -878,7 +938,7 @@
 
 
                             </div>
-                            <div class="card-body chart-container">
+                            <div class="card-body chart-container" style="height: 300px;">
                                 <canvas id="warga"></canvas>
                             </div>
                             <div class="p-3">
@@ -928,7 +988,7 @@
                                 </h2>
                                 <div id="collapseUsia" class="accordion-collapse collapse" aria-labelledby="headingUsia"
                                     data-bs-parent="#grafikAccordion">
-                                    <div class="accordion-body chart-container">
+                                    <div class="accordion-body chart-container" style="height: 300px;">
                                         <canvas id="usia"></canvas>
                                     </div>
                                 </div>
@@ -969,7 +1029,7 @@
                                 </h2>
                                 <div id="collapsePekerjaan" class="accordion-collapse collapse"
                                     aria-labelledby="headingPekerjaan" data-bs-parent="#grafikAccordion">
-                                    <div class="accordion-body chart-container">
+                                    <div class="accordion-body chart-container" style="height: 300px;">
                                         <canvas id="pekerjaan"></canvas>
                                     </div>
                                     <div class="p-3">
@@ -1071,10 +1131,9 @@
 
     </section>
 
-
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // CHART GENDER
@@ -1100,15 +1159,15 @@
         const chartUsia = new Chart(document.getElementById('usia'), {
             type: 'bar',
             data: {
-                labels: ['Newborn', 'Batita', 'Balita', 'Anak-anak', 'Remaja', 'Dewasa'],
+                labels: ['Newborn(<1)', 'Batita(<3)', 'Balita(<5)', 'Anak-anak(6-15)', 'Remaja(17-20)', 'Dewasa(21+)'],
                 datasets: [{
                     label: 'Kategori Usia',
                     data: [
-                                                                            {{ $usia_counts['newborn'] ?? 0 }},
-                                                                            {{ $usia_counts['batita'] ?? 0 }},
-                                                                            {{ $usia_counts['balita'] ?? 0 }},
-                                                                            {{ $usia_counts['anak_anak'] ?? 0 }},
-                                                                            {{ $usia_counts['remaja'] ?? 0 }},
+                                                                {{ $usia_counts['newborn'] ?? 0 }},
+                                                                {{ $usia_counts['batita'] ?? 0 }},
+                                                                {{ $usia_counts['balita'] ?? 0 }},
+                                                                {{ $usia_counts['anak_anak'] ?? 0 }},
+                                                                {{ $usia_counts['remaja'] ?? 0 }},
                         {{ $usia_counts['dewasa'] ?? 0 }}
                     ],
                     backgroundColor: [
@@ -1150,7 +1209,7 @@
                         @foreach ($data_month as $data)
                             {{ $data }},
                         @endforeach
-                                                                        ],
+                                                                                                            ],
                     fill: true,
                     borderColor: '#56b6f7',
                     tension: 0.3
@@ -1352,7 +1411,4 @@
             chartPernikahan.resize();
         });
     </script>
-
-
-
 @endsection

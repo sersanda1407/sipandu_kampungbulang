@@ -59,17 +59,24 @@
             <div class="card-body">
                 <h4 class="card-title mb-4 text-center text-md-start">Data Singkat Ketua RW</h4>
                 <div class="row align-items-start g-4">
+                    @php
+                        $imageSrc = 'storage/foto_rw/default.png'; // default path
+
+                        if ($data->image_rw) {
+                            if (Str::startsWith($data->image_rw, ['data:image', 'http', 'https'])) {
+                                $imageSrc = $data->image_rw;
+                            } elseif (file_exists(public_path('storage/foto_rw/' . $data->image_rw))) {
+                                $imageSrc = 'storage/foto_rw/' . $data->image_rw;
+                            }
+                        }
+                    @endphp
+
                     <div class="col-md-4 text-center">
-                        @if ($data->image_rw)
-                            <a href="#"
-                                onclick="downloadImageAsPNG('{{ asset('storage/foto_rw/' . $data->image_rw) }}', '{{ $data->nama }}')">
-                                <img src="{{ asset('storage/foto_rw/' . $data->image_rw) }}" alt="Foto RW"
-                                    class="image-preview img-fluid">
-                            </a>
-                        @else
-                            <img src="{{ asset('storage/foto_rw/default.png') }}" alt="Foto RW" class="image-preview img-fluid">
-                        @endif
+                        <a href="#" onclick="downloadImageAsPNG('{{ asset($imageSrc) }}', '{{ $data->nama }}')">
+                            <img src="{{ asset($imageSrc) }}" alt="Foto RW" class="image-preview img-fluid">
+                        </a>
                     </div>
+
                     <div class="col-md-8">
                         <div class="row mb-3">
                             <div class="col-sm-5 info-label">Nama Ketua RW:</div>

@@ -16,6 +16,7 @@ class DashboardController extends Controller
     {
         $tahun_terpilih = $request->get('tahun', date('Y'));
         $list_tahun = range(0001, date('Y'));
+        $currentYear = now()->year;
 
         // Cek apakah user adalah RW atau RT (memiliki relasi ke DataRw / relasi ke DataRt)
         $rw_user_id = \App\DataRw::where('user_id', Auth::id())->value('id');
@@ -37,6 +38,7 @@ class DashboardController extends Controller
 
         // Query penduduk dengan filter
         $query = DataPenduduk::query();
+        
 
         if ($filter_rw) {
             $query->where('rw_id', $filter_rw);
@@ -46,7 +48,8 @@ class DashboardController extends Controller
             $query->where('rt_id', $filter_rt);
         }
 
-        $dataPenduduk = $query->get();
+        // $dataPenduduk = $query->get();
+        $dataPenduduk = $query->whereYear('created_at', $tahun_terpilih)->get();
 
         // Ambil data pertambahan per bulan
         $data_pertambahan = $this->getDataPertambahanWargaPerBulan($tahun_terpilih, $filter_rw, $filter_rt);
@@ -144,7 +147,8 @@ class DashboardController extends Controller
             'list_tahun',
             'total_pertambahan',
             'filter_rw',
-            'filter_rt'
+            'filter_rt',
+            'currentYear'
         ));
     }
 
