@@ -115,7 +115,7 @@
 <body>
 
   <div class="text-center kop-surat">
-    <img src="assets/images/kop_surat_kpbulang.png" alt="Kop Surat Kelurahan Kampung Bulang">
+    <img src="assets/images/kop_surat_kpbulang.webp" alt="Kop Surat Kelurahan Kampung Bulang">
     <div class="mb-3 text-right" style="margin-right: 20px;">
       <p>
         Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}

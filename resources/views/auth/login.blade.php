@@ -8,100 +8,7 @@
     <link rel="stylesheet" href="assets/css/main/app.css">
     <link rel="stylesheet" href="assets/css/pages/auth.css">
     <!-- <link rel="shortcut icon" href="assets/images/logo/favicon.svg" type="image/x-icon"> -->
-    <link rel="shortcut icon" href="assets/images/logo/2.png" type="image/png">
-
-
-    <style>
-        .bg-image {
-            width: 100%;
-            height: 100%;
-        }
-
-
-        .overlay-logo1 {
-            position: absolute;
-            top: 30px;
-            left: 65px;
-            max-width: 80px;
-            max-height: 70px;
-            width: auto;
-            height: auto;
-            z-index: 10;
-            filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.5));
-        }
-
-        .overlay-text {
-            position: absolute;
-            top: 30px;
-            /* Sesuaikan dengan posisi logo */
-            left: 130px;
-            /* Jarak dari logo */
-            color: white;
-            font-weight: bold;
-            z-index: 11;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-        }
-
-        .overlay-text h2 {
-            font-size: 16px;
-            color: white;
-            margin: 0;
-        }
-
-        .overlay-text p {
-            font-size: 12px;
-            margin: 5px 0 0;
-        }
-
-        .logo {
-            width: 160px;
-            height: auto;
-            display: block;
-            /* Supaya bisa margin auto */
-            margin: 0 auto 0px;
-            /* Tengah + margin bawah */
-            filter: drop-shadow(5px 5px 10px rgba(255, 255, 255, 0.5));
-        }
-
-
-        .logo-text {
-            font-size: 24px;
-            font-weight: bold;
-            text-shadow: 2px 2px 5px rgba(135, 133, 255, 0.7);
-            margin: 10px 0 0;
-        }
-
-        .mobile-only {
-            display: none !important;
-        }
-
-        .pc-only {
-            display: flex;
-        }
-
-        /* Responsive Settings */
-        @media (max-width: 768px) {
-            .pc-only {
-                display: none !important;
-            }
-
-            .mobile-only {
-                display: flex !important;
-                align-items: center;
-                justify-content: center;
-                padding: 10px 0;
-            }
-
-            .mobile-hr {
-                display: block !important;
-                width: 100%;
-                border: none;
-                border-top: 1px solid #ccc;
-                margin: 10px 0;
-            }
-        }
-    </style>
-
+    <link rel="shortcut icon" href="assets/images/logo/2.webp" loading="lazy" type="image/png">
 
 </head>
 
@@ -110,15 +17,13 @@
         <div class="row h-100">
             <div class="col-lg-7 d-none d-lg-block position-relative">
                 <div id="auth-right">
-                    <img src="assets/images/bg_data.png" alt="" class="bg-image">
+                    <img src="assets/images/bg_data.webp" loading="lazy" alt="" class="bg-image">
 
                     <!-- Logo -->
-                    <img src="assets/images/Lambang_Kota_Tanjungpinang.png" alt="Logo" class="overlay-logo1">
-                    <!-- <img src="assets/images/logo/2.png" alt="Logo" class="overlay-logo"> -->
+                    <img src="assets/images/Lambang_Kota_Tanjungpinang.webp" loading="lazy" alt="Logo" class="overlay-logo1">
 
                     <!-- Tulisan di sebelah kanan logo -->
                     <div class="overlay-text">
-                        <!-- <h2>SIPEKA | Kampung Bulang</h2> -->
                         <p>Sistem Informasi <br> Pendataan Penduduk Terpadu <br>Kampung Bulang</p>
                     </div>
                 </div>
@@ -140,14 +45,12 @@
                         <div class="card-body">
                             <!-- Logo untuk Mobile -->
                             <div class="logo mobile-only">
-                                <img src="assets/images/logo/logo_sipandu.png" alt="Logo" class="logo">
+                                <img src="assets/images/logo/logo_sipandu.webp" loading="lazy" alt="Logo" class="logo">
                             </div>
                             <div class="mobile-only">
                                 <hr class="mobile-hr">
                             </div>
-                            <!-- <hr class="mobile-only mobile-hr"
-                                style="border: none; border-top: 1px solid #ccc; margin: 20px 0;"> -->
-
+                        
                             <h3 class="text-center fw-bold mb-4">Login</h3>
 
                             <form action="{{ route('login') }}" method="POST">
