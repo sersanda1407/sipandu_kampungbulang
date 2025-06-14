@@ -5,69 +5,73 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\User;
+use App\DataKk;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
 
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
     protected $redirectTo = RouteServiceProvider::HOME;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('guest');
     }
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'kepala_keluarga' => 'required|string|max:255',
+            'no_kk' => 'required|string|max:255|unique:users,email',
+            'alamat' => 'required|string',
+            'rt_id' => 'required|integer',
+            'rw_id' => 'required|integer',
+            'image' => 'required|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
         ]);
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\User
-     */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        try {
+            // Buat akun user
+            $user = User::create([
+                'name' => $data['kepala_keluarga'],
+                'email' => $data['no_kk'],
+                'password' => Hash::make('password'),
+            ]);
+
+            // Simpan data KK
+            $kk = new DataKk();
+            $kk->kepala_keluarga = $data['kepala_keluarga'];
+            $kk->no_kk = $data['no_kk'];
+            $kk->rt_id = $data['rt_id'];
+            $kk->rw_id = $data['rw_id'];
+            $kk->alamat = $data['alamat'];
+            $kk->user_id = $user->id;
+
+            // Simpan gambar jika tersedia
+            if (request()->hasFile('image')) {
+                $image = request()->file('image');
+                $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
+                $image->storeAs('foto_kk', $filename, 'public');
+                $kk->image = $filename;
+            }
+
+            $kk->save();
+
+            // Beri role 'warga'
+            $user->assignRole('warga');
+
+            session()->flash('success', 'Pendaftaran berhasil. Silakan login menggunakan No KK dan password: password');
+            return $user;
+        } catch (\Illuminate\Database\QueryException $e) {
+            session()->flash('error', $e->errorInfo[1] == 1062 ? 'No KK sudah terdaftar.' : 'Terjadi kesalahan saat pendaftaran.');
+            return redirect()->back()->withInput();
+        }
     }
 }

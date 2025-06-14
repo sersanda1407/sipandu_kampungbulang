@@ -133,6 +133,14 @@ class DashboardController extends Controller
                 $data_ekonomi['Mampu']++;
         }
 
+$data_agama = $dataPenduduk->whereNotNull('agama')
+    ->groupBy('agama')
+    ->map(function ($group) {
+        return $group->count();
+    })
+    ->toArray();
+
+
         return view('dashboard', compact(
             'data_month',
             'gender_laki',
@@ -148,7 +156,8 @@ class DashboardController extends Controller
             'total_pertambahan',
             'filter_rw',
             'filter_rt',
-            'currentYear'
+            'currentYear',
+            'data_agama'
         ));
     }
 

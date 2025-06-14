@@ -182,6 +182,30 @@
                         <!-- Sidebar Grafik Kanan -->
                         <div class="col-12 col-lg-3">
                             <div class="accordion" id="grafikAccordion">
+                                <!-- Agama -->
+                                <div class="accordion-item shadow mb-2">
+                                    <h2 class="accordion-header" id="headingAgama">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseAgama" aria-expanded="false"
+                                            aria-controls="collapseAgama">
+                                            Agama
+                                        </button>
+                                    </h2>
+                                    <div id="collapseAgama" class="accordion-collapse collapse"
+                                        aria-labelledby="headingAgama" data-bs-parent="#grafikAccordion">
+                                        <div class="accordion-body chart-container" style="height: 300px">
+                                            <canvas id="agama"></canvas>
+                                        </div>
+                                        <div class="p-3">
+                                            <strong>Keterangan:</strong>
+                                            <ul class="mb-0">
+                                                @foreach($data_agama as $agama => $jumlah)
+                                                    <li>{{ $agama }} = {{ $jumlah }} orang</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <!-- Usia -->
                                 <div class="accordion-item shadow mb-2">
@@ -197,7 +221,19 @@
                                         <div class="accordion-body chart-container" style="height: 300px;">
                                             <canvas id="usia"></canvas>
                                         </div>
+                                        <div class="p-3">
+                                            <strong>Keterangan:</strong>
+                                            <ul class="mb-0">
+                                                <li>Newborn (<1)={{ $usia_counts['newborn'] ?? 0 }} orang</li>
+                                                <li>Batita (<3)={{ $usia_counts['batita'] ?? 0 }} orang</li>
+                                                <li>Balita (<5)={{ $usia_counts['balita'] ?? 0 }} orang</li>
+                                                <li>Anak-Anak (6-15) = {{ $usia_counts['anak_anak'] ?? 0 }} orang</li>
+                                                <li>Remaja (17-20) = {{ $usia_counts['remaja'] ?? 0 }} orang</li>
+                                                <li>Dewasa (21+) = {{ $usia_counts['dewasa'] ?? 0 }} orang</li>
+                                            </ul>
+                                        </div>
                                     </div>
+
                                 </div>
 
                                 <!-- Jenis Kelamin -->
@@ -699,7 +735,29 @@
                     <!-- Sidebar Grafik Kanan -->
                     <div class="col-12 col-lg-3">
                         <div class="accordion" id="grafikAccordion">
-
+ <div class="accordion-item shadow mb-2">
+                                    <h2 class="accordion-header" id="headingAgama">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseAgama" aria-expanded="false"
+                                            aria-controls="collapseAgama">
+                                            Agama
+                                        </button>
+                                    </h2>
+                                    <div id="collapseAgama" class="accordion-collapse collapse"
+                                        aria-labelledby="headingAgama" data-bs-parent="#grafikAccordion">
+                                        <div class="accordion-body chart-container" style="height: 300px">
+                                            <canvas id="agama"></canvas>
+                                        </div>
+                                        <div class="p-3">
+                                            <strong>Keterangan:</strong>
+                                            <ul class="mb-0">
+                                                @foreach($data_agama as $agama => $jumlah)
+                                                    <li>{{ $agama }} = {{ $jumlah }} orang</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
                             <!-- Usia -->
                             <div class="accordion-item shadow mb-2">
                                 <h2 class="accordion-header" id="headingUsia">
@@ -713,6 +771,17 @@
                                     <div class="accordion-body chart-container" style="height: 300px;">
                                         <canvas id="usia"></canvas>
                                     </div>
+                                    <div class="p-3">
+                                            <strong>Keterangan:</strong>
+                                            <ul class="mb-0">
+                                                <li>Newborn (<1)={{ $usia_counts['newborn'] ?? 0 }} orang</li>
+                                                <li>Batita (<3)={{ $usia_counts['batita'] ?? 0 }} orang</li>
+                                                <li>Balita (<5)={{ $usia_counts['balita'] ?? 0 }} orang</li>
+                                                <li>Anak-Anak (6-15) = {{ $usia_counts['anak_anak'] ?? 0 }} orang</li>
+                                                <li>Remaja (17-20) = {{ $usia_counts['remaja'] ?? 0 }} orang</li>
+                                                <li>Dewasa (21+) = {{ $usia_counts['dewasa'] ?? 0 }} orang</li>
+                                            </ul>
+                                        </div>
                                 </div>
                             </div>
 
@@ -977,7 +1046,29 @@
                     <!-- Sidebar Grafik Kanan -->
                     <div class="col-12 col-lg-3">
                         <div class="accordion" id="grafikAccordion">
-
+ <div class="accordion-item shadow mb-2">
+                                    <h2 class="accordion-header" id="headingAgama">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseAgama" aria-expanded="false"
+                                            aria-controls="collapseAgama">
+                                            Agama
+                                        </button>
+                                    </h2>
+                                    <div id="collapseAgama" class="accordion-collapse collapse"
+                                        aria-labelledby="headingAgama" data-bs-parent="#grafikAccordion">
+                                        <div class="accordion-body chart-container" style="height: 300px">
+                                            <canvas id="agama"></canvas>
+                                        </div>
+                                        <div class="p-3">
+                                            <strong>Keterangan:</strong>
+                                            <ul class="mb-0">
+                                                @foreach($data_agama as $agama => $jumlah)
+                                                    <li>{{ $agama }} = {{ $jumlah }} orang</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
                             <!-- Usia -->
                             <div class="accordion-item shadow mb-2">
                                 <h2 class="accordion-header" id="headingUsia">
@@ -991,6 +1082,17 @@
                                     <div class="accordion-body chart-container" style="height: 300px;">
                                         <canvas id="usia"></canvas>
                                     </div>
+                                    <div class="p-3">
+                                            <strong>Keterangan:</strong>
+                                            <ul class="mb-0">
+                                                <li>Newborn (<1)={{ $usia_counts['newborn'] ?? 0 }} orang</li>
+                                                <li>Batita (<3)={{ $usia_counts['batita'] ?? 0 }} orang</li>
+                                                <li>Balita (<5)={{ $usia_counts['balita'] ?? 0 }} orang</li>
+                                                <li>Anak-Anak (6-15) = {{ $usia_counts['anak_anak'] ?? 0 }} orang</li>
+                                                <li>Remaja (17-20) = {{ $usia_counts['remaja'] ?? 0 }} orang</li>
+                                                <li>Dewasa (21+) = {{ $usia_counts['dewasa'] ?? 0 }} orang</li>
+                                            </ul>
+                                        </div>
                                 </div>
                             </div>
 
@@ -1136,6 +1238,61 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        // CHART AGAMA
+    const chartAgama = new Chart(document.getElementById('agama'), {
+        type: 'bar',
+        data: {
+            // label sesuai yang kamu inginkan
+            labels: ['Islam', 'Katolik', 'Protestan', 'Konghucu', 'Buddha', 'Hindu'], 
+            datasets: [{
+                label: 'Jumlah Agama',
+                // pastikan urutan sesuai label
+                data: [
+                    {{ $data_agama['Islam'] ?? 0 }}, 
+                    {{ $data_agama['Katolik'] ?? 0 }},
+                    {{ $data_agama['Protestan'] ?? 0 }},
+                    {{ $data_agama['Konghucu'] ?? 0 }},
+                    {{ $data_agama['Buddha'] ?? 0 }},
+                    {{ $data_agama['Hindu'] ?? 0 }}
+                ],
+                backgroundColor: [
+                    '#ff6384',
+                    '#ff9f40',
+                    '#ffcd56',
+                    '#4bc0c0',
+                    '#36a2eb',
+                    '#9966ff'
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Auto Resize
+    window.addEventListener('resize', () => {
+        chartAgama.resize();
+    });
+
         // CHART GENDER
         const chartGender = new Chart(document.getElementById('gender'), {
             type: 'doughnut',
@@ -1163,11 +1320,11 @@
                 datasets: [{
                     label: 'Kategori Usia',
                     data: [
-                                                                {{ $usia_counts['newborn'] ?? 0 }},
-                                                                {{ $usia_counts['batita'] ?? 0 }},
-                                                                {{ $usia_counts['balita'] ?? 0 }},
-                                                                {{ $usia_counts['anak_anak'] ?? 0 }},
-                                                                {{ $usia_counts['remaja'] ?? 0 }},
+                            {{ $usia_counts['newborn'] ?? 0 }},
+                            {{ $usia_counts['batita'] ?? 0 }},
+                            {{ $usia_counts['balita'] ?? 0 }},
+                            {{ $usia_counts['anak_anak'] ?? 0 }},
+                            {{ $usia_counts['remaja'] ?? 0 }},
                         {{ $usia_counts['dewasa'] ?? 0 }}
                     ],
                     backgroundColor: [
@@ -1209,7 +1366,7 @@
                         @foreach ($data_month as $data)
                             {{ $data }},
                         @endforeach
-                                                                                                            ],
+                                                                                                                        ],
                     fill: true,
                     borderColor: '#56b6f7',
                     tension: 0.3

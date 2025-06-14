@@ -6,103 +6,117 @@
         use Illuminate\Support\Facades\Crypt;
     @endphp
 
-    {{-- MODAL ADD --}}
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Tambah Data Keluarga</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="{{ url('kk/store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">Kepala Keluarga</label>
-                            <input type="text" class="form-control" name="kepala_keluarga" id="exampleInputEmail1"
-                                aria-describedby="emailHelp" placeholder="Nama Kepala Keluarga" required>
-                        </div>
+{{-- MODAL ADD --}}
 
-                        <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">No.KK</label>
-                            <input type="text" class="form-control" placeholder="Nomor Kartu Keluarga" name="no_kk"
-                                id="exampleInputPassword1" maxlength="16" minlength="16" required>
-                            <span class="text-danger">
-                                <p>*No Kartu Keluarga ini nantinya akan menjadi username / email untuk login ke akun SIPANDU
-                                </p>
-                            </span>
-                        </div>
-                        <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Password Default</label>
-                            <input type="text" class="form-control" placeholder="password" readonly>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="mb-3">
-                                    <label class="form-label">RW</label>
-                                    <select class="form-select" name="rw_id" id="rw_id">
-                                        <option value="">-- Pilih No Wilayah RW --</option>
-                                        @foreach ($selectRw as $rw)
-                                            <option value="{{ $rw->id }}">{{ $rw->rw }} | {{ $rw->nama }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="mb-3">
-                                    <label class="form-label">RT</label>
-                                    <select class="form-select" name="rt_id" id="rt_id">
-                                        <option value="">-- Pilih No Wilayah RT --</option>
-                                        {{-- Akan diisi oleh JS --}}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <script>
-                            // Data RT dalam bentuk array JS
-                            const rtData = @json($selectRt);
-
-                            document.getElementById('rw_id').addEventListener('change', function () {
-                                const rwId = this.value;
-                                const rtSelect = document.getElementById('rt_id');
-
-                                // Kosongkan dulu isi dropdown RT
-                                rtSelect.innerHTML = '<option value="">-- Pilih No Wilayah RT --</option>';
-
-                                // Filter RT berdasarkan rw_id yang sesuai
-                                const filteredRt = rtData.filter(rt => rt.rw_id == rwId);
-
-                                // Tambahkan option ke dropdown RT
-                                filteredRt.forEach(rt => {
-                                    const option = document.createElement('option');
-                                    option.value = rt.id;
-                                    option.textContent = `${rt.rt} | ${rt.nama}`;
-                                    rtSelect.appendChild(option);
-                                });
-                            });
-                        </script>
-
-                        <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Alamat</label>
-                            <input type="text" class="form-control" placeholder="alamat" name="alamat"
-                                id="exampleInputPassword1" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Foto KK</label>
-                            <input type="file" class="form-control" name="image" id="exampleInputPassword1" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </form>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tambah Data Keluarga</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <form action="{{ url('kk/store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Kepala Keluarga</label>
+                        <input type="text" class="form-control" name="kepala_keluarga" id="exampleInputEmail1"
+                            aria-describedby="emailHelp" placeholder="Nama Kepala Keluarga" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="inputNoKK" class="form-label">No.KK</label>
+                        <input 
+                            id="inputNoKK"
+                            type="text" 
+                            class="form-control" 
+                            name="no_kk"
+                            maxlength="16" 
+                            minlength="16" 
+                            placeholder="Nomor Kartu Keluarga" 
+                            required>
+                        <span class="text-danger">
+                            <p>*No Kartu Keluarga ini nantinya akan menjadi username / email untuk login ke akun SIPANDU</p>
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Password Default</label>
+                        <input type="text" class="form-control" placeholder="password" readonly>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label">RW</label>
+                                <select class="form-select" name="rw_id" id="rw_id">
+                                   <option value="">-- Pilih No Wilayah RW --</option>
+                                   @foreach ($selectRw as $rw)
+                                      <option value="{{ $rw->id }}">{{ $rw->rw }} | {{ $rw->nama }}</option>
+                                   @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label">RT</label>
+                                <select class="form-select" name="rt_id" id="rt_id">
+                                   <option value="">-- Pilih No Wilayah RT --</option>
+                                   {{-- Akan diisi oleh JS --}}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        // Filter hanya nomor di input nomor KK
+                        document.getElementById('inputNoKK').addEventListener('input', function (e) {
+                            this.value = this.value.replace(/[^0-9]/g, '');
+                        });
+
+                        // Menghubungkan RW dan RT
+                        const rtData = @json($selectRt);
+
+                        document.getElementById('rw_id').addEventListener('change', function () {
+                            const rwId = this.value;
+                            const rtSelect = document.getElementById('rt_id');
+
+                            // Kosongkan dahulu isi pilihan RT
+                            rtSelect.innerHTML ='<option value="">-- Pilih No Wilayah RT --</option>';
+
+                            // Filter sesuai rwId
+                            const filteredRt = rtData.filter(rt => rt.rw_id == rwId);
+
+                            // Tambahan option
+                            filteredRt.forEach(rt => {
+                                const option = document.createElement('option');
+                                option.value = rt.id;
+                                option.textContent = `${rt.rt} | ${rt.nama}`;
+                                rtSelect.appendChild(option);
+                            });
+                        });
+                    </script>
+
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Alamat</label>
+                        <input type="text" class="form-control" placeholder="alamat" name="alamat" id="exampleInputPassword1" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Foto KK</label>
+                        <input type="file" class="form-control" name="image" id="exampleInputPassword1" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
+
 
     {{-- MODAL DELETE --}}
     @foreach ($data as $r)

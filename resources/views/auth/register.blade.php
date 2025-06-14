@@ -1,77 +1,114 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Register') }}</div>
+<style>
+    body {
+        background-color: #f3f4f6;
+    }
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('register') }}">
-                        @csrf
+    .register-modal {
+        max-width: 600px;
+        margin: 4rem auto;
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 0.4s ease;
+    }
 
-                        <div class="form-group row">
-                            <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Name') }}</label>
+    @keyframes fadeInUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
 
-                            <div class="col-md-6">
-                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
+    .logo-center {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
 
-                                @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+    .logo-center img {
+        height: 60px;
+    }
 
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
+    .logo-center h1 {
+        font-weight: 700;
+        margin-top: 0.5rem;
+        font-size: 1.5rem;
+        color: #198754;
+    }
+</style>
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
+<div class="register-modal">
+    <div class="logo-center">
+        <img src="{{ asset('assets/images/logo/logo_sipandu.webp') }}" alt="Logo SIPANDU" loading="lazy">
+        <h1>SIPANDU</h1>
+        <p>Sistem Informasi Pendataan Penduduk Terpadu</p>
+    </div>
 
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+    <h3 class="text-center fw-bold mb-4">Pendaftaran Akun Warga</h3>
 
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
+    <form method="POST" action="{{ route('kk.store') }}" enctype="multipart/form-data">
+        @csrf
 
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+        <div class="mb-3">
+            <label>Nama Kepala Keluarga</label>
+            <input type="text" name="kepala_keluarga" class="form-control" required>
+        </div>
 
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+        <div class="mb-3">
+            <label>Nomor Kartu Keluarga (No. KK)</label>
+            <input type="text" name="no_kk" class="form-control" required>
+        </div>
 
-                        <div class="form-group row">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-right">{{ __('Confirm Password') }}</label>
+        <div class="mb-3">
+            <label>Alamat</label>
+            <textarea name="alamat" class="form-control" rows="2" required></textarea>
+        </div>
 
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
-                        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label>RT</label>
+                <select name="rt_id" class="form-select" required>
+                    <option value="">-- Pilih RT --</option>
+                    @foreach ($selectRt as $rt)
+                        <option value="{{ $rt->id }}">{{ $rt->nama }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Register') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+            <div class="col-md-6 mb-3">
+                <label>RW</label>
+                <select name="rw_id" class="form-select" required>
+                    <option value="">-- Pilih RW --</option>
+                    @foreach ($selectRw as $rw)
+                        <option value="{{ $rw->id }}">{{ $rw->nama }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
-    </div>
+
+        <div class="mb-3">
+            <label>Upload Foto KK</label>
+            <input type="file" name="image" class="form-control" accept=".jpg,.jpeg,.png,.webp" required>
+        </div>
+
+        <div class="alert alert-info text-sm">
+            Setelah mendaftar, akun akan dibuat otomatis.<br>
+            <strong>Username:</strong> Nomor KK<br>
+            <strong>Password (default):</strong> password
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Daftar</button>
+
+        <p class="text-center mt-3 mb-0">
+            Sudah punya akun? <a href="{{ route('login') }}" class="text-decoration-none text-primary">Login di sini</a>
+        </p>
+    </form>
 </div>
 @endsection

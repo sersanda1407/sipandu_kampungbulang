@@ -2,100 +2,124 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\DataRw;
 use App\DataRt;
-use App\DataPenduduk;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\KkController;
+use App\Http\Controllers\PendudukController;
+use App\Http\Controllers\RwController;
+use App\Http\Controllers\RtController;
 
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', function () {
+    return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
+});
+
+Route::post('/login', [LoginController::class, 'login'])
+    ->middleware('throttle:5,1')
+    ->name('login');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+
+Route::post('/storePublic', [KkController::class, 'storePublic'])->name('kk.storePublic');
+Auth::routes(['register' => false]);
 
 
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Protected Routes (Authenticated Users)
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
+Route::middleware(['auth'])->group(function () {
 
-Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1')->name('login');
+    // Dashboard & Profil
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/edit-profile', [DashboardController::class, 'editProfile'])->name('profile.edit');
+    Route::put('/edit-lurah', [DashboardController::class, 'editLurah'])->name('edit.lurah');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect()->route('dashboard');
-    } else {
-        return redirect()->route('login');
-    }
-});
+    /*
+    |--------------------------------------------------------------------------
+    | RW Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('rw')->group(function () {
+        Route::get('/', [RwController::class, 'index'])->name('rw.index');
+        Route::post('/store', [RwController::class, 'store'])->name('rw.store');
+        Route::put('/update/{id}', [RwController::class, 'update'])->name('rw.update');
+        Route::delete('/delete/{id}', [RwController::class, 'destroy'])->name('rw.delete');
+        Route::post('/reset-password/{id}', [RwController::class, 'resetPassword'])->name('rw.resetPassword');
+        Route::get('/{id}/showRW', [RwController::class, 'show'])->name('rw.show');
 
-
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// });
-
-
-Route::group(['middleware' => ['auth']], function () {
-
-    Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
-
-    Route::group(['prefix' => 'rw'], function () {
-        Route::get('/', 'RwController@index')->name('rw.index');
-        Route::post('/store', 'RwController@store')->name('rw.store');
-        Route::put('/update/{id}', 'RwController@update')->name('rw.update');
-        Route::delete('/delete/{id}', 'RwController@destroy')->name('rw.delete');
-        Route::post('/reset-password/{id}', 'RwController@resetPassword')->name('rw.resetPassword');
-        Route::get('/api/check-nohp', function (Illuminate\Http\Request $r) {
-            return ['exists' => \App\DataRw::where('no_hp', $r->no_hp)->exists()];
+        // API Check
+        Route::get('/api/check-nohp', function (Request $r) {
+            return ['exists' => DataRw::where('no_hp', $r->no_hp)->exists()];
         })->name('api.check-nohp');
-        Route::get('/api/check-rw', function (Illuminate\Http\Request $r) {
-            return ['exists' => \App\DataRw::where('rw', $r->rw)->exists()];
+
+        Route::get('/api/check-rw', function (Request $r) {
+            return ['exists' => DataRw::where('rw', $r->rw)->exists()];
         })->name('api.check-rw');
-        Route::get('/{id}/showRW', 'RwController@show')->name('rw.show');
-
-
     });
-    Route::group(['prefix' => 'rt'], function () {
-        Route::get('/', 'RtController@index')->name('rt.index');
-        Route::post('/store', 'RtController@store')->name('rt.store');
-        Route::put('/update/{id}', 'RtController@update')->name('rt.update');
-        Route::delete('/delete/{id}', 'RtController@destroy')->name('rt.delete');
-        Route::post('/reset-password/{id}', 'RtController@resetPassword')->name('rt.resetPassword');
-        Route::get('/api/check-nohp', function (Illuminate\Http\Request $r) {
-            return ['exists' => \App\DataRt::where('no_hp', $r->no_hp)->exists()];
+
+    /*
+    |--------------------------------------------------------------------------
+    | RT Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('rt')->group(function () {
+        Route::get('/', [RtController::class, 'index'])->name('rt.index');
+        Route::post('/store', [RtController::class, 'store'])->name('rt.store');
+        Route::put('/update/{id}', [RtController::class, 'update'])->name('rt.update');
+        Route::delete('/delete/{id}', [RtController::class, 'destroy'])->name('rt.delete');
+        Route::post('/reset-password/{id}', [RtController::class, 'resetPassword'])->name('rt.resetPassword');
+        Route::get('/{id}/showRT', [RtController::class, 'show'])->name('rt.show');
+
+        // API Check
+        Route::get('/api/check-nohp', function (Request $r) {
+            return ['exists' => DataRt::where('no_hp', $r->no_hp)->exists()];
         })->name('api.check-nohp');
-        Route::get('/{id}/showRT', 'RtController@show')->name('rt.show');
-
-    });
-    Route::group(['prefix' => 'kk'], function () {
-        Route::get('/', 'KkController@index')->name('kk.index');
-        Route::post('/store', 'KkController@store')->name('kk.store');
-        Route::get('/{id}/showPenduduk', 'KkController@show')->name('kk.show');
-        Route::put('/update/{id}', 'KkController@update')->name('kk.update');
-        Route::delete('/delete/{id}', 'KkController@destroy')->name('kk.delete');
-        Route::post('{id}/showPenduduk/store', 'PendudukController@store')->name('kk.storePdd');
-        Route::delete('{id}/showPenduduk/delete', 'PendudukController@destroy')->name('kk.deletePdd');
-        Route::put('{id}/showPenduduk/edit', 'PendudukController@update')->name('kk.editPdd');
-        Route::post('/{id}/reset-password', 'KkController@resetPassword')->name('kk.resetPassword');
-
-    });
-    Route::group(['prefix' => 'penduduk'], function () {
-        Route::get('/', 'PendudukController@index')->name('penduduk.index');
-        Route::get('/export/{id}', 'PendudukController@export')->name('penduduk.export');
-        Route::get('/exportRt/{id}', 'PendudukController@exportRt')->name('penduduk.exportRt');
-        Route::get('/exportRw/{id}', 'PendudukController@exportRw')->name('penduduk.exportRw');
-        Route::get('/exportAll', 'PendudukController@exportAll')->name('penduduk.exportAll');
-        Route::get('/filter', 'PendudukController@filter')->name('filter.data');
-        Route::get('/penduduk/export-filtered', 'PendudukController@exportFiltered')->name('penduduk.exportFiltered');
-
     });
 
-    Route::post('/edit-profile', 'DashboardController@editProfile')->name('profile.edit');
-    Route::put('/edit-lurah', 'DashboardController@editLurah')->name('edit.lurah');
-    Route::get('/home', 'HomeController@index')->name('home');
+    /*
+    |--------------------------------------------------------------------------
+    | KK (Kartu Keluarga) Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('kk')->group(function () {
+        Route::get('/', [KkController::class, 'index'])->name('kk.index');
+        Route::post('/store', [KkController::class, 'store'])->name('kk.store');
+        Route::get('/{id}/showPenduduk', [KkController::class, 'show'])->name('kk.show');
+        Route::put('/update/{id}', [KkController::class, 'update'])->name('kk.update');
+        Route::delete('/delete/{id}', [KkController::class, 'destroy'])->name('kk.delete');
+        Route::post('/{id}/reset-password', [KkController::class, 'resetPassword'])->name('kk.resetPassword');
+
+        // Penduduk terkait KK
+        Route::post('{id}/showPenduduk/store', [PendudukController::class, 'store'])->name('kk.storePdd');
+        Route::delete('{id}/showPenduduk/delete', [PendudukController::class, 'destroy'])->name('kk.deletePdd');
+        Route::put('{id}/showPenduduk/edit', [PendudukController::class, 'update'])->name('kk.editPdd');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Penduduk Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('penduduk')->group(function () {
+        Route::get('/', [PendudukController::class, 'index'])->name('penduduk.index');
+        Route::get('/export/{id}', [PendudukController::class, 'export'])->name('penduduk.export');
+        Route::get('/exportRt/{id}', [PendudukController::class, 'exportRt'])->name('penduduk.exportRt');
+        Route::get('/exportRw/{id}', [PendudukController::class, 'exportRw'])->name('penduduk.exportRw');
+        Route::get('/exportAll', [PendudukController::class, 'exportAll'])->name('penduduk.exportAll');
+        Route::get('/filter', [PendudukController::class, 'filter'])->name('filter.data');
+        Route::get('/penduduk/export-filtered', [PendudukController::class, 'exportFiltered'])->name('penduduk.exportFiltered');
+    });
 });
-
-Auth::routes();

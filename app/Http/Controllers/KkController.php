@@ -55,8 +55,11 @@ class KkController extends Controller
      */
     public function create()
     {
-        //
+        $selectRt = \App\DataRt::all();
+        $selectRw = \App\DataRw::all();
+        return view('auth.register', compact('selectRt', 'selectRw'));
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -118,6 +121,59 @@ class KkController extends Controller
             }
         }
     }
+
+
+    public function storePublic(Request $request)
+    {
+        $this->validate($request, [
+            'kepala_keluarga' => 'required',
+            'no_kk' => 'required',
+            'image' => 'required|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
+            'rt_id' => 'required|integer',
+            'rw_id' => 'required|integer',
+            'alamat' => 'required',
+        ]);
+
+        try {
+            // Membuat User untuk Kepala Keluarga
+            $kk = User::create([
+                'name' => $request->kepala_keluarga,
+                'email' => $request->no_kk,
+                'password' => bcrypt('password'),
+            ]);
+            $kk->assignRole('warga');
+
+            // Menghubungkan User tersebut ke Kartu Keluarga
+            $data = new DataKk([
+                'kepala_keluarga' => $request->kepala_keluarga,
+                'no_kk' => $request->no_kk,
+                'rt_id' => $request->rt_id,
+                'rw_id' => $request->rw_id,
+                'user_id' => $kk->id,
+                'alamat' => $request->alamat,
+            ]);
+
+            // Mengupload Gambar
+            if ($request->hasFile('image')) {
+                $img = $request->file('image');
+                $filename = (string) Str::uuid() . '.' . $img->getClientOriginalExtension();
+                $img->storeAs('foto_kk', $filename, 'public'); // menyimpan gambar
+                $data->image = $filename;
+            }
+
+            $data->save();
+
+            return redirect()
+                ->back()
+                ->with('success', 'Data anda akan segera diverifikasi. silahkan tunggu 1x24 jam');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'No Kartu Keluarga sudah terdaftar di sistem ini. Silakan periksa kembali dan coba lagi.');
+
+        }
+    }
+
 
 
 

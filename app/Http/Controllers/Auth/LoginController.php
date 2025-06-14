@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\DataRt;
+use App\DataRw;
 
 
 
@@ -73,6 +75,14 @@ class LoginController extends Controller
     
         return redirect()->route('login');
     }
+
+    public function showLoginForm()
+{
+    $selectRt = DataRt::get();
+    $selectRw = DataRw::get();
+    return view('auth.login', compact('selectRt', 'selectRw'));
+}
+
     
 
     /**
