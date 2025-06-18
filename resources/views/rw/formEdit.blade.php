@@ -23,10 +23,10 @@
                             value="{{ old('rw', $d->rw) }}" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label class="form-label">Alamat</label>
-                        <input type="text" class="form-control" name="alamat_rw"
-                            value="{{ old('alamat_rw', $d->alamat_rw) }}" required>
-                    </div>
+    <label class="form-label">Alamat</label>
+    <textarea class="form-control" name="alamat_rw" required>{{ old('alamat_rw', $d->alamat_rw) }}</textarea>
+</div>
+
 
                     <div class="form-group mb-3">
                         <label class="form-label">Nomor Telepon / WhatsApp</label>

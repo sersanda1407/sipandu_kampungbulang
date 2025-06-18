@@ -42,10 +42,10 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <label class="form-label">Alamat</label>
-                        <input type="text" class="form-control" name="alamat_rt"
-                             value="{{ old('alamat_rt', $d->alamat_rt) }}" required>
-                    </div>
+    <label class="form-label">Alamat</label>
+    <textarea class="form-control" name="alamat_rt" required>{{ old('alamat_rt', $d->alamat_rt) }}</textarea>
+</div>
+
                     <div class="form-group mb-3">
                         <label class="form-label">Nomor Telepon / WhatsApp</label>
                         <input type="text" class="form-control" name="no_hp" id="no_hp_rt_{{ $d->id }}"

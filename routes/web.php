@@ -12,6 +12,8 @@ use App\Http\Controllers\KkController;
 use App\Http\Controllers\PendudukController;
 use App\Http\Controllers\RwController;
 use App\Http\Controllers\RtController;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+use App\Http\Controllers\InboxController;
 
 /*
 |--------------------------------------------------------------------------
@@ -122,4 +124,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/filter', [PendudukController::class, 'filter'])->name('filter.data');
         Route::get('/penduduk/export-filtered', [PendudukController::class, 'exportFiltered'])->name('penduduk.exportFiltered');
     });
+
+    Route::prefix('inbox')->group(function () {
+    Route::get('/', [InboxController::class, 'index'])->name('inbox.index');
+    Route::post('/verifikasi/{id}', [InboxController::class, 'verifikasi'])->name('inbox.verifikasi');
+});
+
 });

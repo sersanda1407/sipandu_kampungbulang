@@ -50,31 +50,40 @@ class LoginController extends Controller
         Session::put('backUrl', URL::previous());
     }
 
-    public function authenticated(Request $request, $user)
-    {
-        Log::info('Login Berhasil', [
-            'user_id' => $user->id,
-            'nama' => $user->name,
-            'email' => $user->email,
-            'role' => $user->getRoleNames()->first(),
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'waktu' => now()->toDateTimeString(),
-        ]);
-    
-        if ($user->hasRole('superadmin')) {
-            return redirect()->route('dashboard')->with('toast_success', 'Welcome, ' . $user->name);
-        } elseif ($user->hasRole('rw')) {
-            return redirect()->route('dashboard')->with('toast_success', 'Welcome, ' . $user->name);
-        } elseif ($user->hasRole('rt')) {
-            return redirect()->route('dashboard')->with('toast_success', 'Welcome, ' . $user->name);
-        } elseif ($user->hasRole('warga')) {
-            return redirect()->route('dashboard')->with('toast_success', 'Welcome, ' . $user->name);
-        }
-        
-    
-        return redirect()->route('login');
+public function authenticated(Request $request, $user)
+{
+    Log::info('Login Berhasil', [
+        'user_id' => $user->id,
+        'nama' => $user->name,
+        'email' => $user->email,
+        'role' => $user->getRoleNames()->first(),
+        'ip_address' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+        'waktu' => now()->toDateTimeString(),
+    ]);
+
+    // Superadmin, RT, RW langsung boleh masuk
+    if ($user->hasRole('superadmin') || $user->hasRole('rw') || $user->hasRole('rt')) {
+        return redirect()->route('dashboard')->with('toast_success', 'Welcome, ' . $user->name);
     }
+
+    // Jika role-nya warga, periksa dulu status verifikasi KK
+    if ($user->hasRole('warga')) {
+        // Asumsikan relasi: $user->Kk() -> hasOne(DataKk)
+        $kk = $user->Kk()->first(); 
+
+        if (!$kk || $kk->verifikasi !== 'diterima') {
+            Auth::logout(); // Paksa logout
+            return redirect()->route('login')->with('error', 'Data anda belum diverifikasi atau ditolak. Silakan tunggu proses verifikasi.');
+        }
+
+        return redirect()->route('dashboard')->with('toast_success', 'Welcome, ' . $user->name);
+    }
+
+    // Jika tidak memiliki role valid
+    return redirect()->route('login')->with('error', 'Role tidak dikenali.');
+}
+
 
     public function showLoginForm()
 {

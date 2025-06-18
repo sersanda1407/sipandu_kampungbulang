@@ -68,10 +68,10 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label class="form-label">Alamat</label>
-                            <input type="text" class="form-control" name="alamat_rt" placeholder="Alamat tinggal ketua RT"
-                                minlength="8" required>
-                        </div>
+    <label class="form-label">Alamat</label>
+    <textarea class="form-control" name="alamat_rt" placeholder="Alamat tinggal ketua RT" minlength="8" required></textarea>
+</div>
+
 
                         <div class="form-group mb-3">
                             <label class="form-label">Nomor Telepon / WhatsApp</label>

@@ -28,20 +28,19 @@
     <link rel="stylesheet" href={{ asset('assets/css/pages/simple-datatables.css') }}>
     <link rel="stylesheet" href={{ asset('assets/css/pages/fontawesome.css') }}>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    <style>
-    .chart-container {
-        position: relative;
-        width: 100%;
-        height: 180px;
-    }
 
-    canvas {
-        width: 100% !important;
-        height: 100% !important;
-    }
-    
-</style>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 180px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
 
 
 </head>
@@ -148,6 +147,21 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
+                        @hasrole('superadmin|rw|rt')
+                        <li class="sidebar-item {{ request()->is('inbox*') ? 'active' : '' }}">
+                            <a href="{{ route('inbox.index') }}" class='sidebar-link position-relative'>
+                                <i class="bi bi-inbox-fill fs-5 me-2"></i>
+                                <span>Kotak Verifikasi</span>
+                                @if ($inboxCount > 0)
+                                    <span class="badge bg-danger rounded-pill position-absolute"
+                                        style="top: 46%; left: 80%; transform: translate(-50%, -50%)">
+                                        {{ $inboxCount }}
+                                    </span>
+                                @endif
+                            </a>
+                        </li>
+                        @endhasrole
+
 
 
                         <li class="sidebar-title">Menu</li>

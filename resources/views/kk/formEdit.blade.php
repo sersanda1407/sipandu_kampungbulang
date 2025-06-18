@@ -107,10 +107,10 @@
                         </script>
 
                         <div class="mb-3">
-                            <label class="form-label">Alamat</label>
-                            <input type="text" class="form-control" value="{{ $d->alamat }}"
-                                name="alamat" required>
-                        </div>
+    <label class="form-label">Alamat</label>
+    <textarea class="form-control" name="alamat" required>{{ $d->alamat }}</textarea>
+</div>
+
 
                         <div class="mb-3">
                             <label class="form-label">Foto KK</label>

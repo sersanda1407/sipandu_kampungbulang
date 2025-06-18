@@ -24,29 +24,43 @@ class KkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
 
-        $user = Auth::user();
-        // dd($user);
+public function index()
+{
+    $user = Auth::user();
 
-        if ($user->hasRole('rw') == true) {
-            $data = DataKk::where('rw_id', '=', $user->Rw[0]->id)->get();
-        } elseif ($user->hasRole('rt') == true) {
-            $data = DataKk::where('rt_id', $user->Rt[0]->id)->get();
-        } elseif ($user->hasRole('warga') == true) {
-            $data = DataKk::where('user_id', $user->Kk[0]->user_id)->get();
-        } else {
-            $data = DataKk::all();
-        }
-        // $data = DataKk::all();
+    // Superadmin: Lihat semua data yang sudah diterima
+    if ($user->hasRole('superadmin')) {
+        $data = DataKk::where('verifikasi', 'diterima')->get();
 
-        $lurah = Lurah::first();
+    // RW: Lihat data dari wilayah RW-nya yang sudah diterima
+    } elseif ($user->hasRole('rw')) {
+        $data = DataKk::where('verifikasi', 'diterima')
+                     ->where('rw_id', $user->Rw[0]->id)
+                     ->get();
 
-        $selectRt = DataRt::get();
-        $selectRw = DataRw::get();
-        return view('kk.index', compact(['selectRt', 'selectRw', 'data', 'lurah']));
+    // RT: Lihat data dari wilayah RT-nya yang sudah diterima
+    } elseif ($user->hasRole('rt')) {
+        $data = DataKk::where('verifikasi', 'diterima')
+                     ->where('rt_id', $user->Rt[0]->id)
+                     ->get();
+
+    // Warga: hanya lihat data miliknya (tidak perlu cek verifikasi)
+    } elseif ($user->hasRole('warga')) {
+        $data = DataKk::where('user_id', $user->Kk[0]->user_id)->get();
+
+    // Default: kosongkan
+    } else {
+        $data = collect(); // atau bisa kasih abort(403)
     }
+
+    $lurah = Lurah::first();
+    $selectRt = DataRt::all();
+    $selectRw = DataRw::all();
+
+    return view('kk.index', compact(['selectRt', 'selectRw', 'data', 'lurah']));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -94,6 +108,7 @@ class KkController extends Controller
             $data->rw_id = $request->rw_id;
             $data->user_id = $kk->id;
             $data->alamat = $request->alamat;
+            $data->verifikasi = 'diterima';
 
             // Menyimpan Gambar dengan UUID
             if ($request->hasFile('image')) {
@@ -132,6 +147,7 @@ class KkController extends Controller
             'rt_id' => 'required|integer',
             'rw_id' => 'required|integer',
             'alamat' => 'required',
+            'no_telp' => 'required'
         ]);
 
         try {
@@ -151,6 +167,8 @@ class KkController extends Controller
                 'rw_id' => $request->rw_id,
                 'user_id' => $kk->id,
                 'alamat' => $request->alamat,
+                'no_telp' => $request->no_telp,
+                'verifikasi' => 'pending'
             ]);
 
             // Mengupload Gambar

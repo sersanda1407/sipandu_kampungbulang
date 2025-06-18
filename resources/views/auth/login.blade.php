@@ -94,33 +94,23 @@
                                 @csrf
 
                                 <div class="form-group position-relative has-icon-left mb-4">
-                                    <input type="text"
-                                        class="form-control form-control-xl @error('email') is-invalid @enderror"
+                                    <input type="text" class="form-control form-control-xl"
                                         placeholder="Email atau No. KK" name="email" value="{{ old('email') }}" required
                                         autofocus>
                                     <div class="form-control-icon">
                                         <i class="bi bi-person"></i>
                                     </div>
-                                    @error('email')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
                                 </div>
 
                                 <div class="form-group position-relative has-icon-left mb-4">
-                                    <input type="password"
-                                        class="form-control form-control-xl @error('password') is-invalid @enderror"
-                                        placeholder="Password" name="password" required>
+                                    <input type="password" class="form-control form-control-xl" placeholder="Password"
+                                        name="password" required>
                                     <div class="form-control-icon">
                                         <i class="bi bi-shield-lock"></i>
                                     </div>
-                                    @error('password')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
                                 </div>
+
+
 
                                 <div class="form-check form-check-lg d-flex align-items-center mb-4">
                                     <input class="form-check-input me-2" type="checkbox" id="flexCheckDefault">
@@ -193,21 +183,27 @@
                 </div>
 
                 <div class="form-group mb-3">
-                <label for="rw_id">Pilih RW</label>
-                <select name="rw_id" id="rw_id_modal" class="form-control" required>
-                    <option value="">-- Pilih RW --</option>
-                    @foreach($selectRw as $rw)
-                        <option value="{{ $rw->id }}">{{ $rw->rw }} | {{ $rw->nama }} </option>
-                    @endforeach
-                </select>
-            </div>
+                    <label for="rw_id">Pilih RW</label>
+                    <select name="rw_id" id="rw_id_modal" class="form-control" required>
+                        <option value="">-- Pilih RW --</option>
+                        @foreach($selectRw as $rw)
+                            <option value="{{ $rw->id }}">{{ $rw->rw }} | {{ $rw->nama }} </option>
+                        @endforeach
+                    </select>
+                </div>
 
-            <div class="form-group mb-3">
-                <label for="rt_id">Pilih RT</label>
-                <select name="rt_id" id="rt_id_modal" class="form-control" required>
-                    <option value="">-- Pilih RT --</option>
-                </select>
-            </div>
+                <div class="form-group mb-3">
+                    <label for="rt_id">Pilih RT</label>
+                    <select name="rt_id" id="rt_id_modal" class="form-control" required>
+                        <option value="">-- Pilih RT --</option>
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="no_telp">No Telepon</label>
+                    <input id="no_hp" name="no_telp" class="form-control" placeholder="Masukkan nomor telepon" maxlength="12" minlength="8" required>
+                </div>
+
 
                 <div class="form-group mb-3">
                     <label for="alamat">Alamat Lengkap</label>
@@ -227,6 +223,12 @@
         </div>
     </div>
 
+    <script>
+        document.getElementById("no_hp").addEventListener("input", function (e) {
+            this.value = this.value.replace(/[^0-9]/g, ''); // Hanya izinkan angka
+        });
+    </script>
+
 
     <!-- SCRIPT MODAL -->
     <script>
@@ -245,60 +247,87 @@
             }
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         document.getElementById('no_kk').addEventListener('input', function (e) {
             // Menghapus karakter non-angka
             this.value = this.value.replace(/[^0-9]/g, '');
         });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        @if ($errors->any())
+        // Deteksi halaman login (tanpa modal aktif)
+        @if (Route::currentRouteName() == 'login' && ($errors->has('email') || $errors->has('password')))
             Swal.fire({
                 icon: 'error',
-                title: 'Terjadi Kesalahan!',
-                html: "{!! implode('<br>', $errors->all()) !!}",
+                title: 'Login Gagal!',
+                html: `
+                        @if ($errors->has('email'))
+                            <div style="text-align:centre;">Silahkan cek kembali. Email atau Password Salah</div>
+                        @endif
+                        @if ($errors->has('password'))
+                            <div style="text-align:centre;"><b>Password yang anda input salah</div>
+                        @endif
+                    `,
+                timer: 10000
             });
         @endif
 
+        // Deteksi error dari form registrasi (modal)
+        @if (Route::currentRouteName() == 'kk.storePublic' && $errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Pendaftaran Gagal!',
+                html: `{!! implode('<br>', $errors->all()) !!}`,
+                timer: 10000
+            });
+        @endif
+
+        // Session flash message (umum)
         @if (session('error'))
             Swal.fire({
                 icon: 'error',
                 title: 'Terjadi Kesalahan!',
-                text: "{{ session('error') }}"
+                text: "{{ session('error') }}",
+                timer: 10000
             });
         @endif
 
         @if (session('success'))
             Swal.fire({
                 icon: 'success',
-                title: 'Pendaftaran Berhasil!',
-                text: "{{ session('success') }}"
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                timer: 10000
             });
         @endif
     </script>
+
+
+
     <script>
         // Menghubungkan RW dan RT
     const rtData = @json($selectRt);
 
-    document.getElementById('rw_id_modal').addEventListener('change', function () {
-        const rwId = this.value;
-        const rtSelect = document.getElementById('rt_id_modal');
+        document.getElementById('rw_id_modal').addEventListener('change', function () {
+            const rwId = this.value;
+            const rtSelect = document.getElementById('rt_id_modal');
 
-        // Kosongkan dahulu pilihan RT
-        rtSelect.innerHTML ='<option value="">-- Pilih RT --</option>';
+            // Kosongkan dahulu pilihan RT
+            rtSelect.innerHTML = '<option value="">-- Pilih RT --</option>';
 
-        // Filter sesuai rwId yang dipilih
-        const filteredRt = rtData.filter(rt => rt.rw_id == rwId);
+            // Filter sesuai rwId yang dipilih
+            const filteredRt = rtData.filter(rt => rt.rw_id == rwId);
 
-        // Tambahan option
-        filteredRt.forEach(rt => {
-            const option = document.createElement('option');
-            option.value = rt.id;
-            option.textContent = `${rt.rt} | ${rt.nama}`;
-            rtSelect.appendChild(option);
+            // Tambahan option
+            filteredRt.forEach(rt => {
+                const option = document.createElement('option');
+                option.value = rt.id;
+                option.textContent = `${rt.rt} | ${rt.nama}`;
+                rtSelect.appendChild(option);
+            });
         });
-    });
 
     </script>
 
