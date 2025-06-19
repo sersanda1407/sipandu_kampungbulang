@@ -19,14 +19,9 @@
 
                         <div class="mb-3">
                             <label class="form-label">No.KK</label>
-                            <input id="inputEditNoKK{{ $d->id }}"
-                                type="text"
-                                class="form-control"
-                                value="{{ $d->no_kk }}"
-                                name="no_kk"
-                                maxlength="16"
-                                minlength="16"
-                                required>
+                                <input id="inputEditNoKK{{ $d->id }}"type="text" class="form-control"  value="{{ $d->no_kk }}"
+                                name="no_kk" maxlength="16" minlength="16" required
+                                @hasrole('rw|rt|warga') readonly @endhasrole>
                         </div>
 
                         <script>
@@ -37,40 +32,43 @@
                             });
                         </script>
 
-                        <div class="row">
-                            {{-- =====================  RW  ===================== --}}
-                            <div class="col">
-                                <div class="mb-3">
-                                   <label class="form-label">RW</label>
-                                   <select id="rwSelect{{ $d->id }}" class="form-select" name="rw_id">
-                                      <option value="">-- Pilih No Wilayah RW --</option>
-                                      @foreach ($selectRw as $rw)
-                                         <option value="{{ $rw->id }}"
-                                             {{ $d->rw_id == $rw->id ? 'selected' : '' }}>
-                                             {{ $rw->rw }} &nbsp;|&nbsp; {{ $rw->nama }}
-                                         </option>
-                                      @endforeach
-                                   </select>
-                                </div>
-                            </div>
+                       <div class="row">
+    {{-- =====================  RW  ===================== --}}
+    <div class="col">
+        <div class="mb-3">
+            <label class="form-label">RW</label>
+            <select id="rwSelect{{ $d->id }}" class="form-select" name="rw_id"
+                @hasrole('warga') disabled @endhasrole>
+                <option value="">-- Pilih No Wilayah RW --</option>
+                @foreach ($selectRw as $rw)
+                    <option value="{{ $rw->id }}"
+                        {{ $d->rw_id == $rw->id ? 'selected' : '' }}>
+                        {{ $rw->rw }} &nbsp;|&nbsp; {{ $rw->nama }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
 
-                            {{-- =====================  RT  ===================== --}}
-                            <div class="col">
-                                <div class="mb-3">
-                                   <label class="form-label">RT</label>
-                                   <select id="rtSelect{{ $d->id }}" class="form-select" name="rt_id">
-                                      <option value="">-- Pilih No Wilayah RT --</option>
-                                      @foreach ($selectRt as $rt)
-                                         <option value="{{ $rt->id }}"
-                                                 data-rw="{{ $rt->rw_id }}"
-                                                 {{ $d->rt_id == $rt->id ? 'selected' : '' }}>
-                                             {{ $rt->rt }} &nbsp;|&nbsp; {{ $rt->nama }}
-                                         </option>
-                                      @endforeach
-                                   </select>
-                                </div>
-                            </div>
-                        </div>
+    {{-- =====================  RT  ===================== --}}
+    <div class="col">
+        <div class="mb-3">
+            <label class="form-label">RT</label>
+            <select id="rtSelect{{ $d->id }}" class="form-select" name="rt_id"
+                @hasrole('warga') disabled @endhasrole>
+                <option value="">-- Pilih No Wilayah RT --</option>
+                @foreach ($selectRt as $rt)
+                    <option value="{{ $rt->id }}"
+                        data-rw="{{ $rt->rw_id }}"
+                        {{ $d->rt_id == $rt->id ? 'selected' : '' }}>
+                        {{ $rt->rt }} &nbsp;|&nbsp; {{ $rt->nama }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+</div>
+
 
                         <script>
                         document.addEventListener('DOMContentLoaded', function(){

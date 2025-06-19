@@ -70,7 +70,7 @@
                 <div class="d-md-flex justify-content-between align-items-center mb-3">
                     <form method="GET" action="{{ route('inbox.index') }}"
                         class="d-flex align-items-center gap-2 mb-2 mb-md-0">
-                        <label for="entries" class="me-2 mb-0">Tampilkan</label>
+                        <label for="entries" class="me-2 mb-0"></label>
                         <select name="entries" id="entries" class="form-select form-select-sm w-auto"
                             onchange="this.form.submit()">
                             @foreach ([5, 10, 25, 50] as $entry)
@@ -79,7 +79,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <span class="ms-2">entri</span>
+                        <span class="ms-2">entries per page</span>
                     </form>
 
                     <form method="GET" action="{{ route('inbox.index') }}" class="d-flex">
@@ -204,7 +204,7 @@
                                 $to = min($from + $data->count() - 1, $data->total());
                             @endphp
                             <small>
-                                Menampilkan {{ $from }} sampai {{ $to }} dari total {{ $data->total() }} entri
+                                Shows {{ $from }} to {{ $to }} of {{ $data->total() }} entries
                             </small>
                         </div>
                         <div>

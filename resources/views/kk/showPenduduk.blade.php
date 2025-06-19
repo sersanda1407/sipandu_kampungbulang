@@ -151,7 +151,23 @@
 
                         <div class="mb-3">
                             <label for="">Pekerjaan <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="pekerjaan" id="exampleInputPassword1" required>
+                            <select class="form-select" type="text" placeholder="Pilih Pekerjaan" name="pekerjaan" required>
+                                <option value="">-- Pilih Pekerjaan --</option>
+                                <option value="PNS">Pegawai Negeri Sipil</option>
+                                <option value="TNI">Tentara Nasional Indonesia</option>
+                                <option value="POLRI">Polisi</option>
+                                <option value="P3K">Pegawai P3K</option>
+                                <option value="Honorer">Pegawai Honorer</option>
+                                <option value="Wiraswasta">Wiraswasta</option>
+                                <option value="Buruh">Buruh Harian Lepas</option>
+                                <option value="Wirausaha">Wirausaha/Pengusaha</option>
+                                <option value="Guru">Guru</option>
+                                <option value="Pensiunan/Purnawirawan">Pensiunan TNI/POLRI/PNS</option>
+                                <option value="Ibu Rumah Tangga">Ibu Rumah Tangga</option>
+                                <option value="Pelajar/Mahasiswa">Mahasiswa/Pelajar</option>
+                                <option value="Tidak Bekerja">Tidak Bekerja</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="gaji" class="form-label">Pendapatan <span class="text-danger">*</span></label>
@@ -345,10 +361,10 @@
                             </button>
 
                             <!-- @if (count($penduduk) > 0)
-                                                            <a href="{{ url('penduduk/export/' . encrypt($data->id)) }}" class="btn btn-danger rounded-pill">
-                                                                <i class="fas fa-file-pdf"></i> Export PDF
-                                                            </a>
-                                                        @endif -->
+                                                                <a href="{{ url('penduduk/export/' . encrypt($data->id)) }}" class="btn btn-danger rounded-pill">
+                                                                    <i class="fas fa-file-pdf"></i> Export PDF
+                                                                </a>
+                                                            @endif -->
                         </div>
 
                         <!-- Tambahkan class 'table-responsive' untuk tampilan mobile -->
@@ -409,15 +425,15 @@
                                             <td>
                                                 @php
 
-                                                $imageKtpSrc = 'storage/foto_ktp/default.jpg';
+                                                    $imageKtpSrc = 'storage/foto_ktp/default.jpg';
 
-                                                if ($pd->image_ktp) {
-                                                if (Str::startsWith($pd->image_ktp, ['data:image', 'http', 'https'])) {
-                                                $imageKtpSrc = $pd->image_ktp;
-                                                } elseif (file_exists(public_path('storage/foto_ktp/' . $pd->image_ktp))) {
-                                                $imageKtpSrc = 'storage/foto_ktp/' . $pd->image_ktp;
-                                                }
-                                                }
+                                                    if ($pd->image_ktp) {
+                                                        if (Str::startsWith($pd->image_ktp, ['data:image', 'http', 'https'])) {
+                                                            $imageKtpSrc = $pd->image_ktp;
+                                                        } elseif (file_exists(public_path('storage/foto_ktp/' . $pd->image_ktp))) {
+                                                            $imageKtpSrc = 'storage/foto_ktp/' . $pd->image_ktp;
+                                                        }
+                                                    }
                                                 @endphp
 
                                                 <a href="#"

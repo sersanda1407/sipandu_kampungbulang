@@ -28,7 +28,7 @@
                         <div class="mb-3">
                             <label for="exampleInputPassword1" class="form-label">Nomor NIK</label>
                             <input type="text" class="form-control" value="{{$d->nik}}" name="nik" id="nik{{ $d->id }}"
-                                maxlength="16" minlength="16" required>
+                                maxlength="16" minlength="16" required @hasrole('rw|rt|warga') readonly @endhasrole>
                         </div>
                         <div class="mb-3">
                             <label for="" class="form-label">Nomor Telepon / WhatsApp</label>
@@ -120,17 +120,38 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="">Pekerjaan</label>
-                            <input type="text" class="form-control" name="pekerjaan" value="{{$d->pekerjaan}}"
-                                id="exampleInputPassword1" required>
+                            <label for="">Pekerjaan <span class="text-danger">*</span></label>
+                            <select class="form-select" name="pekerjaan" required>
+                                <option value="">-- Pilih Pekerjaan --</option>
+                                <option value="PNS" {{ $d->pekerjaan == 'PNS' ? 'selected' : '' }}>Pegawai Negeri Sipil
+                                </option>
+                                <option value="TNI" {{ $d->pekerjaan == 'TNI' ? 'selected' : '' }}>Tentara Nasional Indonesia
+                                </option>
+                                <option value="POLRI" {{ $d->pekerjaan == 'POLRI' ? 'selected' : '' }}>Polisi</option>
+                                <option value="P3K" {{ $d->pekerjaan == 'P3K' ? 'selected' : '' }}>Pegawai P3K</option>
+                                <option value="Honorer" {{ $d->pekerjaan == 'Honorer' ? 'selected' : '' }}>Pegawai Honorer
+                                </option>
+                                <option value="Wiraswasta" {{ $d->pekerjaan == 'Wiraswasta' ? 'selected' : '' }}>Wiraswasta
+                                </option>
+                                <option value="Buruh" {{ $d->pekerjaan == 'Buruh' ? 'selected' : '' }}>Buruh Harian Lepas
+                                </option>
+                                <option value="Wirausaha" {{ $d->pekerjaan == 'Wirausaha' ? 'selected' : '' }}>
+                                    Wirausaha/Pengusaha</option>
+                                <option value="Guru" {{ $d->pekerjaan == 'Guru' ? 'selected' : '' }}>Guru</option>
+                                <option value="Pensiunan/Purnawirawan" {{ $d->pekerjaan == 'Pensiunan/Purnawirawan' ? 'selected' : '' }}>Pensiunan TNI/POLRI/PNS</option>
+                                <option value="Ibu Rumah Tangga" {{ $d->pekerjaan == 'Ibu Rumah Tangga' ? 'selected' : '' }}>
+                                    Ibu Rumah Tangga</option>
+                                <option value="Pelajar/Mahasiswa" {{ $d->pekerjaan == 'Pelajar/Mahasiswa' ? 'selected' : '' }}>Mahasiswa/Pelajar</option>
+                                <option value="Tidak Bekerja" {{ $d->pekerjaan == 'Tidak Bekerja' ? 'selected' : '' }}>Tidak
+                                    Bekerja</option>
+                                <option value="Lainnya" {{ $d->pekerjaan == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                            </select>
                         </div>
+
                         <div class="mb-3">
                             <label for="exampleInputPassword1" class="form-label">Pendapatan</label>
-                            <input type="text" class="form-control"
-                            value="Rp.{{ number_format($d->gaji, 0, '.', '.') }},-"
-                            name="gaji" id="gaji{{ $d->id }}"
-                            oninput="formatCurrencyRealtime(this)"
-                            required>
+                            <input type="text" class="form-control" value="Rp.{{ number_format($d->gaji, 0, '.', '.') }},-"
+                                name="gaji" id="gaji{{ $d->id }}" oninput="formatCurrencyRealtime(this)" required>
                         </div>
                         <label>Status</label>
                         <div class="mb-3">
@@ -197,23 +218,23 @@
                 // Simpan posisi kursor
                 let cursorPos = el.selectionStart;
                 let originalLength = el.value.length;
-        
+
                 // Ambil hanya digit angka
                 let number = el.value.replace(/[^\d]/g, '');
-        
+
                 // Format dengan koma ribuan
                 let formatted = number.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        
+
                 // Set nilai yang telah diformat
                 el.value = formatted;
-        
+
                 // Perbaiki posisi kursor setelah format
                 let newLength = formatted.length;
                 cursorPos = cursorPos + (newLength - originalLength);
                 el.setSelectionRange(cursorPos, cursorPos);
             }
         </script>
-        
-        
+
+
     </div>
 @endforeach
