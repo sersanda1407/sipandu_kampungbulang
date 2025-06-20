@@ -27,9 +27,10 @@
                                 maxlength="3" required>
                         </div>
                         <div class="form-group mb-3">
-    <label class="form-label">Alamat</label>
-    <textarea class="form-control" name="alamat_rw" placeholder="Alamat tinggal Ketua RW" required></textarea>
-</div>
+                            <label class="form-label">Alamat</label>
+                            <textarea class="form-control" name="alamat_rw" placeholder="Alamat tinggal Ketua RW"
+                                required></textarea>
+                        </div>
 
 
                         <div class="form-group mb-3">
@@ -140,6 +141,10 @@
 
     {{-- MODAL DELETE --}}
     @foreach ($data as $r)
+        @php
+            $encryptedId = Crypt::encryptString($r->id);
+        @endphp
+
         <div class="modal fade" id="modalDelete{{ $r->id }}" tabindex="-1" aria-labelledby="modalHapusBarang"
             aria-hidden="true">
             <div class="modal-dialog">
@@ -152,7 +157,7 @@
                         </h5>
                     </div>
                     <div class="modal-footer">
-                        <form action={{ url('/rw/delete/' . $r->id) }} method="POST">
+                        <form action="{{ url('/rw/delete/' . $encryptedId) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -163,6 +168,7 @@
             </div>
         </div>
     @endforeach
+
     {{-- END MODAL DELETE --}}
     <div class="container-fluid">
         <div class="row">
@@ -194,14 +200,14 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>
                                             @php
-                                            $imageSrc = 'storage/foto_rw/default.jpg';
-                                            if ($d->image_rw) {
-                                            if (Str::startsWith($d->image_rw, ['data:image', 'http', 'https'])) {
-                                            $imageSrc = $d->image_rw;
-                                            } elseif (file_exists(public_path('storage/foto_rw/' . $d->image_rw))) {
-                                            $imageSrc = 'storage/foto_rw/' . $d->image_rw;
-                                            }
-                                            }
+                                                $imageSrc = 'storage/foto_rw/default.jpg';
+                                                if ($d->image_rw) {
+                                                    if (Str::startsWith($d->image_rw, ['data:image', 'http', 'https'])) {
+                                                        $imageSrc = $d->image_rw;
+                                                    } elseif (file_exists(public_path('storage/foto_rw/' . $d->image_rw))) {
+                                                        $imageSrc = 'storage/foto_rw/' . $d->image_rw;
+                                                    }
+                                                }
                                             @endphp
 
                                             <a href="#" onclick="showImageModal('{{ asset($imageSrc) }}', '{{ $d->nama }}')">

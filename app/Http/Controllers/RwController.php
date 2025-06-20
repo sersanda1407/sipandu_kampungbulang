@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DataRw;
+use App\DataRt;
 use Illuminate\Http\Request;
 use App\User;
 use App\Lurah;
@@ -228,18 +229,46 @@ class RwController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        $data = DataRw::find($id);
-
-        User::where('id', '=', $data->user_id)->delete();
-
-        $data->delete();
-
-        Alert::Success('Sukses!', 'Berhasil menghapus Data RW');
-
+public function destroy($encryptedId)
+{
+    try {
+        $id = Crypt::decryptString($encryptedId); // ← ini menyamarkan ID
+    } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+        Alert::error('Gagal!', 'ID tidak valid.');
         return redirect()->route('rw.index');
     }
+
+    $data = DataRw::find($id);
+
+    if (!$data) {
+        Alert::error('Gagal!', 'Data RW tidak ditemukan.');
+        return redirect()->route('rw.index');
+    }
+
+    $userRwId = $data->user_id;
+
+    // Hapus semua RT milik RW ini
+    $dataRts = DataRt::where('rw_id', $data->id)->get();
+
+    foreach ($dataRts as $rt) {
+        if ($rt->user_id) {
+            User::where('id', $rt->user_id)->delete();
+        }
+        $rt->delete();
+    }
+
+    if ($userRwId) {
+        User::where('id', $userRwId)->delete();
+    }
+
+    $data->delete();
+
+    Alert::success('Sukses!', 'Berhasil menghapus Data RW dan semua RT terkait');
+    return redirect()->route('rw.index');
+}
+
+
+
 
     public function resetPassword($id)
     {

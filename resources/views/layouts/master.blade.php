@@ -9,6 +9,7 @@
         @php
             $titleMap = [
                 'dashboard' => 'Dashboard',
+                'inbox' => 'Kotak Verifikasi',
                 'rw' => 'Data RW',
                 'rt' => 'Data RT',
                 'kk' => 'Data Kartu Keluarga',
@@ -40,6 +41,19 @@
             width: 100% !important;
             height: 100% !important;
         }
+
+        .accordion-button::after {
+            display: none !important;
+        }
+
+        /* Dot hijau indikator aktif */
+        .dot-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: #28a745;
+            border-radius: 50%;
+            display: inline-block;
+        }
     </style>
 
 
@@ -51,7 +65,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Profil</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Akun</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="/edit-profile" method="POST">
@@ -138,6 +152,36 @@
                 </div>
                 <div class="sidebar-menu">
                     <ul class="menu">
+                        {{-- sesuaikan --}}
+                        <li class="sidebar-item px-3 pb-1">
+                            <div class="accordion" id="accordionUserInfo">
+                                <div class="accordion-item border-0">
+                                    <h2 class="accordion-header" id="headingUser">
+                                        <button
+                                            class="accordion-button collapsed px-0 py-2 bg-transparent shadow-none d-flex align-items-center gap-2"
+                                            type="button" data-bs-toggle="collapse" data-bs-target="#collapseUser"
+                                            aria-expanded="false" aria-controls="collapseUser"
+                                            style="padding-right: 0; background: none;">
+                                            <span class="dot-indicator"></span>
+                                            <span class="fw-bold">{{ Auth::user()->name }}</span>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseUser" class="accordion-collapse collapse"
+                                        aria-labelledby="headingUser" data-bs-parent="#accordionUserInfo">
+                                        <div class="accordion-body px-0 py-1">
+                                            <span class="d-block text-muted small">
+                                                Role:
+                                                <strong>{{ ucfirst(Auth::user()->getRoleNames()->first()) }}</strong>
+                                            </span>
+                                            <span class="d-block text-muted small">
+                                                Status: <span class="text-success">Aktif</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
 
                         <li class="sidebar-title">Dashboard</li>
 
@@ -206,7 +250,7 @@
                         <li class="sidebar-item {{ request()->is('pengguna*') ? 'active' : '' }}">
                             <a href="edit#pengguna" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#edit">
                                 <i class="fas fa-user-edit"></i>
-                                <span>Edit Pengguna</span>
+                                <span>Akun</span>
                             </a>
                         </li>
 
