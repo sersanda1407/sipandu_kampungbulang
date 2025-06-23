@@ -436,11 +436,12 @@
                                         {{-- Cek apakah isinya berupa base64 atau URL langsung dari database --}}
                                         @if(Str::startsWith($rt->image_rt, ['data:image', 'http', 'https']))
                                             <img src="{{ $rt->image_rt }}" alt="Foto Ketua RT" class="img-fluid rounded shadow-sm"
-                                                style="max-width: 150px;">
+                                                style="width: 150px; height: 200px; object-fit: cover;">
                                         @elseif(file_exists(public_path('storage/foto_rt/' . $rt->image_rt)))
                                             {{-- Fallback: ambil dari storage jika nama file tersimpan --}}
                                             <img src="{{ asset('storage/foto_rt/' . $rt->image_rt) }}" alt="Foto Ketua RT"
-                                                class="img-fluid rounded shadow-sm" style="max-width: 150px;">
+                                                class="img-fluid rounded shadow-sm"
+                                                style="width: 150px; height: 200px; object-fit: cover;">
                                         @else
                                             <p class="text-muted">Foto Ketua RT tidak ditemukan.</p>
                                         @endif
@@ -492,10 +493,11 @@
                                     @if($rw && $rw->image_rw)
                                         @if(Str::startsWith($rw->image_rw, ['data:image', 'http', 'https']))
                                             <img src="{{ $rw->image_rw }}" alt="Foto Ketua RW" class="img-fluid rounded shadow-sm"
-                                                style="max-width: 150px;">
+                                                style="width: 150px; height: 200px; object-fit: cover;">
                                         @elseif(file_exists(public_path('storage/foto_rw/' . $rw->image_rw)))
                                             <img src="{{ asset('storage/foto_rw/' . $rw->image_rw) }}" alt="Foto Ketua RW"
-                                                class="img-fluid rounded shadow-sm" style="max-width: 150px;">
+                                                class="img-fluid rounded shadow-sm"
+                                                style="width: 150px; height: 200px; object-fit: cover;">
                                         @else
                                             <p class="text-muted">Foto Ketua RW tidak ditemukan.</p>
                                         @endif
@@ -629,16 +631,16 @@
                                                 <i class="fas fa-address-card"></i>
                                             </div>
                                         </div>
-                                     <div class="col-md-8">
-                                                                <h6 class="text-muted font-semibold">Data KK</h6>
-                                                                <h6 class="font-extrabold mb-0">
-                                                                    {{
+                                        <div class="col-md-8">
+                                            <h6 class="text-muted font-semibold">Data KK</h6>
+                                            <h6 class="font-extrabold mb-0">
+                                                {{
         \App\DataKk::where('verifikasi', 'diterima')
             ->where('rw_id', \App\DataRw::where('user_id', Auth::id())->value('id'))
             ->count()
-                                }}
-                                                                </h6>
-                                                            </div>
+                                        }}
+                                            </h6>
+                                        </div>
 
                                     </div>
                                 </div>
@@ -1252,11 +1254,11 @@
                     label: 'Jumlah Agama',
                     // pastikan urutan sesuai label
                     data: [
-                            {{ $data_agama['Islam'] ?? 0 }},
-                            {{ $data_agama['Katolik'] ?? 0 }},
-                            {{ $data_agama['Protestan'] ?? 0 }},
-                            {{ $data_agama['Konghucu'] ?? 0 }},
-                            {{ $data_agama['Buddha'] ?? 0 }},
+                                    {{ $data_agama['Islam'] ?? 0 }},
+                                    {{ $data_agama['Katolik'] ?? 0 }},
+                                    {{ $data_agama['Protestan'] ?? 0 }},
+                                    {{ $data_agama['Konghucu'] ?? 0 }},
+                                    {{ $data_agama['Buddha'] ?? 0 }},
                         {{ $data_agama['Hindu'] ?? 0 }}
                     ],
                     backgroundColor: [
@@ -1324,11 +1326,11 @@
                 datasets: [{
                     label: 'Kategori Usia',
                     data: [
-                                    {{ $usia_counts['newborn'] ?? 0 }},
-                                    {{ $usia_counts['batita'] ?? 0 }},
-                                    {{ $usia_counts['balita'] ?? 0 }},
-                                    {{ $usia_counts['anak_anak'] ?? 0 }},
-                                    {{ $usia_counts['remaja'] ?? 0 }},
+                                            {{ $usia_counts['newborn'] ?? 0 }},
+                                            {{ $usia_counts['batita'] ?? 0 }},
+                                            {{ $usia_counts['balita'] ?? 0 }},
+                                            {{ $usia_counts['anak_anak'] ?? 0 }},
+                                            {{ $usia_counts['remaja'] ?? 0 }},
                         {{ $usia_counts['dewasa'] ?? 0 }}
                     ],
                     backgroundColor: [
@@ -1370,7 +1372,7 @@
                         @foreach ($data_month as $data)
                             {{ $data }},
                         @endforeach
-                                                                                                                                ],
+                                                                                                                                        ],
                     fill: true,
                     borderColor: '#56b6f7',
                     tension: 0.3
