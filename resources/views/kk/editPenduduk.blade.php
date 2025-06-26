@@ -23,7 +23,7 @@
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Nama Lengkap</label>
                             <input type="text" class="form-control" value="{{$d->nama}}" name="nama" id="exampleInputEmail1"
-                                aria-describedby="emailHelp" required>
+                                aria-describedby="emailHelp" required @hasrole('rw|rt|warga') readonly @endhasrole>
                         </div>
                         <div class="mb-3">
                             <label for="exampleInputPassword1" class="form-label">Nomor NIK</label>
@@ -45,78 +45,111 @@
                             <div class="col-sm-4">
                                 <label for="">Tempat Lahir</label>
                                 <input class="form-control" type="text" placeholder="Tempat Lahir" value="{{$d->tmp_lahir}}"
-                                    name="tmp_lahir" required>
+                                    name="tmp_lahir" required @hasrole('rw|rt|warga') readonly @endhasrole>
                             </div>
                             <div class="col-sm-4">
                                 <label for="">Tanggal Lahir</label>
                                 <input class="form-control" type="date" placeholder="Tanggal Lahir" value={{ old('tgl_lahir', $d->tgl_lahir) }} name="tgl_lahir" id="tgl_lahir{{ $d->id }}" required
-                                    oninput="hitungUsia({{ $d->id }})">
+                                    oninput="hitungUsia({{ $d->id }})" @hasrole('rw|rt|warga') readonly @endhasrole>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="">Jenis Kelamin</label>
-                            <select class="form-select" type="text" placeholder="Nama Lengkap" name="gender" required>
-                                <option value="">-- Pilih Jenis Kelamin --</option>
-                                <option value="Laki-laki" {{$d->gender === 'Laki-laki' ? 'selected' : ''}}>Laki-Laki</option>
-                                <option value="Perempuan" {{$d->gender === 'Perempuan' ? 'selected' : ''}}>Perempuan</option>
-                            </select>
-                        </div>
+    <label for="">Jenis Kelamin</label>
+    @hasrole('warga')
+        <select class="form-select" disabled>
+            <option value="">-- Pilih Jenis Kelamin --</option>
+            <option value="Laki-laki" {{ $d->gender === 'Laki-laki' ? 'selected' : '' }}>Laki-Laki</option>
+            <option value="Perempuan" {{ $d->gender === 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+        </select>
+        <input type="hidden" name="gender" value="{{ $d->gender }}">
+    @else
+        <select class="form-select" name="gender" required>
+            <option value="">-- Pilih Jenis Kelamin --</option>
+            <option value="Laki-laki" {{ $d->gender === 'Laki-laki' ? 'selected' : '' }}>Laki-Laki</option>
+            <option value="Perempuan" {{ $d->gender === 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+        </select>
+    @endhasrole
+</div>
+
                         <div class="mb-3">
-                            <label for="">Agama</label>
-                            <select class="form-select" type="text" placeholder="Agama" name="agama" required>
-                                <option value="">-- Pilih Agama --</option>
-                                <option value="Islam" {{ $d->agama === 'Islam' ? 'selected' : '' }}>Islam
-                                </option>
-                                <option value="Katolik" {{ $d->agama === 'Katolik' ? 'selected' : '' }}>Katolik
-                                </option>
-                                <option value="Protestan" {{ $d->agama === 'Protestas' ? 'selected' : '' }}>
-                                    Protestan
-                                </option>
-                                <option value="Konghucu" {{ $d->agama === 'Konghucu' ? 'selected' : '' }}>
-                                    Konghucu
-                                </option>
-                                <option value="Buddha" {{ $d->agama === 'Buddha' ? 'selected' : '' }}>Buddha
-                                </option>
-                                <option value="Hindu" {{ $d->agama === 'Hindu' ? 'selected' : '' }}>Hindu
-                                </option>
-                            </select>
-                        </div>
+    <label for="">Agama</label>
+    @hasrole('rw|rt|warga')
+        <select class="form-select" name="agama_disabled" disabled>
+            <option value="">-- Pilih Agama --</option>
+            <option value="Islam" {{ $d->agama === 'Islam' ? 'selected' : '' }}>Islam</option>
+            <option value="Katolik" {{ $d->agama === 'Katolik' ? 'selected' : '' }}>Katolik</option>
+            <option value="Protestan" {{ $d->agama === 'Protestan' ? 'selected' : '' }}>Protestan</option>
+            <option value="Konghucu" {{ $d->agama === 'Konghucu' ? 'selected' : '' }}>Konghucu</option>
+            <option value="Buddha" {{ $d->agama === 'Buddha' ? 'selected' : '' }}>Buddha</option>
+            <option value="Hindu" {{ $d->agama === 'Hindu' ? 'selected' : '' }}>Hindu</option>
+        </select>
+        <input type="hidden" name="agama" value="{{ $d->agama }}">
+    @else
+        <select class="form-select" name="agama" required>
+            <option value="">-- Pilih Agama --</option>
+            <option value="Islam" {{ $d->agama === 'Islam' ? 'selected' : '' }}>Islam</option>
+            <option value="Katolik" {{ $d->agama === 'Katolik' ? 'selected' : '' }}>Katolik</option>
+            <option value="Protestan" {{ $d->agama === 'Protestan' ? 'selected' : '' }}>Protestan</option>
+            <option value="Konghucu" {{ $d->agama === 'Konghucu' ? 'selected' : '' }}>Konghucu</option>
+            <option value="Buddha" {{ $d->agama === 'Buddha' ? 'selected' : '' }}>Buddha</option>
+            <option value="Hindu" {{ $d->agama === 'Hindu' ? 'selected' : '' }}>Hindu</option>
+        </select>
+    @endhasrole
+</div>
+
 
                         <label for="">Alamat</label>
                         <div class="mb-3">
-                            <textarea class="form-control" name="alamat" id="" cols="30" rows="3">{{$d->alamat}}</textarea>
+                            <textarea class="form-control" name="alamat" id="" cols="30" rows="3" @hasrole('rw|rt|warga') readonly @endhasrole>{{$d->alamat}}</textarea>
                         </div>
 
                         <div class="row">
                             <div class="col">
-                                <div class="mb-3">
-                                    <label for="">Status Pernikahan</label>
-                                    <select class="form-select" type="text" placeholder="" name="status_pernikahan"
-                                        required>
-                                        <option value="">-- Pilih Status Pernikahan --</option>
-                                        <option value="Kawin" {{$d->status_pernikahan === 'Kawin' ? 'selected' : ''}}>Kawin
-                                        </option>
-                                        <option value="Belum Kawin" {{$d->status_pernikahan === 'Belum Kawin' ? 'selected' : ''}}>Belum Kawin</option>
-                                        <option value="Cerai" {{$d->status_pernikahan === 'Cerai' ? 'selected' : ''}}>Cerai
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
+    <div class="mb-3">
+        <label for="">Status Pernikahan</label>
+        @hasrole('rw|rt|warga')
+            <select class="form-select" disabled>
+                <option value="">-- Pilih Status Pernikahan --</option>
+                <option value="Kawin" {{ $d->status_pernikahan === 'Kawin' ? 'selected' : '' }}>Kawin</option>
+                <option value="Belum Kawin" {{ $d->status_pernikahan === 'Belum Kawin' ? 'selected' : '' }}>Belum Kawin</option>
+                <option value="Cerai" {{ $d->status_pernikahan === 'Cerai' ? 'selected' : '' }}>Cerai</option>
+            </select>
+            <input type="hidden" name="status_pernikahan" value="{{ $d->status_pernikahan }}">
+        @else
+            <select class="form-select" name="status_pernikahan" required>
+                <option value="">-- Pilih Status Pernikahan --</option>
+                <option value="Kawin" {{ $d->status_pernikahan === 'Kawin' ? 'selected' : '' }}>Kawin</option>
+                <option value="Belum Kawin" {{ $d->status_pernikahan === 'Belum Kawin' ? 'selected' : '' }}>Belum Kawin</option>
+                <option value="Cerai" {{ $d->status_pernikahan === 'Cerai' ? 'selected' : '' }}>Cerai</option>
+            </select>
+        @endhasrole
+    </div>
+</div>
+
                             <div class="col">
-                                <div class="mb-3">
-                                    <label for="">Status Di Keluarga</label>
-                                    <select class="form-select" type="text" placeholder="" name="status_keluarga" required>
-                                        <option value="">-- Pilih Status Dikeluarga --</option>
-                                        <option value="Kepala Rumah Tangga" {{$d->status_keluarga === 'Kepala Rumah Tangga' ? 'selected' : ''}}>Kepala Keluarga</option>
-                                        <option value="Isteri" {{$d->status_keluarga === 'Isteri' ? 'selected' : ''}}>Isteri
-                                        </option>
-                                        <option value="Anak" {{$d->status_keluarga === 'Anak' ? 'selected' : ''}}>Anak
-                                        </option>
-                                        <option value="Lainnya" {{$d->status_keluarga === 'Lainnya' ? 'selected' : ''}}>
-                                            Lainnya</option>
-                                    </select>
-                                </div>
-                            </div>
+    <div class="mb-3">
+        <label for="">Status Di Keluarga</label>
+        @hasrole('rw|rt|warga')
+            <select class="form-select" disabled>
+                <option value="">-- Pilih Status Dikeluarga --</option>
+                <option value="Kepala Rumah Tangga" {{ $d->status_keluarga === 'Kepala Rumah Tangga' ? 'selected' : '' }}>Kepala Keluarga</option>
+                <option value="Isteri" {{ $d->status_keluarga === 'Isteri' ? 'selected' : '' }}>Isteri</option>
+                <option value="Anak" {{ $d->status_keluarga === 'Anak' ? 'selected' : '' }}>Anak</option>
+                <option value="Lainnya" {{ $d->status_keluarga === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+            </select>
+            <input type="hidden" name="status_keluarga" value="{{ $d->status_keluarga }}">
+        @else
+            <select class="form-select" name="status_keluarga" required>
+                <option value="">-- Pilih Status Dikeluarga --</option>
+                <option value="Kepala Rumah Tangga" {{ $d->status_keluarga === 'Kepala Rumah Tangga' ? 'selected' : '' }}>Kepala Keluarga</option>
+                <option value="Isteri" {{ $d->status_keluarga === 'Isteri' ? 'selected' : '' }}>Isteri</option>
+                <option value="Anak" {{ $d->status_keluarga === 'Anak' ? 'selected' : '' }}>Anak</option>
+                <option value="Lainnya" {{ $d->status_keluarga === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+            </select>
+        @endhasrole
+    </div>
+</div>
+
                         </div>
 
                         <div class="mb-3">
