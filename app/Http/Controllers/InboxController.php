@@ -50,8 +50,7 @@ public function index(Request $request)
         $search = $request->search;
         $query->where(function ($q) use ($search) {
             $q->where('kepala_keluarga', 'like', "%$search%")
-              ->orWhere('no_kk', 'like', "%$search%")
-              ->orWhere('alamat', 'like', "%$search%");
+              ->orWhere('no_kk', 'like', "%$search%");
         });
     }
 

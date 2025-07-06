@@ -62,16 +62,18 @@
     </style>
 
     <div class="container py-4">
+        <div class="py-3">
+            <h3>Kotak Verifikasi Pendaftaran Warga Baru</h3>
+        </div>
         <div class="card shadow">
             <div class="card-body">
-                <h4 class="card-title mb-4 text-center text-md-start">Kotak Verifikasi Pendaftaran Warga Baru</h4>
-
                 {{-- Search dan Entries --}}
                 <div class="d-md-flex justify-content-between align-items-center mb-3">
+                    {{-- Form Pilihan Jumlah Data --}}
                     <form method="GET" action="{{ route('inbox.index') }}"
                         class="d-flex align-items-center gap-2 mb-2 mb-md-0">
                         <label for="entries" class="me-2 mb-0"></label>
-                        <select name="entries" id="entries" class="form-select form-select-sm w-auto"
+                        <select name="entries" id="entries" class="form-select form-select-md w-auto"
                             onchange="this.form.submit()">
                             @foreach ([5, 10, 25, 50] as $entry)
                                 <option value="{{ $entry }}" {{ request('entries') == $entry ? 'selected' : '' }}>
@@ -82,18 +84,28 @@
                         <span class="ms-2">entries per page</span>
                     </form>
 
-                    <form method="GET" action="{{ route('inbox.index') }}" class="d-flex">
+                    {{-- Form Pencarian --}}
+                    <form method="GET" action="{{ route('inbox.index') }}" class="d-flex" id="searchForm">
                         <input type="hidden" name="entries" value="{{ request('entries', 5) }}">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari data..."
-                            class="form-control form-control-sm me-2" />
-                        <button type="submit" class="btn btn-primary btn-sm">Cari</button>
+                        <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
+                            placeholder="Search..." class="form-control form-control-md" autocomplete="off" />
                     </form>
+
                 </div>
 
-                {{-- Isi Inbox --}}
+                {{-- Tampilkan Pesan Berdasarkan Kondisi --}}
                 @if ($data->isEmpty())
-                    <div class="alert alert-info">Tidak ada pendaftaran warga yang menunggu verifikasi.</div>
+                    @if (request('search'))
+                        <div class="alert alert-warning text-center">
+                            Data dengan kata kunci "<strong>{{ request('search') }}</strong>" tidak ditemukan.
+                        </div>
+                    @else
+                        <div class="alert alert-info text-center">
+                            Tidak ada pendaftaran warga yang menunggu verifikasi.
+                        </div>
+                    @endif
                 @else
+
                     @foreach ($data as $kk)
                         <div class="inbox-item p-3 mb-3 border rounded">
                             <div class="row align-items-start">
@@ -217,6 +229,20 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchForm = document.getElementById('searchForm');
+
+        let typingTimer;
+        const delay = 500; // 500 ms
+
+        searchInput.addEventListener('input', function () {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                searchForm.submit();
+            }, delay);
+        });
+    </script>
 
     <script>
         let rotationAngle = 0;
