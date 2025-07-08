@@ -169,10 +169,29 @@
                                     <div id="collapseUser" class="accordion-collapse collapse"
                                         aria-labelledby="headingUser" data-bs-parent="#accordionUserInfo">
                                         <div class="accordion-body px-0 py-1">
+                                            @php
+                                                $role = ucfirst(Auth::user()->getRoleNames()->first());
+                                                switch ($role) {
+                                                    case 'Rt':
+                                                        $roleDisplay = 'Ketua RT';
+                                                        break;
+                                                    case 'Rw':
+                                                        $roleDisplay = 'Ketua RW';
+                                                        break;
+                                                    case 'Superadmin':
+                                                        $roleDisplay = 'Admin Kelurahan';
+                                                        break;
+                                                    default:
+                                                        $roleDisplay = $role;
+                                                        break;
+                                                }
+                                            @endphp
+
                                             <span class="d-block text-muted small">
                                                 Role:
-                                                <strong>{{ ucfirst(Auth::user()->getRoleNames()->first()) }}</strong>
+                                                <strong>{{ $roleDisplay }}</strong>
                                             </span>
+
                                             <span class="d-block text-muted small">
                                                 Status: <span class="text-success">Aktif</span>
                                             </span>
@@ -250,7 +269,7 @@
                         <li class="sidebar-item {{ request()->is('pengguna*') ? 'active' : '' }}">
                             <a href="edit#pengguna" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#edit">
                                 <i class="fas fa-user-edit"></i>
-                                <span>Akun</span>
+                                <span>Kelola Akun</span>
                             </a>
                         </li>
 
