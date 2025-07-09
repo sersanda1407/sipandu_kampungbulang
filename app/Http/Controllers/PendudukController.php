@@ -9,26 +9,24 @@ use App\DataRw;
 use App\Lurah;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
-
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 
 
 class PendudukController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+ * @return \Illuminate\View\View
+ */
+
 
     public function index()
     {
+        /** @var \App\User $user */
         $user = Auth::user();
 
         if ($user->hasRole('rw')) {
@@ -338,7 +336,7 @@ class PendudukController extends Controller
     {
         try {
             $id = decrypt($encryptedId);
-        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+        } catch (DecryptException $e) {
             abort(404, 'Data tidak valid atau rusak.');
         }
 
@@ -359,7 +357,7 @@ class PendudukController extends Controller
     {
         try {
             $id = decrypt($encryptedId);
-        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+        } catch (DecryptException $e) {
             abort(404, 'Data tidak valid atau rusak.');
         }
 
@@ -383,7 +381,7 @@ class PendudukController extends Controller
     {
         try {
             $id = decrypt($encryptedId);
-        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+        } catch (DecryptException $e) {
             abort(404, 'Data tidak valid atau rusak.');
         }
 
@@ -437,7 +435,7 @@ public function exportFiltered(Request $request)
                 $rw = $rt->rw;
             }
         }
-    } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+    } catch (DecryptException $e) {
         abort(404, 'ID tidak valid atau rusak.');
     }
 

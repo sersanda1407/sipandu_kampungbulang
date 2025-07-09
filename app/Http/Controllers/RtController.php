@@ -17,6 +17,8 @@ class RtController extends Controller
 {
     public function index()
     {
+        /** @var \App\User $user */
+        
         $user = Auth::user();
         $rw = DataRw::where('user_id', $user->id)->first();
         $rt = DataRt::where('user_id', $user->id)->first();
