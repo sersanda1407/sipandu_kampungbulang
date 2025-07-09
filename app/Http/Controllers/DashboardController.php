@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
+use Spatie\Permission\Traits\HasRoles;
+
 
 class DashboardController extends Controller
 {
@@ -38,7 +40,7 @@ class DashboardController extends Controller
 
         // Query penduduk dengan filter
         $query = DataPenduduk::query();
-        
+
 
         if ($filter_rw) {
             $query->where('rw_id', $filter_rw);
@@ -133,15 +135,30 @@ class DashboardController extends Controller
                 $data_ekonomi['Mampu']++;
         }
 
-$data_agama = $dataPenduduk->whereNotNull('agama')
-    ->groupBy('agama')
-    ->map(function ($group) {
-        return $group->count();
-    })
-    ->toArray();
+        $data_agama = $dataPenduduk->whereNotNull('agama')
+            ->groupBy('agama')
+            ->map(function ($group) {
+                return $group->count();
+            })
+            ->toArray();
 
 
-        return view('dashboard', compact(
+        $user = Auth::user();
+
+        if ($user->hasRole('superadmin')) {
+            $viewName = 'dashboard/dashboard-admin';
+        } elseif ($user->hasRole('rw')) {
+            $viewName = 'dashboard/dashboard-rw';
+        } elseif ($user->hasRole('rt')) {
+            $viewName = 'dashboard/dashboard-rt';
+        } elseif ($user->hasRole('warga')) {
+            $viewName = 'dashboard/dashboard-warga';
+        } else {
+            abort(403, 'Akses tidak diizinkan. Kamu siapa ya?');
+        }
+
+
+        return view($viewName, compact(
             'data_month',
             'gender_laki',
             'gender_cewe',
@@ -237,5 +254,4 @@ $data_agama = $dataPenduduk->whereNotNull('agama')
         Alert::success('Sukses!', 'Data Lurah berhasil diperbarui.');
         return redirect()->back();
     }
-
 }

@@ -2,22 +2,8 @@
 
 @section('master')
 
-    {{-- MODAL ADD --}}
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary">Simpan</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
+
 
     <div class="container-fluid">
         <div class="row">
@@ -36,9 +22,10 @@
                                     <select name="rw_id" id="rw_id" class="form-select">
                                         <option value="">-- Pilih RW --</option>
                                         @foreach ($selectRw as $rw)
-                                            <option value="{{ $rw->id }}" {{ request('rw_id') == $rw->id ? 'selected' : '' }}>
+                                            <option value="{{ encrypt($rw->id) }}" {{ isset($rwId) && $rwId == $rw->id ? 'selected' : '' }}>
                                                 {{ $rw->rw }}
                                             </option>
+
                                         @endforeach
                                     </select>
                                 </div>
@@ -48,7 +35,9 @@
                                     <select name="rt_id" id="rt_id" class="form-select">
                                         <option value="">-- Pilih RT --</option>
                                         @foreach ($selectRt as $rt)
-                                            <option value="{{ $rt->id }}">{{ $rt->rt }}</option>
+                                            <option value="{{ encrypt($rt->id) }}" {{ isset($rtId) && $rtId == $rt->id ? 'selected' : '' }}>
+                                                {{ $rt->rt }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -87,33 +76,121 @@
                         </script>
                         @endhasrole
 
-                        @if (Auth::user()->hasrole('rt'))
-                            <a href="{{ url('/penduduk/exportRt/' . encrypt(Auth::user()->Rt[0]->id)) }}" target="_blank"
-                                class="btn btn-danger rounded-pill mb-3">
-                                <i class="fas fa-file-pdf"></i>
-                                <span>Export Pdf</span>
-                            </a>
-                        @elseif (Auth::user()->hasrole('rw'))
-                            <a href="{{ url('/penduduk/exportRw/' . encrypt(Auth::user()->Rw[0]->id)) }}" target="_blank"
-                                class="btn btn-danger rounded-pill mb-3">
-                                <i class="fas fa-file-pdf"></i>
-                                <span>Export PDF</span>
-                            </a>
-                        @elseif (Auth::user()->hasrole('superadmin'))
-                            @php
-                                $params = [];
-                                if (request('rt_id'))
-                                    $params['rt_id'] = encrypt(request('rt_id'));
-                                if (request('rw_id'))
-                                    $params['rw_id'] = encrypt(request('rw_id'));
-                            @endphp
+                      @php
+    $exportRoute = '';
+@endphp
 
-                            <a href="{{ !empty($params) ? route('penduduk.exportFiltered', $params) : route('penduduk.exportAll') }}"
-                                target="_blank" class="btn btn-danger rounded-pill mb-3">
-                                <i class="fas fa-file-pdf"></i>
-                                <span>Export PDF</span>
-                            </a>
-                        @endif
+@if (Auth::user()->hasrole('rt'))
+    <button type="button" class="btn btn-danger rounded-pill mb-3" data-bs-toggle="modal"
+        data-bs-target="#exportModal">
+        <i class="fas fa-file-pdf"></i>
+        <span>Export PDF</span>
+    </button>
+    @php
+        $exportRoute = route('penduduk.exportRt', encrypt(Auth::user()->Rt[0]->id));
+    @endphp
+
+@elseif (Auth::user()->hasrole('rw'))
+    <button type="button" class="btn btn-danger rounded-pill mb-3" data-bs-toggle="modal"
+        data-bs-target="#exportModal">
+        <i class="fas fa-file-pdf"></i>
+        <span>Export PDF</span>
+    </button>
+    @php
+        $exportRoute = route('penduduk.exportRw', encrypt(Auth::user()->Rw[0]->id));
+    @endphp
+
+@elseif (Auth::user()->hasrole('superadmin'))
+    <button type="button" class="btn btn-danger rounded-pill mb-3" data-bs-toggle="modal"
+        data-bs-target="#exportModal">
+        <i class="fas fa-file-pdf"></i>
+        <span>Export PDF</span>
+    </button>
+    @php
+        $params = [];
+        if (request()->filled('rw_id')) {
+            $params['rw_id'] = encrypt(request()->rw_id);
+        }
+        if (request()->filled('rt_id')) {
+            $params['rt_id'] = encrypt(request()->rt_id);
+        }
+
+        $exportRoute = empty($params)
+            ? route('penduduk.exportAll')
+            : route('penduduk.exportFiltered', $params);
+    @endphp
+@endif
+
+<!-- Modal Export PDF -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="exportForm" method="GET" action="{{ $exportRoute }}">
+            <input type="hidden" name="rw_id" value="{{ request()->filled('rw_id') ? request()->rw_id : '' }}">
+            <input type="hidden" name="rt_id" value="{{ request()->filled('rt_id') ? request()->rt_id : '' }}">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Pilih Keterangan Tambahan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        @php
+                            $opsi = [
+                                'gender' => 'Jenis Kelamin',
+                                'agama' => 'Agama',
+                                'status_ekonomi' => 'Status Ekonomi',
+                                'status_pernikahan' => 'Status Pernikahan',
+                                'pekerjaan' => 'Pekerjaan',
+                                'usia' => 'Usia'
+                            ];
+                        @endphp
+                        @foreach ($opsi as $key => $label)
+                            <div class="col-md-4">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="tampilkan[]"
+                                        value="{{ $key }}" id="check_{{ $key }}">
+                                    <label class="form-check-label" for="check_{{ $key }}">
+                                        {{ $label }}
+                                    </label>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary" id="btnExport">Export PDF</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('exportForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const url = new URL(form.action);
+
+        const formData = new FormData(form);
+        formData.forEach((value, key) => {
+            if (key.endsWith('[]')) {
+                url.searchParams.append(key, value);
+            } else {
+                url.searchParams.set(key, value);
+            }
+        });
+
+        window.open(url.toString(), '_blank');
+
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    });
+</script>
 
                         {{-- Table Responsive --}}
                         <div class="table-responsive">

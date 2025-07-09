@@ -15,13 +15,8 @@
     }
 
     .kop-surat {
-      margin-top: -30px;
+      margin-top: -20px;
       margin-bottom: 10px;
-    }
-
-    .kop-surat img {
-      width: 100%;
-      max-width: 1000px;
     }
 
     h5.title {
@@ -39,7 +34,9 @@
 
     .footer-section {
       page-break-inside: avoid;
+      page-break-before: avoid;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       margin-top: 50px;
     }
@@ -113,10 +110,33 @@
 </head>
 
 <body>
+  <div style="text-align: center; margin-bottom: 10px;">
+    <table style="width: 100%;">
+      <tr>
+        <td style="width: 15%; text-align: right;">
+          <img src="{{ public_path('assets/images/Lambang_Kota_Tanjungpinang.webp') }}"
+            style="width: 85px; height: auto;">
+        </td>
+        <td style="width: 70%; text-align: center;">
+          <div style="font-size: 20px; font-weight: bold; line-height: 1.2;">
+            PEMERINTAH KOTA TANJUNGPINANG<br>
+            KECAMATAN TANJUNGPINANG TIMUR<br>
+            <span style="font-size: 22px;">KELURAHAN KAMPUNG BULANG</span><br>
+            <span style="font-size: 14px; font-weight: normal;">
+              Jl. Sultan Sulaiman, Kampung Bulang Bawah, Kecamatan Tanjungpinang Timur<br>
+              Kota Tanjungpinang, Provinsi Kepulauan Riau – 29122<br>
+              Telp. +62811-7784-847 | email: <u>kmpbulang@yahoo.com</u>
+            </span>
+          </div>
+        </td>
+        <td style="width: 15%;"></td>
+      </tr>
+    </table>
+    <hr style="border: 2px solid black; margin-top: 8px;">
+  </div>
 
   <div class="text-center kop-surat">
-    <img src="assets/images/kop_surat_kpbulang.webp" alt="Kop Surat Kelurahan Kampung Bulang">
-    <div class="mb-3 text-right" style="margin-right: 20px;">
+    <div class="mb-4 text-right" style="margin-right: 20px;">
       <p>
         Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}
       </p>
@@ -194,39 +214,155 @@
     </tbody>
   </table>
 
-  <div class="footer-section">
-    <div style="font-size: 14px; line-height: 1.4;">
-      <p><strong>Total:</strong></p>
-      <ul>
-        <li>Jumlah Laki-laki = {{ $jumlah_laki }}</li>
-        <li>Jumlah Perempuan = {{ $jumlah_perempuan }}</li>
-      </ul>
+  <div style="page-break-inside: avoid;">
 
-      <p><strong>Status Ekonomi Keluarga:</strong></p>
-      <ul>
-        @foreach ($statusCounts as $label => $jumlah)
-      <li>{{ $label }}: {{ $jumlah }} KK</li>
+
+    <div class="footer-section">
+      {{-- start - sesuaikan bagian ini --}}
+      @php
+    $boxList = [];
+
+    if (request()->has('tampilkan')) {
+      foreach (request('tampilkan') as $kategori) {
+      $rows = [];
+
+      switch ($kategori) {
+        case 'gender':
+        $rows = [
+          ['Laki-laki', $jumlah_laki . ' orang'],
+          ['Perempuan', $jumlah_perempuan . ' orang'],
+        ];
+        $title = 'Jenis Kelamin';
+        break;
+
+        case 'status_ekonomi':
+        $rows = collect($statusCounts)->map(fn($jumlah, $label) => [$label, "$jumlah KK"])->values()->toArray();
+        $title = 'Status Ekonomi Keluarga';
+        break;
+
+        case 'agama':
+        $rows = $penduduk->groupBy('agama')->map->count()
+          ->map(fn($jumlah, $agama) => [$agama, "$jumlah orang"])->values()->toArray();
+        $title = 'Agama';
+        break;
+
+        case 'status_pernikahan':
+        $rows = $penduduk->groupBy('status_pernikahan')->map->count()
+          ->map(fn($jumlah, $status) => [$status, "$jumlah orang"])->values()->toArray();
+        $title = 'Status Pernikahan';
+        break;
+
+        case 'pekerjaan':
+        $rows = $penduduk->groupBy('pekerjaan')->map->count()
+          ->map(fn($jumlah, $job) => [$job, "$jumlah orang"])->values()->toArray();
+        $title = 'Pekerjaan';
+        break;
+
+        case 'usia':
+        $rows = [
+          ['0–5 Tahun', $penduduk->where('usia', '<=', 5)->count() . ' orang'],
+          ['6–17 Tahun', $penduduk->whereBetween('usia', [6, 17])->count() . ' orang'],
+          ['18–59 Tahun', $penduduk->whereBetween('usia', [18, 59])->count() . ' orang'],
+          ['60+ Tahun', $penduduk->where('usia', '>=', 60)->count() . ' orang'],
+        ];
+        $title = 'Kategori Usia';
+        break;
+
+        default:
+        $title = null;
+        break;
+      }
+
+      if ($title && $rows) {
+        $boxList[] = [
+        'title' => $title,
+        'rows' => $rows
+        ];
+      }
+      }
+    }
+    @endphp
+
+      @if (!empty($boxList))
+      <style>
+      .summary-container {
+        width: 100%;
+        margin-top: 20px;
+        font-size: 11px;
+        page-break-inside: avoid;
+        page-break-before: avoid;
+      }
+
+      .summary-box {
+        display: inline-block;
+        width: 32%;
+        vertical-align: top;
+        margin: 0 1% 20px 0;
+        page-break-inside: avoid;
+      }
+
+      .summary-box table {
+        width: 100%;
+        border: 1px solid #000;
+        border-collapse: collapse;
+      }
+
+      .summary-box th,
+      .summary-box td {
+        border: 1px solid #000;
+        padding: 4px;
+        font-size: 10px;
+      }
+
+      .summary-box th {
+        background-color: #f2f2f2;
+        text-align: center;
+      }
+      </style>
+
+      <div class="summary-container">
+      <p>Berikut adalah tabel rincian data:</p>
+      @foreach ($boxList as $box)
+      <div class="summary-box">
+      <table>
+      <thead>
+        <tr>
+        <th colspan="2">{{ $box['title'] }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach ($box['rows'] as [$label, $value])
+      <tr>
+      <td>{{ $label }}</td>
+      <td style="text-align: right;">{{ $value }}</td>
+      </tr>
+      @endforeach
+      </tbody>
+      </table>
+      </div>
     @endforeach
-      </ul>
+      </div>
+    @endif
+
+      <div class="footer-left">
+        <p>
+          Data ini dicetak pada hari <strong>{{ $waktu->translatedFormat('l, d F Y') }}</strong>
+          pada jam <strong>{{ $waktu->format('H:i') }} {{ $zonaAktif }}</strong>
+        </p>
+      </div>
+      <div class="footer-right">
+        <p style="margin: 0;">
+          Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}<br>
+          Lurah Kampung Bulang
+          <br><br><br>
+          <strong>{{ $lurah->nama ?? '-' }}</strong><br>
+          {{ $lurah->jabatan ?? '-' }}<br>
+          NIP. {{ $lurah->nip ?? '-' }}
+        </p>
+      </div>
+      {{-- selesai - sesuaikan bagian ini --}}
     </div>
 
-
-    <div class="footer-left">
-      <p>
-        Data ini dicetak pada hari <strong>{{ $waktu->translatedFormat('l, d F Y') }}</strong>
-        pada jam <strong>{{ $waktu->format('H:i') }} {{ $zonaAktif }}</strong>
-      </p>
-    </div>
-    <div class="footer-right">
-      <p style="margin: 0;">
-        Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}<br>
-        Lurah Kampung Bulang
-        <br><br><br>
-        <strong>{{ $lurah->nama ?? '-' }}</strong><br>
-        {{ $lurah->jabatan ?? '-' }}<br>
-        NIP. {{ $lurah->nip ?? '-' }}
-      </p>
-    </div>
   </div>
 
 

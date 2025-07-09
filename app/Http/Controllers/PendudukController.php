@@ -14,6 +14,8 @@ use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Encryption\DecryptException;
+
 
 
 
@@ -412,74 +414,109 @@ class PendudukController extends Controller
         return $pdf->stream('Data_Seluruh_Warga_Kampung_Bulang.pdf');
     }
 
-    public function exportFiltered(Request $request)
-    {
-        $query = DataPenduduk::query();
+public function exportFiltered(Request $request)
+{
+    $query = DataPenduduk::query();
 
-        $rt = null;
-        $rw = null;
+    $rt = null;
+    $rw = null;
 
-        try {
-            if ($request->filled('rw_id')) {
-                $rwId = decrypt($request->rw_id);
-                $query->where('rw_id', $rwId);
-                $rw = DataRw::find($rwId);
-            }
-
-            if ($request->filled('rt_id')) {
-                $rtId = decrypt($request->rt_id);
-                $query->where('rt_id', $rtId);
-                $rt = DataRt::find($rtId);
-            }
-        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            abort(404, 'ID tidak valid atau rusak.');
-        }
-
-        $penduduk = $query->get();
-        $penduduk = $this->sortPenduduk($penduduk);
-
-        $lurah = Lurah::first();
-
-        $pdf = PDF::loadView('penduduk.exportFiltered', compact('penduduk', 'lurah', 'rt', 'rw'))
-            ->setPaper('a4', 'landscape')
-            ->setWarnings(false);
-        return $pdf->stream('Data_seluruh_warga_kampung_bulang_Filter_rt&rw.pdf');
-    }
-
-
-    public function filter(Request $request)
-    {
-        $selectRw = DataRw::all();
-
-        $selectRt = DataRt::select('id', 'rt')
-            ->get()
-            ->map(function ($item) {
-                $item->rt = (int) $item->rt;
-                return $item;
-            })
-            ->unique('rt')
-            ->sortBy('rt')
-            ->values();
-
-        if ($request->filled('rt_id') && !$request->filled('rw_id')) {
-            Alert::error('Filter Gagal', 'Silakan pilih RW terlebih dahulu jika ingin memfilter berdasarkan RT.');
-            return redirect()->back();
-        }
-
-        $query = DataPenduduk::query();
-
+    try {
         if ($request->filled('rw_id')) {
-            $query->where('rw_id', $request->rw_id);
+            $rwId = decrypt($request->rw_id);
+            $query->where('rw_id', $rwId);
+            $rw = DataRw::find($rwId);
         }
 
         if ($request->filled('rt_id')) {
-            $query->where('rt_id', $request->rt_id);
+            $rtId = decrypt($request->rt_id);
+            $query->where('rt_id', $rtId);
+            $rt = DataRt::with('rw')->find($rtId);
+
+            if ($rt && !$rw) {
+                $rw = $rt->rw;
+            }
+        }
+    } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+        abort(404, 'ID tidak valid atau rusak.');
+    }
+
+    // ⬇️ tambahkan eager load
+    $penduduk = $query->with(['rt', 'rw', 'kk'])->get();
+    $penduduk = $this->sortPenduduk($penduduk);
+
+    $lurah = Lurah::first();
+
+    $pdf = PDF::loadView('penduduk.exportFiltered', compact('penduduk', 'lurah', 'rt', 'rw'))
+        ->setPaper('a4', 'landscape')
+        ->setWarnings(false);
+    return $pdf->stream('Data_seluruh_warga_kampung_bulang_Filter_rt&rw.pdf');
+}
+
+
+
+
+public function filter(Request $request)
+{
+    $selectRw = DataRw::all();
+
+    $selectRt = DataRt::select('id', 'rt')
+        ->get()
+        ->map(function ($item) {
+            $item->rt = (int) $item->rt;
+            return $item;
+        })
+        ->unique('rt')
+        ->sortBy('rt')
+        ->values();
+
+    $rwId = null;
+    $rtId = null;
+
+    try {
+        if ($request->filled('rw_id')) {
+            $rwId = decrypt($request->rw_id);
         }
 
-        $data = $query->get();
-
-        return view('penduduk.index', compact('data', 'selectRw', 'selectRt'));
+        if ($request->filled('rt_id')) {
+            $rtId = decrypt($request->rt_id);
+        }
+    } catch (DecryptException $e) {
+        Alert::error('Filter Gagal', 'Data filter tidak valid.');
+        return redirect()->back();
     }
+
+    if ($rtId && !$rwId) {
+        Alert::error('Filter Gagal', 'Silakan pilih RW terlebih dahulu jika ingin memfilter berdasarkan RT.');
+        return redirect()->back();
+    }
+
+    $query = DataPenduduk::query();
+
+    if ($rwId) {
+        $query->where('rw_id', $rwId);
+    }
+
+    if ($rtId) {
+        $query->where('rt_id', $rtId);
+    }
+
+    $data = $query->get();
+
+    // ✅ ambil data RT dan RW dari ID terdekripsi
+    $rw = $rwId ? DataRw::find($rwId) : null;
+    $rt = $rtId ? DataRt::with('rw')->find($rtId) : null;
+
+    if ($rt && !$rw) {
+        $rw = $rt->rw;
+    }
+
+    return view('penduduk.index', compact(
+        'data', 'selectRw', 'selectRt',
+        'rwId', 'rtId', 'rw', 'rt'
+    ));
+}
+
 
 
 

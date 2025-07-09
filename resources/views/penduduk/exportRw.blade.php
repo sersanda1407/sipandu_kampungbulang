@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>Data Warga Kelurahan Kampung Bulang</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap CSS -->
+
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
   <style>
@@ -16,13 +16,8 @@
     }
 
     .kop-surat {
-      margin-top: -30px;
+      margin-top: -20px;
       margin-bottom: 10px;
-    }
-
-    .kop-surat img {
-      width: 100%;
-      max-width: 1000px;
     }
 
     h5.title {
@@ -36,6 +31,15 @@
     table td {
       font-size: 9pt;
       vertical-align: middle !important;
+    }
+
+    .footer-section {
+      page-break-inside: avoid;
+      page-break-before: avoid;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-top: 50px;
     }
 
     .footer-left {
@@ -81,19 +85,18 @@
     $jumlahOrang = $anggotaKK->count();
     $rataRata = $jumlahOrang > 0 ? $totalGaji / $jumlahOrang : 0;
 
-    if ($rataRata < 500000) {
+    if ($rataRata < 500000)
     $status = 'Sangat Tidak Mampu';
-    } elseif ($rataRata <= 1500000) {
+    elseif ($rataRata <= 1500000)
     $status = 'Tidak Mampu';
-    } elseif ($rataRata <= 3000000) {
+    elseif ($rataRata <= 3000000)
     $status = 'Menengah ke Bawah';
-    } elseif ($rataRata <= 5000000) {
+    elseif ($rataRata <= 5000000)
     $status = 'Menengah';
-    } elseif ($rataRata <= 10000000) {
+    elseif ($rataRata <= 10000000)
     $status = 'Menengah ke Atas';
-    } else {
+    else
     $status = 'Mampu';
-    }
 
     $statusCounts[$status]++;
   }
@@ -101,13 +104,44 @@
 </head>
 
 <body>
+  <div style="text-align: center; margin-bottom: 10px;">
+    <table style="width: 100%;">
+      <tr>
+        <td style="width: 15%; text-align: right;">
+          <img src="{{ public_path('assets/images/Lambang_Kota_Tanjungpinang.webp') }}"
+            style="width: 85px; height: auto;">
+        </td>
+        <td style="width: 70%; text-align: center;">
+          <div style="font-size: 20px; font-weight: bold; line-height: 1.2;">
+            PEMERINTAH KOTA TANJUNGPINANG<br>
+            KECAMATAN TANJUNGPINANG TIMUR<br>
+            <span style="font-size: 22px;">KELURAHAN KAMPUNG BULANG</span><br>
+            <span style="font-size: 14px; font-weight: normal;">
+              Jl. Sultan Sulaiman, Kampung Bulang Bawah, Kecamatan Tanjungpinang Timur<br>
+              Kota Tanjungpinang, Provinsi Kepulauan Riau – 29122<br>
+              Telp. +62811-7784-847 | email: <u>kmpbulang@yahoo.com</u>
+            </span>
+          </div>
+        </td>
+        <td style="width: 15%;"></td>
+      </tr>
+    </table>
+    <hr style="border: 2px solid black; margin-top: 8px;">
+  </div>
 
   <div class="text-center kop-surat">
-    <img src="{{ public_path('assets/images/kop_surat_kpbulang.webp') }}" alt="Kop Surat Kelurahan Kampung Bulang">
-    <div class="mb-3 text-right" style="margin-right: 20px;">
+    {{-- <img src="{{ public_path('assets/images/kop_surat_kpbulang.webp') }}" alt="Kop Surat Kelurahan Kampung Bulang">
+    --}}
+    <div class="mb-4 text-right" style="margin-right: 20px;">
       <p>Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}</p>
     </div>
-    <h5 class="title">DATA WARGA KELURAHAN KAMPUNG BULANG</h5>
+    <h5 class="title">
+      DATA WARGA
+      @if ($rw)
+      RW {{ $rw->rw }}
+    @endif
+      KELURAHAN KAMPUNG BULANG
+    </h5>
   </div>
 
   <div class="mb-3">
@@ -115,10 +149,7 @@
       Berikut ini adalah data lengkap warga yang berdomisili di wilayah Kelurahan Kampung Bulang khususnya di wilayah
       @if ($rw)
       RW {{ $rw->rw }}
-    @elseif ($rt)
-      RT {{ $rt->rt }}
-    @endif
-      :
+    @endif:
     </p>
   </div>
 
@@ -137,7 +168,7 @@
         <th>Agama</th>
         <th>Status Pernikahan</th>
         <th>Pekerjaan</th>
-        <th>Status Ekonomi</th>
+        <th>Status Ekonomi<br>(rata-rata)</th>
       </tr>
     </thead>
     <tbody>
@@ -145,11 +176,11 @@
       <tr>
       <td class="text-center">{{ $loop->iteration }}</td>
       <td>{{ $pd->nama }}</td>
-      <td>{{ $pd->kk->no_kk ?? '-' }}</td>
+      <td>{{ $pd->kk->no_kk }}</td>
       <td>{{ $pd->nik }}</td>
       <td>{{ $pd->gender }}</td>
       <td>{{ $pd->alamat }}</td>
-      <td class="text-center">{{ $pd->rt->rt ?? '-' }} / {{ $pd->rw->rw ?? '-' }}</td>
+      <td class="text-center">{{ $pd->rt->rt }} / {{ $pd->rw->rw }}</td>
       <td class="text-center">{{ $pd->usia }}</td>
       <td>{{ $pd->tmp_lahir }}, {{ \Carbon\Carbon::parse($pd->tgl_lahir)->format('d-m-Y') }}</td>
       <td>{{ $pd->agama }}</td>
@@ -162,20 +193,19 @@
       $jumlahOrang = $pendudukKK->count();
       $rataRata = $jumlahOrang > 0 ? $totalGaji / $jumlahOrang : 0;
 
-      if ($rataRata < 500000) {
+      if ($rataRata < 500000)
       $statusEkonomi = 'Sangat Tidak Mampu';
-      } elseif ($rataRata <= 1500000) {
+      elseif ($rataRata <= 1500000)
       $statusEkonomi = 'Tidak Mampu';
-      } elseif ($rataRata <= 3000000) {
+      elseif ($rataRata <= 3000000)
       $statusEkonomi = 'Menengah ke Bawah';
-      } elseif ($rataRata <= 5000000) {
+      elseif ($rataRata <= 5000000)
       $statusEkonomi = 'Menengah';
-      } elseif ($rataRata <= 10000000) {
+      elseif ($rataRata <= 10000000)
       $statusEkonomi = 'Menengah ke Atas';
-      } else {
+      else
       $statusEkonomi = 'Mampu';
-      }
-    @endphp
+      @endphp
         {{ $statusEkonomi }}
         <br>
         <small class="text-muted">Rp.{{ number_format($rataRata, 0, ',', '.') }}</small>
@@ -185,23 +215,119 @@
     </tbody>
   </table>
 
-  <div class="footer-section">
-    <div style="font-size: 14px; line-height: 1.4;">
-      <p><strong>Total:</strong></p>
-      <ul>
-        <li>Jumlah Laki-laki = {{ $jumlah_laki }}</li>
-        <li>Jumlah Perempuan = {{ $jumlah_perempuan }}</li>
-      </ul>
+  <div style="page-break-inside: avoid;">
+    @php
+    $boxList = [];
+    if (request()->has('tampilkan')) {
+      foreach (request('tampilkan') as $kategori) {
+      $rows = [];
+      switch ($kategori) {
+        case 'gender':
+        $rows = [['Laki-laki', $jumlah_laki . ' orang'], ['Perempuan', $jumlah_perempuan . ' orang']];
+        $title = 'Jenis Kelamin';
+        break;
+        case 'status_ekonomi':
+        $rows = collect($statusCounts)->map(fn($jumlah, $label) => [$label, "$jumlah KK"])->values()->toArray();
+        $title = 'Status Ekonomi Keluarga';
+        break;
+        case 'agama':
+        $rows = $penduduk->groupBy('agama')->map->count()
+          ->map(fn($jumlah, $agama) => [$agama, "$jumlah orang"])->values()->toArray();
+        $title = 'Agama';
+        break;
+        case 'status_pernikahan':
+        $rows = $penduduk->groupBy('status_pernikahan')->map->count()
+          ->map(fn($jumlah, $status) => [$status, "$jumlah orang"])->values()->toArray();
+        $title = 'Status Pernikahan';
+        break;
+        case 'pekerjaan':
+        $rows = $penduduk->groupBy('pekerjaan')->map->count()
+          ->map(fn($jumlah, $job) => [$job, "$jumlah orang"])->values()->toArray();
+        $title = 'Pekerjaan';
+        break;
+        case 'usia':
+        $rows = [
+          ['0–5 Tahun', $penduduk->where('usia', '<=', 5)->count() . ' orang'],
+          ['6–17 Tahun', $penduduk->whereBetween('usia', [6, 17])->count() . ' orang'],
+          ['18–59 Tahun', $penduduk->whereBetween('usia', [18, 59])->count() . ' orang'],
+          ['60+ Tahun', $penduduk->where('usia', '>=', 60)->count() . ' orang'],
+        ];
+        $title = 'Kategori Usia';
+        break;
+        default:
+        $title = null;
+        break;
+      }
+      if ($title && $rows) {
+        $boxList[] = ['title' => $title, 'rows' => $rows];
+      }
+      }
+    }
+  @endphp
 
-      <p><strong>Status Ekonomi Keluarga:</strong></p>
-      <ul>
-        @foreach ($statusCounts as $label => $jumlah)
-      <li>{{ $label }}: {{ $jumlah }} KK</li>
+    @if (!empty($boxList))
+    <style>
+      .summary-container {
+      width: 100%;
+      margin-top: 20px;
+      font-size: 11px;
+      page-break-inside: avoid;
+      page-break-before: avoid;
+      }
+
+      .summary-box {
+      display: inline-block;
+      width: 32%;
+      vertical-align: top;
+      margin: 0 1% 20px 0;
+      page-break-inside: avoid;
+      }
+
+      .summary-box table {
+      width: 100%;
+      border: 1px solid #000;
+      border-collapse: collapse;
+      }
+
+      .summary-box th,
+      .summary-box td {
+      border: 1px solid #000;
+      padding: 4px;
+      font-size: 10px;
+      }
+
+      .summary-box th {
+      background-color: #f2f2f2;
+      text-align: center;
+      }
+    </style>
+
+    <div class="summary-container">
+      <p>Berikut adalah tabel rincian data:</p>
+      @foreach ($boxList as $box)
+      <div class="summary-box">
+      <table>
+      <thead>
+      <tr>
+        <th colspan="2">{{ $box['title'] }}</th>
+      </tr>
+      </thead>
+      <tbody>
+      @foreach ($box['rows'] as [$label, $value])
+      <tr>
+      <td>{{ $label }}</td>
+      <td style="text-align: right;">{{ $value }}</td>
+      </tr>
+      @endforeach
+      </tbody>
+      </table>
+      </div>
     @endforeach
-      </ul>
     </div>
+  @endif
+  </div>
 
-
+  <div class="footer-section">
     <div class="footer-left">
       <p>
         Data ini dicetak pada hari <strong>{{ $waktu->translatedFormat('l, d F Y') }}</strong>
@@ -211,8 +337,7 @@
     <div class="footer-right">
       <p style="margin: 0;">
         Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}<br>
-        Lurah Kampung Bulang
-        <br><br><br>
+        Lurah Kampung Bulang<br><br><br>
         <strong>{{ $lurah->nama ?? '-' }}</strong><br>
         {{ $lurah->jabatan ?? '-' }}<br>
         NIP. {{ $lurah->nip ?? '-' }}
