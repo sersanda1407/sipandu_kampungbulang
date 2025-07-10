@@ -62,135 +62,137 @@
                             toggleFilterButton();
                             rwSelect.addEventListener('change', toggleFilterButton);
                         </script>
-
-                        <script>
-                            document.getElementById('filter-tanggal').addEventListener('submit', function (e) {
-                                const rw = document.getElementById('rw_id').value;
-                                const rt = document.getElementById('rt_id').value;
-
-                                if (!rw && rt) {
-                                    e.preventDefault();
-                                    alert('Silakan pilih RW terlebih dahulu jika ingin memfilter berdasarkan RT.');
-                                }
-                            });
-                        </script>
                         @endhasrole
 
-                      @php
-    $exportRoute = '';
-@endphp
-
-@if (Auth::user()->hasrole('rt'))
-    <button type="button" class="btn btn-danger rounded-pill mb-3" data-bs-toggle="modal"
-        data-bs-target="#exportModal">
-        <i class="fas fa-file-pdf"></i>
-        <span>Export PDF</span>
-    </button>
-    @php
-        $exportRoute = route('penduduk.exportRt', encrypt(Auth::user()->Rt[0]->id));
-    @endphp
-
-@elseif (Auth::user()->hasrole('rw'))
-    <button type="button" class="btn btn-danger rounded-pill mb-3" data-bs-toggle="modal"
-        data-bs-target="#exportModal">
-        <i class="fas fa-file-pdf"></i>
-        <span>Export PDF</span>
-    </button>
-    @php
-        $exportRoute = route('penduduk.exportRw', encrypt(Auth::user()->Rw[0]->id));
-    @endphp
-
-@elseif (Auth::user()->hasrole('superadmin'))
-    <button type="button" class="btn btn-danger rounded-pill mb-3" data-bs-toggle="modal"
-        data-bs-target="#exportModal">
-        <i class="fas fa-file-pdf"></i>
-        <span>Export PDF</span>
-    </button>
-    @php
-        $params = [];
-        if (request()->filled('rw_id')) {
-            $params['rw_id'] = encrypt(request()->rw_id);
-        }
-        if (request()->filled('rt_id')) {
-            $params['rt_id'] = encrypt(request()->rt_id);
-        }
-
-        $exportRoute = empty($params)
-            ? route('penduduk.exportAll')
-            : route('penduduk.exportFiltered', $params);
-    @endphp
-@endif
-
-<!-- Modal Export PDF -->
-<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <form id="exportForm" method="GET" action="{{ $exportRoute }}">
-            <input type="hidden" name="rw_id" value="{{ request()->filled('rw_id') ? request()->rw_id : '' }}">
-            <input type="hidden" name="rt_id" value="{{ request()->filled('rt_id') ? request()->rt_id : '' }}">
-
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exportModalLabel">Pilih Keterangan Tambahan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
                         @php
-                            $opsi = [
-                                'gender' => 'Jenis Kelamin',
-                                'agama' => 'Agama',
-                                'status_ekonomi' => 'Status Ekonomi',
-                                'status_pernikahan' => 'Status Pernikahan',
-                                'pekerjaan' => 'Pekerjaan',
-                                'usia' => 'Usia'
-                            ];
+                            $exportRoute = '';
                         @endphp
-                        @foreach ($opsi as $key => $label)
-                            <div class="col-md-4">
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" name="tampilkan[]"
-                                        value="{{ $key }}" id="check_{{ $key }}">
-                                    <label class="form-check-label" for="check_{{ $key }}">
-                                        {{ $label }}
-                                    </label>
-                                </div>
+
+                        @if (Auth::user()->hasrole('rt'))
+                            <button type="button" class="btn btn-danger rounded-pill mb-3" data-bs-toggle="modal"
+                                data-bs-target="#exportModal">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Export PDF</span>
+                            </button>
+                            @php
+                                $exportRoute = route('penduduk.exportRt', encrypt(Auth::user()->Rt[0]->id));
+                            @endphp
+
+                        @elseif (Auth::user()->hasrole('rw'))
+                            <button type="button" class="btn btn-danger rounded-pill mb-3" data-bs-toggle="modal"
+                                data-bs-target="#exportModal">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Export PDF</span>
+                            </button>
+                            @php
+                                $exportRoute = route('penduduk.exportRw', encrypt(Auth::user()->Rw[0]->id));
+                            @endphp
+
+                        @elseif (Auth::user()->hasrole('superadmin'))
+                            <button type="button" class="btn btn-danger rounded-pill mb-3" data-bs-toggle="modal"
+                                data-bs-target="#exportModal">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Export PDF</span>
+                            </button>
+                            @php
+                                $params = [];
+                                if (request()->filled('rw_id')) {
+                                    $params['rw_id'] = encrypt(request()->rw_id);
+                                }
+                                if (request()->filled('rt_id')) {
+                                    $params['rt_id'] = encrypt(request()->rt_id);
+                                }
+
+                                $exportRoute = empty($params)
+                                    ? route('penduduk.exportAll')
+                                    : route('penduduk.exportFiltered', $params);
+                            @endphp
+                        @endif
+
+                        <!-- Modal Export PDF -->
+                        <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <form id="exportForm" method="GET" action="{{ $exportRoute }}">
+                                    <input type="hidden" name="rw_id"
+                                        value="{{ request()->filled('rw_id') ? request()->rw_id : '' }}">
+                                    <input type="hidden" name="rt_id"
+                                        value="{{ request()->filled('rt_id') ? request()->rt_id : '' }}">
+
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exportModalLabel">Pilih Keterangan Tambahan</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Tutup"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                @php
+                                                    $opsi = [
+                                                        'gender' => 'Jenis Kelamin',
+                                                        'agama' => 'Agama',
+                                                        'status_ekonomi' => 'Status Ekonomi',
+                                                        'status_pernikahan' => 'Status Pernikahan',
+                                                        'pekerjaan' => 'Pekerjaan',
+                                                        'usia' => 'Usia'
+                                                    ];
+                                                @endphp
+                                                @foreach ($opsi as $key => $label)
+                                                    <div class="col-md-4">
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input" type="checkbox" name="tampilkan[]"
+                                                                value="{{ $key }}" id="check_{{ $key }}">
+                                                            <label class="form-check-label" for="check_{{ $key }}">
+                                                                {{ $label }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-primary" id="btnExport">Export PDF</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                        @endforeach
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary" id="btnExport">Export PDF</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
+                        </div>
 
-<script>
-    document.getElementById('exportForm').addEventListener('submit', function (e) {
-        e.preventDefault();
+                        <script>
+                            document.getElementById('exportForm').addEventListener('submit', function (e) {
+                                const role = "{{ Auth::user()->getRoleNames()[0] }}";
+                                const rw = document.querySelector('input[name="rw_id"]').value;
+                                const rt = document.querySelector('input[name="rt_id"]').value;
 
-        const form = e.target;
-        const url = new URL(form.action);
+                                if (role === 'superadmin' && !rw && rt) {
+                                    e.preventDefault();
+                                    alert('Silakan pilih RW terlebih dahulu jika ingin memfilter berdasarkan RT.');
+                                    return;
+                                }
 
-        const formData = new FormData(form);
-        formData.forEach((value, key) => {
-            if (key.endsWith('[]')) {
-                url.searchParams.append(key, value);
-            } else {
-                url.searchParams.set(key, value);
-            }
-        });
+                                e.preventDefault();
+                                const form = e.target;
+                                const url = new URL(form.action);
 
-        window.open(url.toString(), '_blank');
+                                const formData = new FormData(form);
+                                formData.forEach((value, key) => {
+                                    if (key.endsWith('[]')) {
+                                        url.searchParams.append(key, value);
+                                    } else {
+                                        url.searchParams.set(key, value);
+                                    }
+                                });
 
-        setTimeout(() => {
-            location.reload();
-        }, 1000);
-    });
-</script>
+                                window.open(url.toString(), '_blank');
+
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            });
+
+                        </script>
 
                         {{-- Table Responsive --}}
                         <div class="table-responsive">
