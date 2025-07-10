@@ -1,3 +1,4 @@
+<?php use Carbon\Carbon; ?>
 <!DOCTYPE html>
 <html lang="id">
 
@@ -59,10 +60,8 @@
   </style>
 
   @php
-  use Carbon\Carbon;
-
-  Carbon::setLocale('id');
-  $waktu = Carbon::now('Asia/Jakarta');
+  \Carbon\Carbon::setLocale('id');
+  $waktu = \Carbon\Carbon::now('Asia/Jakarta');
   $zona = [
     'Asia/Jakarta' => 'WIB',
     'Asia/Makassar' => 'WITA',
@@ -195,7 +194,7 @@
       <td>{{ $pd->alamat }}</td>
       <td class="text-center">{{ $pd->rt->rt }} / {{ $pd->rw->rw }}</td>
       <td class="text-center">{{ $pd->usia }}</td>
-      <td>{{ $pd->tmp_lahir }}, {{ \Carbon\Carbon::parse($pd->tgl_lahir)->format('d-m-Y') }}</td>
+      <td>{{ $pd->tmp_lahir }}, {{ Carbon::parse($pd->tgl_lahir)->format('d-m-Y') }}</td>
       <td>{{ $pd->agama }}</td>
       <td>{{ $pd->status_pernikahan }}</td>
       <td>{{ $pd->pekerjaan }}</td>
