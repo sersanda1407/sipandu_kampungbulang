@@ -31,6 +31,12 @@
             font-size: 14px;
         }
 
+        .sorting-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         /* Responsive Fixes */
         @media (max-width: 768px) {
             .info-label {
@@ -58,6 +64,11 @@
             .col-md-6 {
                 text-align: center;
             }
+
+            .sorting-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 
@@ -67,30 +78,40 @@
         </div>
         <div class="card shadow">
             <div class="card-body">
-                {{-- Search dan Entries --}}
+                {{-- Search, Entries, dan Sorting --}}
                 <div class="d-md-flex justify-content-between align-items-center mb-3">
-                    {{-- Form Pilihan Jumlah Data --}}
-                    <form method="GET" action="{{ route('inbox.index') }}"
-                        class="d-flex align-items-center gap-2 mb-2 mb-md-0">
-                        <label for="entries" class="me-2 mb-0"></label>
-                        <select name="entries" id="entries" class="form-select form-select-md w-auto"
-                            onchange="this.form.submit()">
-                            @foreach ([5, 10, 25, 50] as $entry)
-                                <option value="{{ $entry }}" {{ request('entries') == $entry ? 'selected' : '' }}>
-                                    {{ $entry }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <span class="ms-2">entries per page</span>
-                    </form>
+                    <div class="d-flex align-items-center gap-3">
+                        {{-- Form Pilihan Jumlah Data --}}
+                        <form method="GET" action="{{ route('inbox.index') }}" class="d-flex align-items-center gap-2 mb-2 mb-md-0">
+                            <label for="entries" class="me-2 mb-0"></label>
+                            <select name="entries" id="entries" class="form-select form-select-md w-auto" onchange="this.form.submit()">
+                                @foreach ([5, 10, 25, 50] as $entry)
+                                    <option value="{{ $entry }}" {{ request('entries') == $entry ? 'selected' : '' }}>
+                                        {{ $entry }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <span class="ms-2">entries per page</span>
+                        </form>
+
+                        {{-- Form Sorting --}}
+                        <form method="GET" action="{{ route('inbox.index') }}" class="sorting-container">
+                            <input type="hidden" name="entries" value="{{ request('entries', 5) }}">
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                            <select name="sort" id="sort" class="form-select form-select-md w-auto" onchange="this.form.submit()">
+                                <option value="desc" {{ request('sort', 'desc') == 'desc' ? 'selected' : '' }}>Terbaru</option>
+                                <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Terlama</option>
+                            </select>
+                        </form>
+                    </div>
 
                     {{-- Form Pencarian --}}
                     <form method="GET" action="{{ route('inbox.index') }}" class="d-flex" id="searchForm">
                         <input type="hidden" name="entries" value="{{ request('entries', 5) }}">
+                        <input type="hidden" name="sort" value="{{ request('sort', 'desc') }}">
                         <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
-                            placeholder="Search..." class="form-control form-control-md" autocomplete="off" />
+                               placeholder="Search..." class="form-control form-control-md" autocomplete="off" />
                     </form>
-
                 </div>
 
                 {{-- Tampilkan Pesan Berdasarkan Kondisi --}}
@@ -105,7 +126,6 @@
                         </div>
                     @endif
                 @else
-
                     @foreach ($data as $kk)
                         <div class="inbox-item p-3 mb-3 border rounded">
                             <div class="row align-items-start">
@@ -153,7 +173,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
 
                                 {{-- Informasi --}}
@@ -186,24 +205,74 @@
                                     </div>
                                 </div>
 
-                                {{-- Tombol ACC --}}
                                 {{-- Tombol ACC dan Tolak --}}
-                                <div
-                                    class="col-md-3 d-flex flex-column gap-2 justify-content-md-end justify-content-center align-items-center mt-3 mt-md-0">
-                                    <form action="{{ route('inbox.verifikasi', $kk->id) }}" method="POST" class="w-100 text-center">
-                                        @csrf
-                                        <button type="submit" name="acc" value="1" class="btn btn-success btn-sm btn-acc w-100">
-                                            ✔ Terima
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('inbox.verifikasi', $kk->id) }}" method="POST" class="w-100 text-center">
-                                        @csrf
-                                        <button type="submit" name="acc" value="0" class="btn btn-danger btn-sm btn-acc w-100">
-                                            ✘ Tolak
-                                        </button>
-                                    </form>
+                                <div class="col-md-3 d-flex flex-column gap-2 justify-content-md-end justify-content-center align-items-center mt-3 mt-md-0">
+                                    <!-- Button Terima dengan Modal Konfirmasi -->
+                                    <button type="button" class="btn btn-success btn-sm btn-acc w-100" data-bs-toggle="modal"
+                                        data-bs-target="#confirmAcceptModal-{{ $kk->id }}">
+                                        ✔ Terima
+                                    </button>
+
+                                    <!-- Button Tolak dengan Modal Konfirmasi -->
+                                    <button type="button" class="btn btn-danger btn-sm btn-acc w-100" data-bs-toggle="modal"
+                                        data-bs-target="#confirmRejectModal-{{ $kk->id }}">
+                                        ✘ Tolak
+                                    </button>
                                 </div>
 
+                                <!-- Modal Konfirmasi Terima -->
+                                <div class="modal fade" id="confirmAcceptModal-{{ $kk->id }}" tabindex="-1"
+                                    aria-labelledby="confirmAcceptModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmAcceptModalLabel">Konfirmasi Penerimaan Data</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Apakah Anda yakin ingin menerima data ini?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Batal</button>
+                                                <form action="{{ route('inbox.verifikasi', $kk->id) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    <input type="hidden" name="acc" value="1">
+                                                    <button type="submit" class="btn btn-success">Konfirmasi</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Modal Konfirmasi Tolak -->
+                                <div class="modal fade" id="confirmRejectModal-{{ $kk->id }}" tabindex="-1"
+                                    aria-labelledby="confirmRejectModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmRejectModalLabel">Konfirmasi Penolakan Data</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Apakah Anda yakin ingin menolak data ini?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Batal</button>
+                                                <form action="{{ route('inbox.verifikasi', $kk->id) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    <input type="hidden" name="acc" value="0">
+                                                    <button type="submit" class="btn btn-danger">Tolak</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -220,31 +289,33 @@
                             </small>
                         </div>
                         <div>
-                            {{ $data->links() }}
+                            {{ $data->withQueryString()->links() }}
                         </div>
                     </div>
                 @endif
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         const searchInput = document.getElementById('searchInput');
         const searchForm = document.getElementById('searchForm');
+        const sortSelect = document.getElementById('sort');
 
         let typingTimer;
         const delay = 500; // 500 ms
 
-        searchInput.addEventListener('input', function () {
+        searchInput.addEventListener('input', function() {
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => {
+                // Pertahankan nilai sort saat search
+                document.querySelector('input[name="sort"]').value = sortSelect.value;
                 searchForm.submit();
             }, delay);
         });
-    </script>
 
-    <script>
         let rotationAngle = 0;
         let currentImageUrl = '';
         let currentNamaKepalaKeluarga = '';
@@ -275,7 +346,7 @@
             const img = new Image();
             img.src = currentImageUrl;
 
-            img.onload = function () {
+            img.onload = function() {
                 const imgWidth = 180;
                 const imgHeight = (img.height / img.width) * imgWidth;
                 doc.addImage(img, 'JPEG', 15, 40, imgWidth, imgHeight);
@@ -284,12 +355,11 @@
         }
     </script>
 
-
     @if (session('success'))
         <script>
             Swal.fire({
                 icon: 'success',
-                title: 'Berhasil!',
+                title: 'Kartu Keluarga Berhasil diverifikasi!',
                 text: '{{ session('success') }}',
                 showConfirmButton: true,
                 timer: 10000
@@ -300,13 +370,12 @@
     @if (session('error'))
         <script>
             Swal.fire({
-                icon: 'error',
-                title: 'Ditolak!',
+                icon: 'info',
+                title: 'Kartu Keluarga Telah ditolak!',
                 text: '{{ session('error') }}',
                 showConfirmButton: true,
                 timer: 10000
             });
         </script>
     @endif
-
 @endsection

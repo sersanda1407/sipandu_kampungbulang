@@ -54,11 +54,15 @@ public function index(Request $request)
         });
     }
 
+    // Tambahkan fitur sorting
+    $sort = $request->get('sort', 'desc'); // default: terbaru (desc)
+    $query->orderBy('created_at', $sort);
+
     // Ambil data yang difilter & paginasi
     $entries = $request->input('entries', 5);
-    $data = $query->orderBy('created_at', 'desc')->paginate($entries);
+    $data = $query->paginate($entries);
 
-    return view('inbox.index', compact('data'));
+    return view('inbox.index', compact('data', 'sort'));
 }
 
 
