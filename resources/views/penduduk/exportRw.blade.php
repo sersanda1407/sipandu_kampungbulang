@@ -6,7 +6,9 @@
   <meta charset="UTF-8">
   <title>Data Warga @if ($rw)
       RW {{ $rw->rw }}
-    @endif Kelurahan Kampung Bulang</title>
+    @endif Kelurahan Kampung Bulang @if(isset($tahun))
+      Tahun {{ $tahun }}
+    @endif</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -42,7 +44,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      margin-top: 50px;
+      margin-top: 0px;
     }
 
     .footer-left {
@@ -141,7 +143,9 @@
       @if ($rw)
       RW {{ $rw->rw }}
     @endif
-      KELURAHAN KAMPUNG BULANG
+      KELURAHAN KAMPUNG BULANG @if(isset($tahun))
+      TAHUN {{ $tahun }}
+    @endif
     </h5>
   </div>
 
@@ -150,6 +154,8 @@
       Berikut ini adalah data lengkap warga yang berdomisili di wilayah Kelurahan Kampung Bulang khususnya di wilayah
       @if ($rw)
       RW {{ $rw->rw }}
+    @endif @if(isset($tahun))
+      Pada Tahun {{ $tahun }}
     @endif:
     </p>
   </div>

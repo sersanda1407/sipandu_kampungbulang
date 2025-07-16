@@ -110,55 +110,68 @@
                         @endif
 
                         <!-- Modal Export PDF -->
-                        <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <form id="exportForm" method="GET" action="{{ $exportRoute }}">
-                                    <input type="hidden" name="rw_id"
-                                        value="{{ request()->filled('rw_id') ? request()->rw_id : '' }}">
-                                    <input type="hidden" name="rt_id"
-                                        value="{{ request()->filled('rt_id') ? request()->rt_id : '' }}">
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="exportForm" method="GET" action="{{ $exportRoute }}">
+            <input type="hidden" name="rw_id"
+                value="{{ request()->filled('rw_id') ? request()->rw_id : '' }}">
+            <input type="hidden" name="rt_id"
+                value="{{ request()->filled('rt_id') ? request()->rt_id : '' }}">
 
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exportModalLabel">Pilih Keterangan Tambahan</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Tutup"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="row">
-                                                @php
-                                                    $opsi = [
-                                                        'gender' => 'Jenis Kelamin',
-                                                        'agama' => 'Agama',
-                                                        'status_ekonomi' => 'Status Ekonomi',
-                                                        'status_pernikahan' => 'Status Pernikahan',
-                                                        'pekerjaan' => 'Pekerjaan',
-                                                        'usia' => 'Usia'
-                                                    ];
-                                                @endphp
-                                                @foreach ($opsi as $key => $label)
-                                                    <div class="col-md-4">
-                                                        <div class="form-check mb-2">
-                                                            <input class="form-check-input" type="checkbox" name="tampilkan[]"
-                                                                value="{{ $key }}" id="check_{{ $key }}">
-                                                            <label class="form-check-label" for="check_{{ $key }}">
-                                                                {{ $label }}
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Batal</button>
-                                            <button type="submit" class="btn btn-primary" id="btnExport">Export PDF</button>
-                                        </div>
-                                    </div>
-                                </form>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Pilih Keterangan Tambahan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body">
+                    {{-- Filter Tahun --}}
+                    <div class="mb-3">
+                        <label for="tahun" class="form-label">Pilih Tahun</label>
+                        <select name="tahun" id="tahun" class="form-select">
+                            <option value="">-- Semua Tahun --</option>
+                            @for ($year = date('Y'); $year >= 2025; $year--)
+                                <option value="{{ $year }}">{{ $year }}</option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    {{-- Checklist tambahan --}}
+                    <div class="row">
+                        @php
+                            $opsi = [
+                                'gender' => 'Jenis Kelamin',
+                                'agama' => 'Agama',
+                                'status_ekonomi' => 'Status Ekonomi',
+                                'status_pernikahan' => 'Status Pernikahan',
+                                'pekerjaan' => 'Pekerjaan',
+                                'usia' => 'Usia'
+                            ];
+                        @endphp
+                        @foreach ($opsi as $key => $label)
+                            <div class="col-md-4">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="tampilkan[]"
+                                        value="{{ $key }}" id="check_{{ $key }}">
+                                    <label class="form-check-label" for="check_{{ $key }}">
+                                        {{ $label }}
+                                    </label>
+                                </div>
                             </div>
-                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary" id="btnExport">Export PDF</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 
                         <script>
                             document.getElementById('exportForm').addEventListener('submit', function (e) {

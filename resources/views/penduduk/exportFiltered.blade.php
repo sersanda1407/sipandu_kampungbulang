@@ -10,7 +10,8 @@
       RW {{ $rw->rw }}
     @elseif ($rt)
       RT {{ $rt->rt }}
-    @endif Kelurahan Kampung Bulang</title>
+    @endif Kelurahan Kampung Bulang @if(isset($tahun)){{ $tahun }}
+    @endif</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -147,7 +148,9 @@
     @elseif ($rt)
       RT {{ $rt->rt }}
     @endif
-      KELURAHAN KAMPUNG BULANG
+      KELURAHAN KAMPUNG BULANG @if(isset($tahun))
+      TAHUN {{ $tahun }}
+    @endif
     </h5>
   </div>
 
@@ -160,6 +163,8 @@
       RW {{ $rw->rw }}
     @elseif ($rt)
       RT {{ $rt->rt }}
+    @endif @if(isset($tahun))
+      Pada Tahun {{ $tahun }}
     @endif:
     </p>
 

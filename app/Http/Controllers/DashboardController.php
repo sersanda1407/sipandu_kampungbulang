@@ -17,7 +17,7 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $tahun_terpilih = $request->get('tahun', date('Y'));
-        $list_tahun = range(0001, date('Y'));
+        $list_tahun = range(2025, date('Y'));
         $currentYear = now()->year;
 
         // Cek apakah user adalah RW atau RT (memiliki relasi ke DataRw / relasi ke DataRt)

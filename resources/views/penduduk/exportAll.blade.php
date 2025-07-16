@@ -3,7 +3,9 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Data Seluruh Warga Kelurahan Kampung Bulang</title>
+  <title>Data Seluruh Warga Kelurahan Kampung Bulang @if(isset($tahun))
+  Tahun {{ $tahun }}
+@endif</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -38,7 +40,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      margin-top: 50px;
+      margin-top: 0px;
     }
 
     .footer-left {
@@ -50,6 +52,7 @@
       float: right;
       text-align: left;
     }
+
   </style>
   @php
   use Carbon\Carbon;
@@ -137,13 +140,19 @@
         Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}
       </p>
     </div>
-    <h5 class="title">DATA WARGA KELURAHAN KAMPUNG BULANG</h5>
+    <h5 class="title">DATA WARGA KELURAHAN KAMPUNG BULANG
+      @if(isset($tahun))
+      TAHUN {{ $tahun }}
+    @endif
+    </h5>
   </div>
-  <br>
 
   <div class="mb-3">
     <p>
-      Berikut ini adalah data lengkap warga yang berdomisili di wilayah Kelurahan Kampung Bulang:
+      Berikut ini adalah data lengkap warga yang berdomisili di wilayah Kelurahan Kampung Bulang Pada
+      @if(isset($tahun))
+      Tahun {{ $tahun }} :
+    @endif
     </p>
   </div>
 
@@ -209,10 +218,7 @@
     @endforeach
     </tbody>
   </table>
-
   <div style="page-break-inside: avoid;">
-
-
     <div class="footer-section">
       {{-- start - sesuaikan bagian ini --}}
       @php
@@ -358,13 +364,7 @@
       </div>
       {{-- selesai - sesuaikan bagian ini --}}
     </div>
-
   </div>
-
-
-
-
-
 </body>
 
 </html>

@@ -89,9 +89,6 @@ class PendudukController extends Controller
         return view('penduduk.index', compact('data', 'selectRt', 'selectRw', 'kk', 'lurah'));
     }
 
-
-
-
     /**
      * Show the form for creating a new resource.
      *
@@ -351,34 +348,45 @@ class PendudukController extends Controller
             ->setWarnings(false);
         return $pdf->stream('kk.pdf');
     }
-    
-    public function exportRt($encryptedId)
+
+    public function exportRt($encryptedId, Request $request)
     {
         try {
             $id = decrypt($encryptedId);
         } catch (DecryptException $e) {
             abort(404, 'Data tidak valid atau rusak.');
         }
+
+        $tahun = $request->get('tahun');
 
         $rt = DataRt::with('rw')->findOrFail($id);
-        $penduduk = DataPenduduk::where('rt_id', $rt->id)->get();
-        $penduduk = $this->sortPenduduk($penduduk);
-
         $rw = $rt->rw;
+
+        $query = DataPenduduk::where('rt_id', $rt->id);
+        if ($tahun) {
+            $query->whereYear('created_at', $tahun);
+        }
+
+        $penduduk = $this->sortPenduduk($query->get());
+
         $lurah = Lurah::first();
 
-        // Nama file berdasarkan RT & RW
         $filename = 'Data_Penduduk_RT' . str_pad($rt->rt, 3, '0', STR_PAD_LEFT)
-            . '_RW' . str_pad($rw->rw, 3, '0', STR_PAD_LEFT) . '_Kelurahan Kampung Bulang' . '.pdf';
+            . '_RW' . str_pad($rw->rw, 3, '0', STR_PAD_LEFT);
+        if ($tahun) {
+            $filename .= '_Tahun_' . $tahun;
+        }
+        $filename .= '_Kelurahan Kampung Bulang.pdf';
 
-        $pdf = PDF::loadView('penduduk.exportRt', compact('penduduk', 'rt', 'rw', 'lurah'))
+        $pdf = PDF::loadView('penduduk.exportRt', compact('penduduk', 'rt', 'rw', 'lurah', 'tahun'))
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
 
         return $pdf->stream($filename);
     }
-    
-    public function exportRw($encryptedId)
+
+
+    public function exportRw($encryptedId, Request $request)
     {
         try {
             $id = decrypt($encryptedId);
@@ -386,16 +394,26 @@ class PendudukController extends Controller
             abort(404, 'Data tidak valid atau rusak.');
         }
 
+        $tahun = $request->get('tahun');
+
         $rw = DataRw::findOrFail($id);
-        $penduduk = DataPenduduk::where('rw_id', $rw->id)->get();
-        $penduduk = $this->sortPenduduk($penduduk);
+
+        $query = DataPenduduk::where('rw_id', $rw->id);
+        if ($tahun) {
+            $query->whereYear('created_at', $tahun);
+        }
+
+        $penduduk = $this->sortPenduduk($query->get());
 
         $lurah = Lurah::first();
 
-        // Nama file berdasarkan RW
-        $filename = 'Data_Penduduk_RW' . str_pad($rw->rw, 3, '0', STR_PAD_LEFT) . '_Kelurahan Kampung Bulang' . '.pdf';
+        $filename = 'Data_Penduduk_RW' . str_pad($rw->rw, 3, '0', STR_PAD_LEFT);
+        if ($tahun) {
+            $filename .= '_Tahun_' . $tahun;
+        }
+        $filename .= '_Kelurahan Kampung Bulang.pdf';
 
-        $pdf = PDF::loadView('penduduk.exportRw', compact('penduduk', 'lurah', 'rw'))
+        $pdf = PDF::loadView('penduduk.exportRw', compact('penduduk', 'lurah', 'rw', 'tahun'))
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
 
@@ -404,22 +422,41 @@ class PendudukController extends Controller
 
 
 
-    public function exportAll()
+
+    public function exportAll(Request $request)
     {
-        $penduduk = DataPenduduk::all();
-        $penduduk = $this->sortPenduduk($penduduk);
+        $tahun = $request->get('tahun');
+
+        $query = DataPenduduk::query();
+        if ($tahun) {
+            $query->whereYear('created_at', $tahun);
+        }
+
+        $penduduk = $this->sortPenduduk($query->get());
 
         $lurah = Lurah::first();
 
-        $pdf = PDF::loadView('penduduk.exportAll', compact('penduduk', 'lurah'))
+        $filename = 'Data_Seluruh_Warga_Kampung_Bulang';
+        if ($tahun) {
+            $filename .= '_Tahun_' . $tahun;
+        }
+        $filename .= '.pdf';
+
+        $pdf = PDF::loadView('penduduk.exportAll', compact('penduduk', 'lurah', 'tahun'))
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
-        return $pdf->stream('Data_Seluruh_Warga_Kampung_Bulang.pdf');
+        return $pdf->stream($filename);
     }
+
 
     public function exportFiltered(Request $request)
     {
         $query = DataPenduduk::query();
+
+        $tahun = $request->get('tahun');
+        if ($tahun) {
+            $query->whereYear('created_at', $tahun);
+        }
 
         $rt = null;
         $rw = null;
@@ -444,32 +481,33 @@ class PendudukController extends Controller
             abort(404, 'ID tidak valid atau rusak.');
         }
 
-        $penduduk = $query->with(['rt', 'rw', 'kk'])->get();
-        $penduduk = $this->sortPenduduk($penduduk);
+        $penduduk = $this->sortPenduduk($query->with(['rt', 'rw', 'kk'])->get());
 
         $lurah = Lurah::first();
 
-        // Penamaan file PDF
         $filename = 'Data_Penduduk';
-
         if ($rw && $rt) {
-            $filename .= '_RW' . str_pad($rw->rw, 3, '0', STR_PAD_LEFT) . '_RT' . str_pad($rt->rt, 3, '0', STR_PAD_LEFT) . '_Kelurahan Kampung Bulang';
+            $filename .= '_RW' . str_pad($rw->rw, 3, '0', STR_PAD_LEFT)
+                . '_RT' . str_pad($rt->rt, 3, '0', STR_PAD_LEFT);
         } elseif ($rw) {
-            $filename .= '_RW' . str_pad($rw->rw, 3, '0', STR_PAD_LEFT) . '_Kelurahan Kampung Bulang';
+            $filename .= '_RW' . str_pad($rw->rw, 3, '0', STR_PAD_LEFT);
         } elseif ($rt) {
-            $filename .= '_RT' . str_pad($rt->rt, 3, '0', STR_PAD_LEFT) . '_Kelurahan Kampung Bulang';
-        } else {
-            $filename .= '_Semua';
+            $filename .= '_RT' . str_pad($rt->rt, 3, '0', STR_PAD_LEFT);
         }
 
-        $filename .= '.pdf';
+        if ($tahun) {
+            $filename .= '_Tahun_' . $tahun;
+        }
 
-        $pdf = PDF::loadView('penduduk.exportFiltered', compact('penduduk', 'lurah', 'rt', 'rw'))
+        $filename .= '_Kelurahan Kampung Bulang.pdf';
+
+        $pdf = PDF::loadView('penduduk.exportFiltered', compact('penduduk', 'lurah', 'rt', 'rw', 'tahun'))
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
 
         return $pdf->stream($filename);
     }
+
 
 
     public function filter(Request $request)

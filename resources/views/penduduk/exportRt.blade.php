@@ -3,7 +3,9 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Data Warga RT {{ $rt->rt ?? '-' }} / RW {{ $rw->rw ?? '-' }} Kelurahan Kampung Bulang</title>
+  <title>Data Warga RT {{ $rt->rt ?? '-' }} / RW {{ $rw->rw ?? '-' }} Kelurahan Kampung Bulang @if(isset($tahun))
+      Tahun {{ $tahun }}
+    @endif</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -39,7 +41,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      margin-top: 50px;
+      margin-top: 0px;
     }
 
     .footer-left {
@@ -134,7 +136,9 @@
     </div>
     <h5 class="title">
       DATA WARGA RT {{ $rt->rt ?? '-' }} / RW {{ $rw->rw ?? '-' }}
-      KELURAHAN KAMPUNG BULANG
+      KELURAHAN KAMPUNG BULANG @if(isset($tahun))
+      TAHUN {{ $tahun }}
+    @endif
     </h5>
   </div>
 
@@ -147,9 +151,9 @@
       RW {{ $rw->rw }}
     @elseif ($rt)
       RT {{ $rt->rt }}
+    @endif @if(isset($tahun))
+      Pada Tahun {{ $tahun }}
     @endif:
-    </p>
-
   </div>
 
   <table class="table table-bordered table-sm">
