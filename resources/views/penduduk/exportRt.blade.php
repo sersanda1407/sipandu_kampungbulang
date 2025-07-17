@@ -135,11 +135,11 @@
       <p>Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}</p>
     </div>
     <h5 class="title">
-      DATA WARGA RT {{ $rt->rt ?? '-' }} / RW {{ $rw->rw ?? '-' }}
-      KELURAHAN KAMPUNG BULANG @if(isset($tahun))
-      TAHUN {{ $tahun }}
-    @endif
-    </h5>
+  DATA WARGA RT {{ $rt->rt ?? '-' }} / RW {{ $rw->rw ?? '-' }} 
+  KELURAHAN KAMPUNG BULANG
+  @if(isset($tahun)) TAHUN {{ $tahun }} @endif
+</h5>
+
   </div>
 
 <div class="mb-3">
@@ -185,7 +185,7 @@
       <td>{{ $pd->alamat }}</td>
       <td class="text-center">{{ $pd->rt->rt ?? '-' }} / {{ $pd->rw->rw ?? '-' }}</td>
       <td class="text-center">{{ $pd->usia }}</td>
-      <td>{{ $pd->tmp_lahir }},{{ Carbon::parse($pd->tgl_lahir)->format('d-m-Y') }}</td>
+      <td>{{ $pd->tmp_lahir }}, {{ Carbon::parse($pd->tgl_lahir)->format('d-m-Y') }}</td>
       <td>{{ $pd->agama }}</td>
       <td>{{ $pd->status_pernikahan }}</td>
       <td>{{ $pd->pekerjaan }}</td>
@@ -219,6 +219,7 @@
     </tbody>
   </table>
 
+  <div style="page-break-inside: avoid;">
   {{-- Tabel Ringkasan --}}
   @php
   $boxList = [];
@@ -341,6 +342,7 @@
         NIP. {{ $lurah->nip ?? '-' }}
       </p>
     </div>
+  </div>
   </div>
 
 </body>

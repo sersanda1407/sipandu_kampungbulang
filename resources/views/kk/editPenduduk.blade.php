@@ -98,10 +98,21 @@
 </div>
 
 
-                        <label for="">Alamat</label>
-                        <div class="mb-3">
-                            <textarea class="form-control" name="alamat" id="" cols="30" rows="3" @hasrole('rw|rt|warga') readonly @endhasrole>{{$d->alamat}}</textarea>
-                        </div>
+<div class="mb-3">
+    <label for="">Alamat</label>
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="alamatSesuaiKK{{ $d->id }}"
+            onchange="autofillAlamat({{ $d->id }}, '{{ addslashes($d->kk->alamat ?? '') }}')">
+        <label class="form-check-label" for="alamatSesuaiKK{{ $d->id }}">
+            Isi Alamat sesuai Kartu Keluarga
+        </label>
+    </div>
+    
+    <textarea class="form-control" name="alamat" id="alamat{{ $d->id }}" cols="30" rows="3"
+        @hasrole('rw|rt|warga') readonly @endhasrole>{{ $d->alamat }}</textarea>
+</div>
+
+
 
                         <div class="row">
                             <div class="col">
@@ -181,11 +192,13 @@
                             </select>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Pendapatan</label>
-                            <input type="text" class="form-control" value="Rp.{{ number_format($d->gaji, 0, '.', '.') }},-"
-                                name="gaji" id="gaji{{ $d->id }}" oninput="formatCurrencyRealtime(this)" required>
-                        </div>
+<div class="mb-3">
+  <label for="gaji" class="form-label">Pendapatan</label>
+  <div class="input-group">
+    <input type="text" name="gaji" class="form-control gaji" value="{{ number_format($d->gaji, 0, ',', '.') }}" required>
+  </div>
+</div>
+
                         <label>Status</label>
                         <div class="mb-3">
                             <select class="form-select" name="status_sosial" required>
@@ -217,6 +230,25 @@
             </div>
         </div>
         <script>
+let previousAlamatValues = {};
+
+function autofillAlamat(id, alamatKK) {
+    const checkbox = document.getElementById('alamatSesuaiKK' + id);
+    const textarea = document.getElementById('alamat' + id);
+
+    if (checkbox.checked) {
+        // Simpan nilai sebelumnya sebelum diubah
+        previousAlamatValues[id] = textarea.value;
+        textarea.value = alamatKK;
+        textarea.setAttribute('readonly', true);
+    } else {
+        // Kembalikan nilai sebelumnya
+        textarea.value = previousAlamatValues[id] || '';
+        textarea.removeAttribute('readonly');
+    }
+}
+</script>
+        <script>
             function hitungUsia(id) {
                 let tglLahir = document.getElementById('tgl_lahir' + id).value;
                 if (tglLahir) {
@@ -239,7 +271,7 @@
                 }
 
                 // Menyeleksi semua input dengan nama 'nik' dan 'no_hp'
-                document.querySelectorAll("input[name='nik'], input[name='no_hp'], input[name='gaji']").forEach(function (input) {
+                document.querySelectorAll("input[name='nik'], input[name='no_hp']").forEach(function (input) {
                     input.addEventListener("input", function () {
                         onlyNumbers(this);
                     });
@@ -247,26 +279,36 @@
             });
         </script>
         <script>
-            function formatCurrencyRealtime(el) {
-                // Simpan posisi kursor
-                let cursorPos = el.selectionStart;
-                let originalLength = el.value.length;
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.gaji').each(function () {
+            formatGajiField(this);
+        });
 
-                // Ambil hanya digit angka
-                let number = el.value.replace(/[^\d]/g, '');
-
-                // Format dengan koma ribuan
-                let formatted = number.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-                // Set nilai yang telah diformat
-                el.value = formatted;
-
-                // Perbaiki posisi kursor setelah format
-                let newLength = formatted.length;
-                cursorPos = cursorPos + (newLength - originalLength);
-                el.setSelectionRange(cursorPos, cursorPos);
+        $(document).on('input', '.gaji', function () {
+            let angka = $(this).val().replace(/[^0-9]/g, '');
+            if (angka) {
+                $(this).val('Rp.' + formatRupiah(angka));
+            } else {
+                $(this).val('');
             }
-        </script>
+        });
+
+        function formatRupiah(angka) {
+            return angka.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function formatGajiField(input) {
+            let angka = $(input).val().replace(/[^0-9]/g, '');
+            if (angka) {
+                $(input).val('Rp.' + formatRupiah(angka));
+            }
+        }
+    });
+</script>
+
+
 
 
     </div>

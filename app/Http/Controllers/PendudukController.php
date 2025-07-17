@@ -143,7 +143,7 @@ class PendudukController extends Controller
         $data->status_keluarga = $request->status_keluarga;
         $data->status_sosial = $request->status_sosial;
         $data->pekerjaan = $request->pekerjaan;
-        $data->gaji = (int) str_replace('.', '', $request->gaji);
+        $data->gaji = (int) str_replace(['Rp', '.', ' '], '', $request->gaji);
         $data->no_hp = $request->no_hp;
 
         // Gunakan UUID untuk nama file gambar
@@ -257,7 +257,7 @@ class PendudukController extends Controller
         $data->status_keluarga = $request->status_keluarga;
         $data->status_sosial = $request->status_sosial;
         $data->pekerjaan = $request->pekerjaan;
-        $data->gaji = (int) str_replace('.', '', $request->gaji);
+        $data->gaji = (int) str_replace(['Rp', '.', ' '], '', $request->gaji);
         $data->no_hp = $request->no_hp;
 
         $data->save();

@@ -115,11 +115,19 @@
                                 <option value="Hindu">Hindu</option>
                             </select>
                         </div>
-
-                        <label for="">Alamat <span class="text-danger">*</span></label>
                         <div class="mb-3">
-                            <textarea class="form-control" name="alamat" id="" cols="30" rows="3"></textarea>
+
+                            <label for="">Alamat <span class="text-danger">*</span></label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" value="1" id="alamatSesuaiKK">
+                                <label class="form-check-label" for="alamatSesuaiKK">
+                                    Isi Alamat sesuai dengan data KK
+                                </label>
+                            </div>
+                            <textarea class="form-control" name="alamat" id="alamatPenduduk" cols="30" rows="3"
+                                required></textarea>
                         </div>
+
 
                         <div class="row">
                             <div class="col">
@@ -169,10 +177,14 @@
                                 <option value="Lainnya">Lainnya</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="gaji" class="form-label">Pendapatan <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="gaji" placeholder="Pendapatan" id="gaji" required>
-                        </div>
+                      <div class="mb-3">
+  <label for="gaji" class="form-label">Pendapatan <span class="text-danger">*</span></label>
+  <div class="input-group">
+    <input type="text" id="gaji" name="gaji" class="form-control" required placeholder="Masukkan Pendapatan">
+  </div>
+</div>
+
+
                         <div class="row">
                             <div class="col-auto">
                                 <div class="mb-3">
@@ -226,9 +238,39 @@
                         document.getElementById("no_hp").addEventListener("input", function (e) {
                             this.value = this.value.replace(/[^0-9]/g, ''); // Menghapus karakter non-angka
                         });
+                    </script>
+<!-- jQuery (wajib) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-                        document.getElementById("gaji").addEventListener("input", function (e) {
-                            this.value = this.value.replace(/[^0-9]/g, ''); // Menghapus karakter non-angka
+<script>
+$(document).ready(function() {
+    $('#gaji').on('input', function() {
+        let angka = $(this).val().replace(/[^0-9]/g, ''); // hanya angka
+        if (angka) {
+            $(this).val('Rp.' + formatRupiah(angka));
+        } else {
+            $(this).val('');
+        }
+    });
+
+    function formatRupiah(angka) {
+        return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+});
+</script>
+
+                    <script>
+                        const checkboxAlamat = document.getElementById('alamatSesuaiKK');
+                        const textareaAlamat = document.getElementById('alamatPenduduk');
+
+                        checkboxAlamat.addEventListener('change', function () {
+                            if (this.checked) {
+                                textareaAlamat.value = @json($data->alamat); // Ambil dari data KK
+                                textareaAlamat.setAttribute('readonly', true);
+                            } else {
+                                textareaAlamat.value = '';
+                                textareaAlamat.removeAttribute('readonly');
+                            }
                         });
                     </script>
 
@@ -271,7 +313,7 @@
 
                                     <div class="col-12 col-md-6 d-flex">
                                         <span class="fw-bold me-2">Rata-rata Pendapatan:</span>
-                                        <span>Rp.{{ number_format($rataRata, 0, ',', '.') }},-</span>
+                                        <span>Rp.{{ number_format($rataRata, 0, ',', '.') }}</span>
                                     </div>
 
                                     @php
@@ -361,10 +403,10 @@
                             </button>
 
                             <!-- @if (count($penduduk) > 0)
-                                                                <a href="{{ url('penduduk/export/' . encrypt($data->id)) }}" class="btn btn-danger rounded-pill">
-                                                                    <i class="fas fa-file-pdf"></i> Export PDF
-                                                                </a>
-                                                            @endif -->
+                                                                            <a href="{{ url('penduduk/export/' . encrypt($data->id)) }}" class="btn btn-danger rounded-pill">
+                                                                                <i class="fas fa-file-pdf"></i> Export PDF
+                                                                            </a>
+                                                                        @endif -->
                         </div>
 
                         <!-- Tambahkan class 'table-responsive' untuk tampilan mobile -->
