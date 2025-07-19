@@ -12,7 +12,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Data Keluarga</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Tambah Data Kartu Keluarga</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ url('kk/store') }}" method="POST" enctype="multipart/form-data">

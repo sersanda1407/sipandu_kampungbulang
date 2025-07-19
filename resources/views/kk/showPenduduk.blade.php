@@ -302,8 +302,8 @@ $(document).ready(function() {
                                         <span>{{ $data->alamat }}</span>
                                     </div>
                                     <div class="col-12 col-md-6 d-flex">
-                                        <span class="fw-bold me-2">RW / RT:</span>
-                                        <span>{{ $data->rw->rw }} / {{ $data->rt->rt }}</span>
+                                        <span class="fw-bold me-2">RT / RW:</span>
+                                        <span>{{ $data->rt->rt }} / {{ $data->rw->rw }}</span>
                                     </div>
                                     @php
                                         $totalGaji = $penduduk->sum('gaji');
