@@ -7,6 +7,7 @@ use App\DataRt;
 use Illuminate\Http\Request;
 use App\User;
 use App\Lurah;
+use App\DataPenduduk;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
@@ -71,7 +72,7 @@ class RwController extends Controller
 
             // Cek manual untuk rw duplicate
             if (DataRw::where('rw', $request->rw)->exists()) {
-                Alert::error('Gagal!', 'Nomor RW ' . $request->rw . ' sudah terdaftar.');
+                Alert::error('Gagal!', 'Nomor Wilayah RW ' . $request->rw . ' sudah terdaftar di Kelurahan Kampung Bulang.');
                 return redirect()->back()->withInput();
             }
 
@@ -111,7 +112,7 @@ class RwController extends Controller
             return redirect()->back();
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->errorInfo[1] == 1062) {
-                Alert::error('Gagal!', 'Nomor RW sudah terdaftar.');
+                Alert::error('Gagal!', 'Nomor wilayah RW tersebut sudah terdaftar di Kelurahan Kampung Bulang.');
                 return redirect()->back()->withInput();
             } else {
                 Alert::error('Gagal!', 'Terjadi kesalahan.');
@@ -232,7 +233,7 @@ class RwController extends Controller
 public function destroy($encryptedId)
 {
     try {
-        $id = Crypt::decryptString($encryptedId); // ← ini menyamarkan ID
+        $id = Crypt::decryptString($encryptedId);
     } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
         Alert::error('Gagal!', 'ID tidak valid.');
         return redirect()->route('rw.index');
@@ -245,11 +246,17 @@ public function destroy($encryptedId)
         return redirect()->route('rw.index');
     }
 
+    // 💡 Tambahkan pengecekan: apakah ada penduduk di wilayah RW ini?
+    $jumlahPenduduk = \App\DataPenduduk::where('rw_id', $data->id)->count();
+    if ($jumlahPenduduk > 0) {
+        Alert::error('Gagal!', 'Tidak dapat menghapus Data RW karena masih ada penduduk di wilayah ini.');
+        return redirect()->route('rw.index');
+    }
+
     $userRwId = $data->user_id;
 
     // Hapus semua RT milik RW ini
     $dataRts = DataRt::where('rw_id', $data->id)->get();
-
     foreach ($dataRts as $rt) {
         if ($rt->user_id) {
             User::where('id', $rt->user_id)->delete();
@@ -266,6 +273,7 @@ public function destroy($encryptedId)
     Alert::success('Sukses!', 'Berhasil menghapus Data RW dan semua RT terkait');
     return redirect()->route('rw.index');
 }
+
 
 
 

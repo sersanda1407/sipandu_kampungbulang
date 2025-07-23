@@ -62,7 +62,7 @@ class RtController extends Controller
 
         // ❗ Cek duplikat RT di RW yang sama
         if (DataRt::where('rt', $request->rt)->where('rw_id', $request->rw_id)->exists()) {
-            Alert::error('Gagal!', 'RT ' . $request->rt . ' sudah terdaftar di RW tersebut.');
+            Alert::error('Gagal!', 'Nomor Wilayah RT ' . $request->rt . ' sudah terdaftar di wilayah RW tersebut.');
             return redirect()->back()->withInput();
         }
 
@@ -159,7 +159,7 @@ class RtController extends Controller
                 ->exists();
 
             if ($exists) {
-                Alert::error('Gagal!', 'RT ' . $request->rt . ' sudah digunakan di RW tersebut.');
+                Alert::error('Gagal!', 'Nomor wilayah RT ' . $request->rt . ' sudah digunakan di wilayah RW tersebut.');
                 return redirect()->back()->withInput();
             }
         }
@@ -200,16 +200,40 @@ class RtController extends Controller
         return redirect()->route('rt.index');
     }
 
-
-    public function destroy($id)
-    {
-        $data = DataRt::find($id);
-        User::where('id', '=', $data->user_id)->delete();
-        $data->delete();
-
-        Alert::Success('Sukses!', 'Berhasil menghapus Data RT');
+public function destroy($id)
+{
+    try {
+        $id = Crypt::decryptString($id);
+    } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+        Alert::error('Gagal!', 'ID tidak valid atau telah rusak.');
         return redirect()->route('rt.index');
     }
+
+    $data = DataRt::find($id);
+
+    if (!$data) {
+        Alert::error('Gagal!', 'Data RT tidak ditemukan.');
+        return redirect()->route('rt.index');
+    }
+
+    // ✅ Cek apakah masih ada penduduk di RT ini
+    $jumlahPenduduk = \App\DataPenduduk::where('rt_id', $data->id)->count();
+    if ($jumlahPenduduk > 0) {
+        Alert::error('Gagal!', 'Tidak dapat menghapus RT karena masih ada penduduk di wilayah ini.');
+        return redirect()->route('rt.index');
+    }
+
+    // ✅ Hapus user RT jika ada
+    if ($data->user_id) {
+        User::where('id', $data->user_id)->delete();
+    }
+
+    $data->delete();
+
+    Alert::success('Sukses!', 'Berhasil menghapus Data RT');
+    return redirect()->route('rt.index');
+}
+
 
     public function resetPassword($id)
     {

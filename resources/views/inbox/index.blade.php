@@ -82,9 +82,11 @@
                 <div class="d-md-flex justify-content-between align-items-center mb-3">
                     <div class="d-flex align-items-center gap-3">
                         {{-- Form Pilihan Jumlah Data --}}
-                        <form method="GET" action="{{ route('inbox.index') }}" class="d-flex align-items-center gap-2 mb-2 mb-md-0">
+                        <form method="GET" action="{{ route('inbox.index') }}"
+                            class="d-flex align-items-center gap-2 mb-2 mb-md-0">
                             <label for="entries" class="me-2 mb-0"></label>
-                            <select name="entries" id="entries" class="form-select form-select-md w-auto" onchange="this.form.submit()">
+                            <select name="entries" id="entries" class="form-select form-select-md w-auto"
+                                onchange="this.form.submit()">
                                 @foreach ([5, 10, 25, 50] as $entry)
                                     <option value="{{ $entry }}" {{ request('entries') == $entry ? 'selected' : '' }}>
                                         {{ $entry }}
@@ -98,8 +100,10 @@
                         <form method="GET" action="{{ route('inbox.index') }}" class="sorting-container">
                             <input type="hidden" name="entries" value="{{ request('entries', 5) }}">
                             <input type="hidden" name="search" value="{{ request('search') }}">
-                            <select name="sort" id="sort" class="form-select form-select-md w-auto" onchange="this.form.submit()">
-                                <option value="desc" {{ request('sort', 'desc') == 'desc' ? 'selected' : '' }}>Terbaru</option>
+                            <select name="sort" id="sort" class="form-select form-select-md w-auto"
+                                onchange="this.form.submit()">
+                                <option value="desc" {{ request('sort', 'desc') == 'desc' ? 'selected' : '' }}>Terbaru
+                                </option>
                                 <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Terlama</option>
                             </select>
                         </form>
@@ -110,7 +114,7 @@
                         <input type="hidden" name="entries" value="{{ request('entries', 5) }}">
                         <input type="hidden" name="sort" value="{{ request('sort', 'desc') }}">
                         <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
-                               placeholder="Search..." class="form-control form-control-md" autocomplete="off" />
+                            placeholder="Search..." class="form-control form-control-md" autocomplete="off" />
                     </form>
                 </div>
 
@@ -206,22 +210,34 @@
                                 </div>
 
                                 {{-- Tombol ACC dan Tolak --}}
-                                <div class="col-md-3 d-flex flex-column gap-2 justify-content-md-end justify-content-center align-items-center mt-3 mt-md-0">
+                                <div
+                                    class="col-md-3 d-flex flex-column gap-2 justify-content-md-end justify-content-center align-items-center mt-3 mt-md-0">
                                     <!-- Button Terima dengan Modal Konfirmasi -->
-                                    <button type="button" class="btn btn-success btn-sm btn-acc w-100" data-bs-toggle="modal"
-                                        data-bs-target="#confirmAcceptModal-{{ $kk->id }}">
+                                    <form id="form-acc-{{ $kk->id }}" action="{{ route('inbox.verifikasi', $kk->id) }}"
+                                        method="POST" style="display: none;">
+                                        @csrf
+                                        <input type="hidden" name="acc" value="1">
+                                    </form>
+                                    <button type="button" class="btn btn-success btn-sm btn-acc w-100"
+                                        onclick="confirmAccept('{{ $kk->id }}', '{{ $kk->kepala_keluarga }}','{{ $kk->no_kk }}')">
                                         ✔ Terima
                                     </button>
 
+
+                                    <form id="form-tolak-{{ $kk->id }}" action="{{ route('inbox.verifikasi', $kk->id) }}"
+                                        method="POST" style="display: none;">
+                                        @csrf
+                                        <input type="hidden" name="acc" value="0">
+                                    </form>
                                     <!-- Button Tolak dengan Modal Konfirmasi -->
-                                    <button type="button" class="btn btn-danger btn-sm btn-acc w-100" data-bs-toggle="modal"
-                                        data-bs-target="#confirmRejectModal-{{ $kk->id }}">
+                                    <button type="button" class="btn btn-danger btn-sm btn-acc w-100"
+                                        onclick="confirmReject('{{ $kk->id }}', '{{ $kk->kepala_keluarga }}','{{ $kk->no_kk }}')">
                                         ✘ Tolak
                                     </button>
                                 </div>
 
                                 <!-- Modal Konfirmasi Terima -->
-                                <div class="modal fade" id="confirmAcceptModal-{{ $kk->id }}" tabindex="-1"
+                                {{-- <div class="modal fade" id="confirmAcceptModal-{{ $kk->id }}" tabindex="-1"
                                     aria-labelledby="confirmAcceptModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -245,10 +261,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <!-- Modal Konfirmasi Tolak -->
-                                <div class="modal fade" id="confirmRejectModal-{{ $kk->id }}" tabindex="-1"
+                                {{-- <div class="modal fade" id="confirmRejectModal-{{ $kk->id }}" tabindex="-1"
                                     aria-labelledby="confirmRejectModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -272,7 +288,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                     @endforeach
@@ -298,6 +314,43 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmAccept(id, nama, nokk) {
+            Swal.fire({
+                title: 'Terima Pendaftaran?',
+                html: `Data atas nama <strong>${nama}</strong> dengan No. KK <strong>${nokk}</strong> akan diterima.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Terima',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`form-acc-${id}`).submit();
+                }
+            });
+        }
+
+        function confirmReject(id, nama, nokk) {
+            Swal.fire({
+                title: 'Tolak Pendaftaran?',
+                html: `Data atas nama <strong>${nama}</strong> dengan No. KK <strong>${nokk}</strong> akan <b>DITOLAK</b>.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Tolak',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`form-tolak-${id}`).submit();
+                }
+            });
+        }
+    </script>
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         const searchInput = document.getElementById('searchInput');
@@ -307,7 +360,7 @@
         let typingTimer;
         const delay = 500; // 500 ms
 
-        searchInput.addEventListener('input', function() {
+        searchInput.addEventListener('input', function () {
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => {
                 // Pertahankan nilai sort saat search
@@ -346,7 +399,7 @@
             const img = new Image();
             img.src = currentImageUrl;
 
-            img.onload = function() {
+            img.onload = function () {
                 const imgWidth = 180;
                 const imgHeight = (img.height / img.width) * imgWidth;
                 doc.addImage(img, 'JPEG', 15, 40, imgWidth, imgHeight);

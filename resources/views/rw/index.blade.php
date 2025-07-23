@@ -139,37 +139,6 @@
     </script>
     {{-- END MODAL Tambah data RW --}}
 
-    {{-- MODAL DELETE --}}
-    @foreach ($data as $r)
-        @php
-            $encryptedId = Crypt::encryptString($r->id);
-        @endphp
-
-        <div class="modal fade" id="modalDelete{{ $r->id }}" tabindex="-1" aria-labelledby="modalHapusBarang"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <i class="fas fa-exclamation-circle mb-2"
-                            style="color: #e74a3b; font-size:120px; justify-content:center; display:flex"></i>
-                        <h5 class="text-center">Apakah anda yakin ingin menghapus Data Ketua RW {{ $r->rw }} atas nama
-                            {{ $r->nama }} ?
-                        </h5>
-                    </div>
-                    <div class="modal-footer">
-                        <form action="{{ url('/rw/delete/' . $encryptedId) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Hapus</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endforeach
-
-    {{-- END MODAL DELETE --}}
     <div class="container-fluid">
         <div class="row">
             <div class="py-3">
@@ -241,10 +210,17 @@
                                                         </button>
                                                     </li>
                                                     <li>
-                                                        <button class="dropdown-item text-danger" data-bs-toggle="modal"
-                                                            data-bs-target="#modalDelete{{ $d->id }}">
+                                                        <button type="button" class="dropdown-item text-danger"
+                                                            onclick="confirmDelete('{{ $d->id }}', '{{ $d->nama }}')">
                                                             <i class="fas fa-trash"></i> Hapus
                                                         </button>
+                                                        <form id="delete-form-{{ $d->id }}"
+                                                            action="{{ route('rw.delete', Crypt::encryptString($d->id)) }}"
+                                                            method="POST" style="display: none;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
+
                                                     </li>
                                                     @hasrole('superadmin')
                                                     <hr>
@@ -338,6 +314,29 @@
                 };
             }
         </script>
+
+        {{-- SweetAlert2 --}}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            function confirmDelete(id, nama) {
+                Swal.fire({
+                    title: 'Yakin ingin menghapus?',
+                    html: `Data Ketua RW <strong>${nama}</strong> dan Seluruh RT di wilayahnya juga akan dihapus permanen!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e74c3c',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById(`delete-form-${id}`).submit();
+                    }
+                });
+            }
+        </script>
+
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         {{-- MODAL RESET PASSWORD RW --}}

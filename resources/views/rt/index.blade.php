@@ -1,32 +1,6 @@
 @extends('layouts.master')
 
 @section('master')
-    {{-- MODAL DELETE --}}
-    @foreach ($data as $r)
-        <div class="modal fade" id="modalDelete{{ $r->id }}" tabindex="-1" aria-labelledby="modalHapusBarang"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <i class="fas fa-exclamation-circle mb-2"
-                            style="color: #e74a3b; font-size:120px; justify-content:center; display:flex"></i>
-                        <h5 class="text-center">Apakah anda yakin ingin menghapus Data Ketua RT {{ $r->rt }} / RW
-                            {{ $r->Rw->rw }} atas nama {{ $r->nama }} ?
-                        </h5>
-                    </div>
-                    <div class="modal-footer">
-                        <form action={{ url('/rt/delete/' . $r->id) }} method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Hapus</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endforeach
-    {{-- END MODAL DELETE --}}
 
     <!-- Modal Tambah Data -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -68,9 +42,10 @@
                         </div>
 
                         <div class="form-group mb-3">
-    <label class="form-label">Alamat</label>
-    <textarea class="form-control" name="alamat_rt" placeholder="Alamat tinggal ketua RT" minlength="8" required></textarea>
-</div>
+                            <label class="form-label">Alamat</label>
+                            <textarea class="form-control" name="alamat_rt" placeholder="Alamat tinggal ketua RT"
+                                minlength="8" required></textarea>
+                        </div>
 
 
                         <div class="form-group mb-3">
@@ -209,15 +184,15 @@
                                         <td>
                                             @php
 
-                                            $imageSrc = 'storage/foto_rt/default.jpg';
+                                                $imageSrc = 'storage/foto_rt/default.jpg';
 
-                                            if ($d->image_rt) {
-                                            if (Str::startsWith($d->image_rt, ['data:image', 'http', 'https'])) {
-                                            $imageSrc = $d->image_rt;
-                                            } elseif (file_exists(public_path('storage/foto_rt/' . $d->image_rt))) {
-                                            $imageSrc = 'storage/foto_rt/' . $d->image_rt;
-                                            }
-                                            }
+                                                if ($d->image_rt) {
+                                                    if (Str::startsWith($d->image_rt, ['data:image', 'http', 'https'])) {
+                                                        $imageSrc = $d->image_rt;
+                                                    } elseif (file_exists(public_path('storage/foto_rt/' . $d->image_rt))) {
+                                                        $imageSrc = 'storage/foto_rt/' . $d->image_rt;
+                                                    }
+                                                }
                                             @endphp
 
                                             <a href="#" onclick="showImageModal('{{ asset($imageSrc) }}', '{{ $d->nama }}')">
@@ -253,11 +228,20 @@
                                                         </button>
                                                     </li>
                                                     <li>
-                                                        <button class="dropdown-item text-danger" data-bs-toggle="modal"
-                                                            data-bs-target="#modalDelete{{ $d->id }}">
+                                                        <button type="button" class="dropdown-item text-danger"
+                                                            onclick="confirmDeleteRT('{{ $d->id }}', '{{ $d->rt }}', '{{ $d->Rw->rw }}', '{{ $d->nama }}')">
                                                             <i class="fas fa-trash"></i> Hapus
                                                         </button>
+
+                                                        <form id="delete-form-rt-{{ $d->id }}"
+                                                            action="{{ url('/rt/delete/' . Crypt::encryptString($d->id)) }}"
+                                                            method="POST" style="display: none;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
                                                     </li>
+
+
 
                                                     <hr>
                                                     <li>
@@ -349,6 +333,26 @@
                     }
                 </script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                <script>
+                    function confirmDeleteRT(id, rt, rw, nama) {
+                        Swal.fire({
+                            title: 'Yakin ingin menghapus?',
+                            html: `Data Ketua RT <strong>RT ${rt} / RW ${rw}</strong> atas nama <strong>${nama}</strong> akan dihapus permanen!`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Hapus',
+                            cancelButtonText: 'Batal',
+                            confirmButtonColor: '#e74c3c',
+                            cancelButtonColor: '#6c757d',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                document.getElementById(`delete-form-rt-${id}`).submit();
+                            }
+                        });
+                    }
+                </script>
 
 
                 {{-- MODAL RESET PASSWORD RT --}}
