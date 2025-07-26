@@ -56,13 +56,14 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Foto RW</label>
-                        <input type="file" class="form-control" name="image_rw" accept="image/*">
-                        <small class="text-muted">Kosongkan jika tidak ingin mengganti foto</small><br>
-                        @if ($d->image_rw)
-                            <img src="{{ asset('storage/foto_rw/' . $d->image_rw) }}" alt="Foto RW" width="100" height="70">
-                        @endif
-                    </div>
+    <label class="form-label">Foto RW</label>
+    <input type="file" class="form-control upload-gambar" name="image_rw" accept="image/*">
+    <small class="text-muted">Kosongkan jika tidak ingin mengganti foto</small><br>
+    @if ($d->image_rw)
+        <img src="{{ asset('storage/foto_rw/' . $d->image_rw) }}" alt="Foto RW" width="100" height="70">
+    @endif
+</div>
+
                 </div>
 
                 <div class="modal-footer">
@@ -77,6 +78,25 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.querySelectorAll('.upload-gambar').forEach(function(input) {
+        input.addEventListener('change', function () {
+            const file = this.files[0];
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+            if (file && !allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                });
+                this.value = '';
+            }
+        });
+    });
+</script>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

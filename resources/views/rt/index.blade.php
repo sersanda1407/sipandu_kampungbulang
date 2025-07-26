@@ -76,9 +76,10 @@
 
                         <div class="mb-3">
                             <label class="form-label">Foto Ketua RT</label>
-                            <input type="file" class="form-control" name="image_rt" required accept="image/*">
+                            <input type="file" class="form-control upload-gambar" name="image_rt" accept="image/*" required>
                             <small class="text-muted">Upload foto Ketua RT</small>
                         </div>
+
                     </div>
 
                     <div class="modal-footer">
@@ -93,6 +94,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.querySelectorAll('.upload-gambar').forEach(function (input) {
+            input.addEventListener('change', function () {
+                const file = this.files[0];
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+                if (file && !allowedTypes.includes(file.type)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops!',
+                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                    });
+                    this.value = ''; // Reset input
+                }
+            });
+        });
+    </script>
 
     {{-- Script Validasi Nomor HP dan RT --}}
     <script>

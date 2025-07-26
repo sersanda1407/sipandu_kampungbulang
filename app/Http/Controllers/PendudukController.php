@@ -256,7 +256,12 @@ class PendudukController extends Controller
         $data->status_pernikahan = $request->status_pernikahan;
         $data->status_keluarga = $request->status_keluarga;
         $data->status_sosial = $request->status_sosial;
-        $data->pekerjaan = $request->pekerjaan;
+        $pekerjaanFinal = $request->pekerjaan === 'Lainnya' && $request->filled('pekerjaan_lainnya')
+            ? $request->pekerjaan_lainnya
+            : $request->pekerjaan;
+
+        $data->pekerjaan = $pekerjaanFinal;
+
         $data->gaji = (int) str_replace(['Rp', '.', ' '], '', $request->gaji);
         $data->no_hp = $request->no_hp;
 

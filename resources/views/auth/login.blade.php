@@ -211,10 +211,10 @@
                         required></textarea>
                 </div>
 
-                <div class="form-group mb-3">
-                    <label for="image">Upload Foto Kartu Keluarga</label>
-                    <input type="file" name="image" class="form-control" accept=".jpg,.jpeg,.png,.webp" required>
-                </div>
+                <div class="mb-3">
+    <label>Upload Foto Kartu Keluarga</label>
+    <input type="file" name="image" class="form-control upload-gambar" accept="image/*" required>
+</div>
 
                 <div class="d-grid mt-4">
                     <button type="submit" class="btn btn-primary w-100">Daftar</button>
@@ -222,6 +222,26 @@
             </form>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+    document.querySelectorAll('.upload-gambar').forEach(function(input) {
+        input.addEventListener('change', function () {
+            const file = this.files[0];
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+            if (file && !allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                });
+                this.value = '';
+            }
+        });
+    });
+</script>
+
 
     <script>
         document.getElementById("no_hp").addEventListener("input", function (e) {

@@ -99,9 +99,10 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Foto KK</label>
-                            <input type="file" class="form-control" name="image" id="exampleInputPassword1" required>
-                        </div>
+    <label for="upload_kk" class="form-label">Foto KK</label>
+    <input type="file" class="form-control" name="image" id="upload_kk" accept="image/*" required>
+</div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -112,6 +113,23 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    document.getElementById('upload_kk').addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                });
+                this.value = ''; // Reset input
+            }
+        }
+    });
+</script>
 
 
     <style>

@@ -116,12 +116,13 @@
 
                     <div class="mb-3">
                         <label class="form-label">Foto KK</label>
-                        <input type="file" class="form-control" name="image">
-                        <small class="text-muted">Kosongkan jika tidak ingin mengganti foto</small><br>
-                        @if ($d->image)
-                            <img src="{{ asset('storage/foto_kk/' . $d->image) }}" alt="Foto KK" width="100" height="70">
-                        @endif
+                            <input type="file" class="form-control" name="image" id="upload_kk_edit" accept="image/*">
+                             <small class="text-muted">Kosongkan jika tidak ingin mengganti foto</small><br>
+                                 @if ($d->image)
+                                    <img src="{{ asset('storage/foto_kk/' . $d->image) }}" alt="Foto KK" width="100" height="70">
+                                 @endif
                     </div>
+
                     <input type="hidden" name="oldImage" value="{{ $d->image }}">
                 </div>
 
@@ -133,4 +134,22 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById('upload_kk_edit').addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                });
+                this.value = ''; // Reset input
+            }
+        }
+    });
+</script>
+
 @endforeach

@@ -23,32 +23,6 @@
         }
     </style>
 
-    {{-- MODAL DELETE --}}
-    @foreach ($penduduk as $r)
-        <div class="modal fade" id="modalDelete{{ $r->id }}" tabindex="-1" aria-labelledby="modalHapusBarang"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <i class="fas fa-exclamation-circle mb-2"
-                            style="color: #e74a3b; font-size:120px; justify-content:center; display:flex"></i>
-                        <h5 class="text-center">Apakah anda yakin ingin menghapus data {{ $r->nama }} dari data Kartu Keluarga
-                            ini ?</h5>
-                    </div>
-                    <div class="modal-footer">
-                        <form action={{ url('kk/' . $r->id) . '/showPenduduk/delete' }} method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Hapus</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endforeach
-
-
     {{-- MODAL ADD --}}
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -159,15 +133,14 @@
 
                         <div class="mb-3">
                             <label for="">Pekerjaan <span class="text-danger">*</span></label>
-                            <select class="form-select" type="text" placeholder="Pilih Pekerjaan" name="pekerjaan" required>
+                            <select class="form-select" id="pekerjaanSelect" name="pekerjaan" required>
                                 <option value="">-- Pilih Pekerjaan --</option>
-                                <option value="PNS">Pegawai Negeri Sipil</option>
+                                <option value="PNS/P3K">ASN (PNS / P3K)</option>
                                 <option value="TNI">Tentara Nasional Indonesia</option>
                                 <option value="POLRI">Polisi</option>
-                                <option value="P3K">Pegawai P3K</option>
                                 <option value="Honorer">Pegawai Honorer</option>
                                 <option value="Wiraswasta">Wiraswasta</option>
-                                <option value="Buruh">Buruh Harian Lepas</option>
+                                <option value="Buruh Harian Lepas/Freelance">Buruh Harian Lepas</option>
                                 <option value="Wirausaha">Wirausaha/Pengusaha</option>
                                 <option value="Guru">Guru</option>
                                 <option value="Pensiunan/Purnawirawan">Pensiunan TNI/POLRI/PNS</option>
@@ -176,13 +149,41 @@
                                 <option value="Tidak Bekerja">Tidak Bekerja</option>
                                 <option value="Lainnya">Lainnya</option>
                             </select>
+
+                            <div id="pekerjaanLainnyaInput" style="display: none; margin-top: 10px;">
+                                <label for="">Masukan Pekerjaan Lainnya <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="pekerjaanLainnya"
+                                    placeholder="Masukkan pekerjaan lainnya">
+                            </div>
                         </div>
-                      <div class="mb-3">
-  <label for="gaji" class="form-label">Pendapatan <span class="text-danger">*</span></label>
-  <div class="input-group">
-    <input type="text" id="gaji" name="gaji" class="form-control" required placeholder="Masukkan Pendapatan">
-  </div>
-</div>
+
+                        <script>
+                            const pekerjaanSelect = document.getElementById('pekerjaanSelect');
+                            const pekerjaanLainnyaDiv = document.getElementById('pekerjaanLainnyaInput');
+                            const pekerjaanLainnyaInput = document.getElementById('pekerjaanLainnya');
+
+                            pekerjaanSelect.addEventListener('change', function () {
+                                if (this.value === 'Lainnya') {
+                                    pekerjaanLainnyaDiv.style.display = 'block';
+                                    pekerjaanLainnyaInput.focus();
+                                } else {
+                                    pekerjaanLainnyaDiv.style.display = 'none';
+                                }
+                            });
+
+                            pekerjaanLainnyaInput.addEventListener('input', function () {
+                                // Update selected option value in select
+                                pekerjaanSelect.options[pekerjaanSelect.selectedIndex].value = this.value;
+                            });
+                        </script>
+
+                        <div class="mb-3">
+                            <label for="gaji" class="form-label">Pendapatan <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" id="gaji" name="gaji" class="form-control" required
+                                    placeholder="Masukkan Pendapatan">
+                            </div>
+                        </div>
 
 
                         <div class="row">
@@ -202,7 +203,7 @@
                             <div class="mb-3">
                                 <label for="exampleInputPassword1" class="form-label">Foto KTP <span
                                         class="text-danger">*</span></label>
-                                <input type="file" class="form-control" name="image_ktp" id="exampleInputPassword1"
+                                <input type="file" class="form-control" name="image_ktp" id="upload_ktp" accept="image/*"
                                     required>
                             </div>
 
@@ -214,6 +215,26 @@
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </div>
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                    <script>
+                        document.getElementById('upload_ktp').addEventListener('change', function () {
+                            const file = this.files[0];
+                            if (file) {
+                                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+                                if (!allowedTypes.includes(file.type)) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops!',
+                                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                                    });
+
+                                    this.value = ''; // Reset input
+                                }
+                            }
+                        });
+                    </script>
+
 
                     <script>
                         document.getElementById("tgl_lahir").addEventListener("change", function () {
@@ -239,25 +260,25 @@
                             this.value = this.value.replace(/[^0-9]/g, ''); // Menghapus karakter non-angka
                         });
                     </script>
-<!-- jQuery (wajib) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    <!-- jQuery (wajib) -->
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script>
-$(document).ready(function() {
-    $('#gaji').on('input', function() {
-        let angka = $(this).val().replace(/[^0-9]/g, ''); // hanya angka
-        if (angka) {
-            $(this).val('Rp.' + formatRupiah(angka));
-        } else {
-            $(this).val('');
-        }
-    });
+                    <script>
+                        $(document).ready(function () {
+                            $('#gaji').on('input', function () {
+                                let angka = $(this).val().replace(/[^0-9]/g, ''); // hanya angka
+                                if (angka) {
+                                    $(this).val('Rp.' + formatRupiah(angka));
+                                } else {
+                                    $(this).val('');
+                                }
+                            });
 
-    function formatRupiah(angka) {
-        return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    }
-});
-</script>
+                            function formatRupiah(angka) {
+                                return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                            }
+                        });
+                    </script>
 
                     <script>
                         const checkboxAlamat = document.getElementById('alamatSesuaiKK');
@@ -401,12 +422,6 @@ $(document).ready(function() {
                                 data-bs-target="#exampleModal">
                                 <i class="fas fa-plus"></i> Tambah Data
                             </button>
-
-                            <!-- @if (count($penduduk) > 0)
-                                                                            <a href="{{ url('penduduk/export/' . encrypt($data->id)) }}" class="btn btn-danger rounded-pill">
-                                                                                <i class="fas fa-file-pdf"></i> Export PDF
-                                                                            </a>
-                                                                        @endif -->
                         </div>
 
                         <!-- Tambahkan class 'table-responsive' untuk tampilan mobile -->
@@ -519,14 +534,45 @@ $(document).ready(function() {
                                                             <hr class="dropdown-divider">
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center text-danger"
-                                                                href="#" data-bs-toggle="modal"
-                                                                data-bs-target="#modalDelete{{ $pd->id }}">
+                                                            <a href="#"
+                                                                onclick="confirmDeletePdd('{{ $pd->id }}', '{{ $pd->nama }}')"
+                                                                class="dropdown-item text-danger d-flex align-items-center">
                                                                 <i class="fas fa-trash-alt me-2"></i> Hapus
                                                             </a>
+
+                                                            <form id="delete-form-pdd-{{ $pd->id }}"
+                                                                action="{{ route('kk.deletePdd', $pd->id) }}" method="POST"
+                                                                style="display: none;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                            </form>
+
+
+
                                                         </li>
                                                         @endhasrole
                                                     </ul>
+
+                                                    <script>
+                                                        function confirmDeletePdd(id, nama) {
+                                                            Swal.fire({
+                                                                title: 'Yakin ingin menghapus?',
+                                                                html: `Data penduduk <strong>${nama}</strong> akan dihapus dari Kartu Keluarga ini.`,
+                                                                icon: 'warning',
+                                                                showCancelButton: true,
+                                                                confirmButtonText: 'Hapus',
+                                                                cancelButtonText: 'Batal',
+                                                                confirmButtonColor: '#e74c3c',
+                                                                cancelButtonColor: '#6c757d',
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    document.getElementById(`delete-form-pdd-${id}`).submit();
+                                                                }
+                                                            });
+                                                        }
+                                                    </script>
+
+
                                                 </div>
                                             </td>
 

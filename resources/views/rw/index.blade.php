@@ -2,7 +2,6 @@
 
 @section('master')
 
-
     <!-- Modal Tambah Data RW -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -60,10 +59,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Foto Ketua RW</label>
-                            <input type="file" class="form-control" name="image_rw" required>
-                            <small class="text-muted">Upload foto Ketua RW</small>
-                        </div>
+    <label class="form-label">Foto Ketua RW</label>
+    <input type="file" class="form-control upload-gambar" name="image_rw" required accept="image/*">
+    <small class="text-muted">Upload foto Ketua RW</small>
+</div>
+
                     </div>
 
                     <div class="modal-footer">
@@ -78,6 +78,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+    document.querySelectorAll('.upload-gambar').forEach(function(input) {
+        input.addEventListener('change', function () {
+            const file = this.files[0];
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+            if (file && !allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                });
+                this.value = ''; // Kosongkan kembali input jika tidak valid
+            }
+        });
+    });
+</script>
 
 
     <script>

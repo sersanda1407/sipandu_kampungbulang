@@ -93,10 +93,11 @@
             </div>
         </div>
 
-        <div class="mb-3">
-            <label>Upload Foto KK</label>
-            <input type="file" name="image" class="form-control" accept=".jpg,.jpeg,.png,.webp" required>
-        </div>
+       <div class="mb-3">
+    <label>Upload Foto KK</label>
+    <input type="file" name="image" class="form-control upload-gambar" accept="image/*" required>
+</div>
+
 
         <div class="alert alert-info text-sm">
             Setelah mendaftar, akun akan dibuat otomatis.<br>
@@ -111,4 +112,23 @@
         </p>
     </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.querySelectorAll('.upload-gambar').forEach(function(input) {
+        input.addEventListener('change', function () {
+            const file = this.files[0];
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+            if (file && !allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Format tidak didukung',
+                    text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, gif, webp)'
+                });
+                this.value = '';
+            }
+        });
+    });
+</script>
+
 @endsection
