@@ -209,86 +209,39 @@
                                     </div>
                                 </div>
 
-                                {{-- Tombol ACC dan Tolak --}}
-                                <div
-                                    class="col-md-3 d-flex flex-column gap-2 justify-content-md-end justify-content-center align-items-center mt-3 mt-md-0">
-                                    <!-- Button Terima dengan Modal Konfirmasi -->
-                                    <form id="form-acc-{{ $kk->id }}" action="{{ route('inbox.verifikasi', $kk->id) }}"
-                                        method="POST" style="display: none;">
-                                        @csrf
-                                        <input type="hidden" name="acc" value="1">
-                                    </form>
-                                    <button type="button" class="btn btn-success btn-sm btn-acc w-100"
-                                        onclick="confirmAccept('{{ $kk->id }}', '{{ $kk->kepala_keluarga }}','{{ $kk->no_kk }}')">
-                                        ✔ Terima
-                                    </button>
+{{-- Tombol ACC dan Tolak --}}
+<div class="col-md-3 d-flex flex-column gap-2 justify-content-md-end justify-content-center align-items-center mt-3 mt-md-0">
+    {{-- Tombol Terima dengan VerificationController --}}
+    <form id="form-acc-{{ $kk->id }}" action="{{ route('kk.verify', $kk->id) }}" method="POST"
+        style="display: none;">
+        @csrf
+    </form>
+    <button type="button" class="btn btn-success btn-sm btn-acc w-100"
+            onclick="confirmAccept('{{ $kk->id }}', '{{ $kk->kepala_keluarga }}','{{ $kk->no_kk }}')">
+        ✔ Terima
+    </button>
 
+    {{-- Tombol Tolak dengan VerificationController --}}
+    <form id="form-reject-{{ $kk->id }}" action="{{ route('kk.reject', $kk->id) }}" method="POST"
+        style="display: none;">
+        @csrf
+    </form>
+    <button type="button" class="btn btn-danger btn-sm btn-acc w-100"
+            onclick="confirmReject('{{ $kk->id }}', '{{ $kk->kepala_keluarga }}','{{ $kk->no_kk }}')">
+        ✘ Tolak
+    </button>
 
-                                    <form id="form-tolak-{{ $kk->id }}" action="{{ route('inbox.verifikasi', $kk->id) }}"
-                                        method="POST" style="display: none;">
-                                        @csrf
-                                        <input type="hidden" name="acc" value="0">
-                                    </form>
-                                    <!-- Button Tolak dengan Modal Konfirmasi -->
-                                    <button type="button" class="btn btn-danger btn-sm btn-acc w-100"
-                                        onclick="confirmReject('{{ $kk->id }}', '{{ $kk->kepala_keluarga }}','{{ $kk->no_kk }}')">
-                                        ✘ Tolak
-                                    </button>
-                                </div>
-
-                                <!-- Modal Konfirmasi Terima -->
-                                {{-- <div class="modal fade" id="confirmAcceptModal-{{ $kk->id }}" tabindex="-1"
-                                    aria-labelledby="confirmAcceptModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="confirmAcceptModalLabel">Konfirmasi Penerimaan Data</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Apakah Anda yakin ingin menerima data ini?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Batal</button>
-                                                <form action="{{ route('inbox.verifikasi', $kk->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    <input type="hidden" name="acc" value="1">
-                                                    <button type="submit" class="btn btn-success">Konfirmasi</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> --}}
-
-                                <!-- Modal Konfirmasi Tolak -->
-                                {{-- <div class="modal fade" id="confirmRejectModal-{{ $kk->id }}" tabindex="-1"
-                                    aria-labelledby="confirmRejectModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="confirmRejectModalLabel">Konfirmasi Penolakan Data</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Apakah Anda yakin ingin menolak data ini?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Batal</button>
-                                                <form action="{{ route('inbox.verifikasi', $kk->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    <input type="hidden" name="acc" value="0">
-                                                    <button type="submit" class="btn btn-danger">Tolak</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> --}}
+    {{-- Tombol Batalkan Verifikasi (jika sudah diverifikasi) --}}
+    @if($kk->verifikasi == 'diterima')
+    <form id="form-unverify-{{ $kk->id }}" action="{{ route('kk.unverify', $kk->id) }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+    <button type="button" class="btn btn-warning btn-sm btn-acc w-100"
+            onclick="confirmUnverify('{{ $kk->id }}', '{{ $kk->kepala_keluarga }}','{{ $kk->no_kk }}')">
+        🔄 Batalkan Verifikasi
+    </button>
+    @endif
+</div>
                             </div>
                         </div>
                     @endforeach
@@ -315,39 +268,56 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function confirmAccept(id, nama, nokk) {
-            Swal.fire({
-                title: 'Terima Pendaftaran?',
-                html: `Data atas nama <strong>${nama}</strong> dengan No. KK <strong>${nokk}</strong> akan diterima.`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Terima',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById(`form-acc-${id}`).submit();
-                }
-            });
+function confirmAccept(id, nama, nokk) {
+    Swal.fire({
+        title: 'Terima Pendaftaran?',
+        html: `Data atas nama <strong>${nama}</strong> dengan No. KK <strong>${nokk}</strong> akan diterima dan notifikasi WhatsApp akan dikirim ke warga.`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Terima & Kirim Notifikasi',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById(`form-acc-${id}`).submit();
         }
+    });
+}
 
-        function confirmReject(id, nama, nokk) {
-            Swal.fire({
-                title: 'Tolak Pendaftaran?',
-                html: `Data atas nama <strong>${nama}</strong> dengan No. KK <strong>${nokk}</strong> akan <b>DITOLAK</b>.`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Tolak',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById(`form-tolak-${id}`).submit();
-                }
-            });
+function confirmReject(id, nama, nokk) {
+    Swal.fire({
+        title: 'Tolak Pendaftaran?',
+        html: `Data atas nama <strong>${nama}</strong> dengan No. KK <strong>${nokk}</strong> akan <b>DITOLAK</b> dan notifikasi akan dikirim ke warga dan RT/RW.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Tolak & Kirim Notifikasi',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById(`form-reject-${id}`).submit();
         }
+    });
+}
+
+function confirmUnverify(id, nama, nokk) {
+    Swal.fire({
+        title: 'Batalkan Verifikasi?',
+        html: `Verifikasi untuk <strong>${nama}</strong> dengan No. KK <strong>${nokk}</strong> akan dibatalkan. Notifikasi akan dikirim ke warga dan RT/RW.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Batalkan',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#ffc107',
+        cancelButtonColor: '#6c757d'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById(`form-unverify-${id}`).submit();
+        }
+    });
+}
     </script>
 
 

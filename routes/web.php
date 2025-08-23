@@ -12,6 +12,7 @@ use App\Http\Controllers\KkController;
 use App\Http\Controllers\PendudukController;
 use App\Http\Controllers\RwController;
 use App\Http\Controllers\RtController;
+use App\Http\Controllers\VerificationController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 use App\Http\Controllers\InboxController;
 
@@ -125,9 +126,26 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/penduduk/export-filtered', [PendudukController::class, 'exportFiltered'])->name('penduduk.exportFiltered');
     });
 
-    Route::prefix('inbox')->group(function () {
-    Route::get('/', [InboxController::class, 'index'])->name('inbox.index');
-    Route::post('/verifikasi/{id}', [InboxController::class, 'verifikasi'])->name('inbox.verifikasi');
+/*
+|--------------------------------------------------------------------------
+| Verification Routes (WhatsApp Notifikasi)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::post('/kk/verify/{id}', [VerificationController::class, 'verify'])->name('kk.verify');
+    Route::post('/kk/unverify/{id}', [VerificationController::class, 'unverify'])->name('kk.unverify');
+    Route::post('/kk/reject/{id}', [VerificationController::class, 'reject'])->name('kk.reject');
+    Route::post('/kk/reminder/{id}', [VerificationController::class, 'sendVerificationReminder'])->name('kk.reminder');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Inbox Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->prefix('inbox')->name('inbox.')->group(function () {
+    Route::get('/', [InboxController::class, 'index'])->name('index');
+    Route::post('/verifikasi/{id}', [InboxController::class, 'verifikasi'])->name('verifikasi');
 });
 
 });
