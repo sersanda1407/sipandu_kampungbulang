@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Crypt;
+use App\Providers\FonnteService;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -25,41 +27,48 @@ class KkController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-public function index()
-{
-    $user = Auth::user();
+    protected $fonnteService;
 
-    // Superadmin: Lihat semua data yang sudah diterima
-    if ($user->hasRole('superadmin')) {
-        $data = DataKk::where('verifikasi', 'diterima')->get();
-
-    // RW: Lihat data dari wilayah RW-nya yang sudah diterima
-    } elseif ($user->hasRole('rw')) {
-        $data = DataKk::where('verifikasi', 'diterima')
-                     ->where('rw_id', $user->Rw[0]->id)
-                     ->get();
-
-    // RT: Lihat data dari wilayah RT-nya yang sudah diterima
-    } elseif ($user->hasRole('rt')) {
-        $data = DataKk::where('verifikasi', 'diterima')
-                     ->where('rt_id', $user->Rt[0]->id)
-                     ->get();
-
-    // Warga: hanya lihat data miliknya (tidak perlu cek verifikasi)
-    } elseif ($user->hasRole('warga')) {
-        $data = DataKk::where('user_id', $user->Kk[0]->user_id)->get();
-
-    // Default: kosongkan
-    } else {
-        $data = collect(); // atau bisa kasih abort(403)
+    public function __construct()
+    {
+        $this->fonnteService = new FonnteService();
     }
 
-    $lurah = Lurah::first();
-    $selectRt = DataRt::all();
-    $selectRw = DataRw::all();
+    public function index()
+    {
+        $user = Auth::user();
 
-    return view('kk.index', compact(['selectRt', 'selectRw', 'data', 'lurah']));
-}
+        // Superadmin: Lihat semua data yang sudah diterima
+        if ($user->hasRole('superadmin')) {
+            $data = DataKk::where('verifikasi', 'diterima')->get();
+
+            // RW: Lihat data dari wilayah RW-nya yang sudah diterima
+        } elseif ($user->hasRole('rw')) {
+            $data = DataKk::where('verifikasi', 'diterima')
+                ->where('rw_id', $user->Rw[0]->id)
+                ->get();
+
+            // RT: Lihat data dari wilayah RT-nya yang sudah diterima
+        } elseif ($user->hasRole('rt')) {
+            $data = DataKk::where('verifikasi', 'diterima')
+                ->where('rt_id', $user->Rt[0]->id)
+                ->get();
+
+            // Warga: hanya lihat data miliknya (tidak perlu cek verifikasi)
+        } elseif ($user->hasRole('warga')) {
+            $data = DataKk::where('user_id', $user->Kk[0]->user_id)->get();
+
+            // Default: kosongkan
+        } else {
+            $data = collect(); // atau bisa kasih abort(403)
+        }
+
+        $lurah = Lurah::first();
+        $selectRt = DataRt::all();
+        $selectRw = DataRw::all();
+
+        return view('kk.index', compact(['selectRt', 'selectRw', 'data', 'lurah']));
+    }
 
 
     /**
@@ -138,59 +147,100 @@ public function index()
     }
 
 
-    public function storePublic(Request $request)
-    {
-        $this->validate($request, [
-            'kepala_keluarga' => 'required',
-            'no_kk' => 'required',
-            'image' => 'required|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
-            'rt_id' => 'required|integer',
-            'rw_id' => 'required|integer',
-            'alamat' => 'required',
-            'no_telp' => 'required'
+public function storePublic(Request $request)
+{
+    $this->validate($request, [
+        'kepala_keluarga' => 'required',
+        'no_kk' => 'required',
+        'image' => 'required|mimes:jpeg,jpg,png,gif,svg,webp|max:3072',
+        'rt_id' => 'required|integer',
+        'rw_id' => 'required|integer',
+        'alamat' => 'required',
+        'no_telp' => 'required'
+    ]);
+
+    try {
+        // Membuat User untuk Kepala Keluarga
+        $user = User::create([
+            'name' => $request->kepala_keluarga,
+            'email' => $request->no_kk,
+            'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('warga');
+
+        // Menghubungkan User tersebut ke Kartu Keluarga
+        $data = new DataKk([
+            'kepala_keluarga' => $request->kepala_keluarga,
+            'no_kk' => $request->no_kk,
+            'rt_id' => $request->rt_id,
+            'rw_id' => $request->rw_id,
+            'user_id' => $user->id,
+            'alamat' => $request->alamat,
+            'no_telp' => $request->no_telp,
+            'verifikasi' => 'pending'
         ]);
 
-        try {
-            // Membuat User untuk Kepala Keluarga
-            $kk = User::create([
-                'name' => $request->kepala_keluarga,
-                'email' => $request->no_kk,
-                'password' => bcrypt('password'),
-            ]);
-            $kk->assignRole('warga');
+        // Mengupload Gambar
+        if ($request->hasFile('image')) {
+            $img = $request->file('image');
+            $filename = (string) Str::uuid() . '.' . $img->getClientOriginalExtension();
+            $img->storeAs('foto_kk', $filename, 'public');
+            $data->image = $filename;
+        }
 
-            // Menghubungkan User tersebut ke Kartu Keluarga
-            $data = new DataKk([
-                'kepala_keluarga' => $request->kepala_keluarga,
-                'no_kk' => $request->no_kk,
-                'rt_id' => $request->rt_id,
-                'rw_id' => $request->rw_id,
-                'user_id' => $kk->id,
-                'alamat' => $request->alamat,
-                'no_telp' => $request->no_telp,
-                'verifikasi' => 'pending'
-            ]);
+        $data->save();
 
-            // Mengupload Gambar
-            if ($request->hasFile('image')) {
-                $img = $request->file('image');
-                $filename = (string) Str::uuid() . '.' . $img->getClientOriginalExtension();
-                $img->storeAs('foto_kk', $filename, 'public'); // menyimpan gambar
-                $data->image = $filename;
-            }
+        // ✅ KIRIM NOTIFIKASI WHATSAPP SETELAH DATA DISIMPAN
+        $this->sendWhatsAppNotifications($data);
 
-            $data->save();
+        return redirect()
+            ->back()
+            ->with('success', 'Pendaftaran berhasil! Notifikasi WhatsApp telah dikirim. Data anda akan segera diverifikasi. Silahkan tunggu 1x24 jam');
 
-            return redirect()
-                ->back()
-                ->with('success', 'Data anda akan segera diverifikasi. silahkan tunggu 1x24 jam');
-        } catch (\Exception $e) {
+    } catch (\Illuminate\Database\QueryException $e) {
+        if ($e->errorInfo[1] == 1062) {
             return redirect()
                 ->back()
                 ->with('error', 'No Kartu Keluarga sudah terdaftar di sistem ini. Silakan periksa kembali dan coba lagi.');
-
+        } else {
+            Log::error('StorePublic error: ' . $e->getMessage());
+            return redirect()
+                ->back()
+                ->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi.');
         }
+    } catch (\Exception $e) {
+        Log::error('StorePublic general error: ' . $e->getMessage());
+        return redirect()
+            ->back()
+            ->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
     }
+}
+
+/**
+ * Kirim notifikasi WhatsApp untuk registrasi baru
+ */
+protected function sendWhatsAppNotifications($kk)
+{
+    try {
+        Log::info('Mengirim notifikasi WhatsApp untuk KK: ' . $kk->id);
+
+        // 1. Kirim ke user
+        $userResult = $this->fonnteService->sendToUser($kk);
+        Log::info('Notifikasi ke user: ' . ($userResult ? 'Berhasil' : 'Gagal'));
+
+        // 2. Kirim ke RT terkait
+        $rtResult = $this->fonnteService->sendToRT($kk);
+        Log::info('Notifikasi ke RT: ' . ($rtResult ? 'Berhasil' : 'Gagal'));
+
+        // 3. Kirim ke RW terkait
+        $rwResult = $this->fonnteService->sendToRW($kk);
+        Log::info('Notifikasi ke RW: ' . ($rwResult ? 'Berhasil' : 'Gagal'));
+
+    } catch (\Exception $e) {
+        Log::error('WhatsApp notifications error: ' . $e->getMessage());
+        // Jangan throw exception, biarkan proses registrasi tetap berhasil
+    }
+}
 
 
 

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\DataKk;
 use App\DataRw;
 use App\DataRt;
 use App\Http\Controllers\Auth\LoginController;
@@ -35,6 +36,37 @@ Route::post('/storePublic', [KkController::class, 'storePublic'])->name('kk.stor
 Auth::routes(['register' => false]);
 
 
+Route::get('/api/check-phone', function (Request $request) {
+    $phone = $request->query('no_telp');
+
+    if (!$phone) {
+        return response()->json(['exists' => false, 'message' => 'Nomor telepon tidak diberikan']);
+    }
+
+    // Cek di tabel DataKk (kolom 'no_telp')
+    $existsInKk = DataKk::where('no_telp', $phone)->exists();
+
+    // Cek di tabel Rt (kolom 'no_hp')
+    $existsInRt = DataRt::where('no_hp', $phone)->exists();
+
+    // Cek di tabel Rw (kolom 'no_hp')
+    $existsInRw = DataRw::where('no_hp', $phone)->exists();
+
+    // Jika nomor ada di SALAH SATU dari ketiga tabel, dianggap terdaftar
+    $exists = $existsInKk || $existsInRt || $existsInRw;
+
+    // Opsi: Beri tahu juga di tabel mana nomor itu ditemukan (lebih informatif)
+    $foundIn = [];
+    if ($existsInKk) $foundIn[] = 'DataKk';
+    if ($existsInRt) $foundIn[] = 'Rt';
+    if ($existsInRw) $foundIn[] = 'Rw';
+
+    return response()->json([
+        'exists' => $exists,
+        'found_in_tables' => $foundIn // Opsional, bisa dihilangkan jika tidak perlu
+    ]);
+})->name('api.check-phone');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +80,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/edit-profile', [DashboardController::class, 'editProfile'])->name('profile.edit');
     Route::put('/edit-lurah', [DashboardController::class, 'editLurah'])->name('edit.lurah');
+    // Route untuk validasi duplikasi no HP/telepon
+Route::get('/api/check-phone', [DashboardController::class, 'checkDuplicatePhone'])->name('api.check-phone');
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     /*
@@ -126,26 +160,26 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/penduduk/export-filtered', [PendudukController::class, 'exportFiltered'])->name('penduduk.exportFiltered');
     });
 
-/*
-|--------------------------------------------------------------------------
-| Verification Routes (WhatsApp Notifikasi)
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth'])->group(function () {
-    Route::post('/kk/verify/{id}', [VerificationController::class, 'verify'])->name('kk.verify');
-    Route::post('/kk/unverify/{id}', [VerificationController::class, 'unverify'])->name('kk.unverify');
-    Route::post('/kk/reject/{id}', [VerificationController::class, 'reject'])->name('kk.reject');
-    Route::post('/kk/reminder/{id}', [VerificationController::class, 'sendVerificationReminder'])->name('kk.reminder');
-});
+    /*
+    |--------------------------------------------------------------------------
+    | Verification Routes (WhatsApp Notifikasi)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['auth'])->group(function () {
+        Route::post('/kk/verify/{id}', [VerificationController::class, 'verify'])->name('kk.verify');
+        Route::post('/kk/unverify/{id}', [VerificationController::class, 'unverify'])->name('kk.unverify');
+        Route::post('/kk/reject/{id}', [VerificationController::class, 'reject'])->name('kk.reject');
+        Route::post('/kk/reminder/{id}', [VerificationController::class, 'sendVerificationReminder'])->name('kk.reminder');
+    });
 
-/*
-|--------------------------------------------------------------------------
-| Inbox Routes
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth'])->prefix('inbox')->name('inbox.')->group(function () {
-    Route::get('/', [InboxController::class, 'index'])->name('index');
-    Route::post('/verifikasi/{id}', [InboxController::class, 'verifikasi'])->name('verifikasi');
-});
+    /*
+    |--------------------------------------------------------------------------
+    | Inbox Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['auth'])->prefix('inbox')->name('inbox.')->group(function () {
+        Route::get('/', [InboxController::class, 'index'])->name('index');
+        Route::post('/verifikasi/{id}', [InboxController::class, 'verifikasi'])->name('verifikasi');
+    });
 
 });

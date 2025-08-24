@@ -62,35 +62,139 @@
 
 
 <body>
-    <div class="modal fade" id="edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Kelola Akun</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="/edit-profile" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Email / No KK</label>
-                            <input type="text" class="form-control" name="email" id="exampleInputPassword1"
-                                value="{{ \Auth::user()->email }}" required readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Password</label>
-                            <input type="password" class="form-control" name="password" id="exampleInputPassword1"
-                                required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                    </div>
-                </form>
+<div class="modal fade" id="edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kelola Akun</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <form action="/edit-profile" method="POST" id="profileForm">
+                @csrf
+                <div class="modal-body">
+                    <!-- Field untuk semua role -->
+                    @php
+                        $namaValue = Auth::user()->name;
+                        
+                        if (Auth::user()->hasRole('warga')) {
+                            $kkData = Auth::user()->Kk->first();
+                            $namaValue = $kkData ? $kkData->kepala_keluarga : Auth::user()->name;
+                        } elseif (Auth::user()->hasRole('rw')) {
+                            $rwData = Auth::user()->Rw->first();
+                            $namaValue = $rwData ? $rwData->nama : Auth::user()->name;
+                        } elseif (Auth::user()->hasRole('rt')) {
+                            $rtData = Auth::user()->Rt->first();
+                            $namaValue = $rtData ? $rtData->nama : Auth::user()->name;
+                        }
+                    @endphp
+
+                    <div class="mb-3">
+                        <label for="nama" class="form-label">Nama</label>
+                        <input type="text" class="form-control text-capitalize" name="nama" id="nama"
+                            value="{{ $namaValue }}" required>
+                    </div>
+                    
+                    <!-- Field khusus untuk RW -->
+                    @if(Auth::user()->hasRole('rw'))
+                        @php $rwData = \App\DataRw::where('user_id', Auth::id())->first(); @endphp
+                        @if($rwData)
+                        <div class="mb-3">
+                            <label for="no_hp" class="form-label">Nomor Telepon / WhatsApp</label>
+                            <input type="text" class="form-control" name="no_hp" id="no_hp" 
+                                value="{{ $rwData->no_hp }}" required
+                                data-current-value="{{ $rwData->no_hp }}"
+                                minlength="8" maxlength="12"
+                                pattern="[0-9]{8,12}"
+                                title="Nomor HP harus 8-12 digit angka">
+                            <div class="invalid-feedback" id="no_hp_error"></div>
+                            <small class="form-text text-muted">Minimal 8 digit, maksimal 12 digit (hanya angka)</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="gmail_rw" class="form-label">Email Pribadi</label>
+                            <input type="email" class="form-control" name="gmail_rw" id="gmail_rw"
+                                value="{{ $rwData->gmail_rw }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="alamat_rw" class="form-label">Alamat RW</label>
+                            <textarea class="form-control" name="alamat_rw" id="alamat_rw" required>{{ $rwData->alamat_rw }}</textarea>
+                        </div>
+                        @endif
+                    @endif
+                    
+                    <!-- Field khusus untuk RT -->
+                    @if(Auth::user()->hasRole('rt'))
+                        @php $rtData = \App\DataRt::where('user_id', Auth::id())->first(); @endphp
+                        @if($rtData)
+                        <div class="mb-3">
+                            <label for="no_hp" class="form-label">Nomor Telepon / WhatsApp</label>
+                            <input type="text" class="form-control" name="no_hp" id="no_hp" 
+                                value="{{ $rtData->no_hp }}" required
+                                data-current-value="{{ $rtData->no_hp }}"
+                                minlength="8" maxlength="12"
+                                pattern="[0-9]{8,12}"
+                                title="Nomor HP harus 8-12 digit angka">
+                            <div class="invalid-feedback" id="no_hp_error"></div>
+                            <small class="form-text text-muted">Minimal 8 digit, maksimal 12 digit (hanya angka)</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="gmail_rt" class="form-label">Email Pribadi</label>
+                            <input type="email" class="form-control" name="gmail_rt" id="gmail_rt"
+                                value="{{ $rtData->gmail_rt }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="alamat_rt" class="form-label">Alamat RT</label>
+                            <textarea class="form-control" name="alamat_rt" id="alamat_rt" required>{{ $rtData->alamat_rt }}</textarea>
+                        </div>
+                        @endif
+                    @endif
+                    
+                    <!-- Field khusus untuk Warga -->
+                    @if(Auth::user()->hasRole('warga'))
+                        @php $kkData = \App\DataKk::where('user_id', Auth::id())->first(); @endphp
+                        @if($kkData)
+                        <div class="mb-3">
+                            <label for="alamat" class="form-label">Alamat</label>
+                            <textarea class="form-control" name="alamat" id="alamat" required>{{ $kkData->alamat }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="no_telp" class="form-label">Nomor Telepon / WhatsApp</label>
+                            <input type="text" class="form-control" name="no_telp" id="no_telp" 
+                                value="{{ $kkData->no_telp }}" required
+                                data-current-value="{{ $kkData->no_telp }}"
+                                minlength="8" maxlength="12"
+                                pattern="[0-9]{8,12}"
+                                title="Nomor telepon harus 8-12 digit angka">
+                            <div class="invalid-feedback" id="no_telp_error"></div>
+                            <small class="form-text text-muted">Minimal 8 digit, maksimal 12 digit (hanya angka)</small>
+                        </div>
+                        @endif
+                    @endif
+                    
+                    <!-- Field untuk semua role -->
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Email / No KK</label>
+                        <input type="text" class="form-control" name="email" id="exampleInputPassword1"
+                            value="{{ \Auth::user()->email }}" required readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" id="exampleInputPassword1">
+                        <small class="text-muted">Kosongkan jika tidak ingin mengubah password</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary" id="submitButton">Simpan Perubahan</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
     <div class="modal fade" id="editLurahModal" tabindex="-1" aria-labelledby="editLurahModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -329,6 +433,141 @@
         document.getElementById("year").innerHTML = new Date().getFullYear() + " &copy; SIPANDU | Kampung Bulang";
     </script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fungsi untuk validasi input nomor
+        function setupPhoneValidation(inputId, errorId) {
+            const input = document.getElementById(inputId);
+            const errorElement = document.getElementById(errorId);
+            
+            if (input && errorElement) {
+                // Validasi input hanya angka
+                input.addEventListener("input", function() {
+                    this.value = this.value.replace(/\D/g, '');
+                    
+                    // Validasi length
+                    if (this.value.length > 12) {
+                        this.value = this.value.slice(0, 12);
+                    }
+                    
+                    // Hapus error saat user mengetik
+                    if (this.value.length >= 8) {
+                        this.classList.remove('is-invalid');
+                        errorElement.textContent = '';
+                    }
+                });
+
+                // Validasi saat blur
+                input.addEventListener("blur", function() {
+                    if (this.value.length < 8 && this.value.length > 0) {
+                        this.classList.add('is-invalid');
+                        errorElement.textContent = 'Nomor telepon/HP minimal 8 digit.';
+                    } else {
+                        this.classList.remove('is-invalid');
+                        errorElement.textContent = '';
+                    }
+                });
+            }
+        }
+
+        // Setup validasi untuk semua input no HP/telepon
+        setupPhoneValidation('no_telp', 'no_telp_error');
+        setupPhoneValidation('no_hp', 'no_hp_error');
+
+        // Validasi duplikasi no HP/telepon
+        const form = document.getElementById('profileForm');
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitButton = document.getElementById('submitButton');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memeriksa...';
+            
+            let isValid = true;
+            
+            // Validasi length no_telp
+            const noTelpInput = document.getElementById('no_telp');
+            if (noTelpInput && noTelpInput.value.length > 0 && noTelpInput.value.length < 8) {
+                noTelpInput.classList.add('is-invalid');
+                document.getElementById('no_telp_error').textContent = 'Nomor telepon minimal 8 digit.';
+                isValid = false;
+            }
+            
+            // Validasi length no_hp
+            const noHpInput = document.getElementById('no_hp');
+            if (noHpInput && noHpInput.value.length > 0 && noHpInput.value.length < 8) {
+                noHpInput.classList.add('is-invalid');
+                document.getElementById('no_hp_error').textContent = 'Nomor HP minimal 8 digit.';
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Simpan Perubahan';
+                // Focus pada input pertama yang error
+                if (noTelpInput && noTelpInput.classList.contains('is-invalid')) {
+                    noTelpInput.focus();
+                } else if (noHpInput && noHpInput.classList.contains('is-invalid')) {
+                    noHpInput.focus();
+                }
+                return;
+            }
+            
+            // Validasi duplikasi no HP untuk RW/RT
+            if (noHpInput) {
+                const currentNoHp = noHpInput.getAttribute('data-current-value');
+                const newNoHp = noHpInput.value;
+                
+                if (newNoHp !== currentNoHp) {
+                    const isDuplicate = await checkDuplicatePhone(newNoHp);
+                    if (isDuplicate) {
+                        noHpInput.classList.add('is-invalid');
+                        document.getElementById('no_hp_error').textContent = 'Nomor HP sudah digunakan oleh pengguna lain.';
+                        isValid = false;
+                    } else {
+                        noHpInput.classList.remove('is-invalid');
+                    }
+                }
+            }
+            
+            // Validasi duplikasi no telepon untuk warga
+            if (noTelpInput) {
+                const currentNoTelp = noTelpInput.getAttribute('data-current-value');
+                const newNoTelp = noTelpInput.value;
+                
+                if (newNoTelp !== currentNoTelp) {
+                    const isDuplicate = await checkDuplicatePhone(newNoTelp);
+                    if (isDuplicate) {
+                        noTelpInput.classList.add('is-invalid');
+                        document.getElementById('no_telp_error').textContent = 'Nomor telepon sudah digunakan oleh pengguna lain.';
+                        isValid = false;
+                    } else {
+                        noTelpInput.classList.remove('is-invalid');
+                    }
+                }
+            }
+            
+            if (isValid) {
+                this.submit();
+            } else {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Simpan Perubahan';
+            }
+        });
+        
+        // Fungsi untuk memeriksa duplikasi no HP/telepon
+        async function checkDuplicatePhone(phoneNumber) {
+            try {
+                const response = await fetch('/api/check-phone?no_telp=' + encodeURIComponent(phoneNumber));
+                const data = await response.json();
+                return data.exists;
+            } catch (error) {
+                console.error('Error checking duplicate phone:', error);
+                return false;
+            }
+        }
+    });
+</script>
 
 </body>
 

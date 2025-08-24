@@ -9,6 +9,15 @@
     <link rel="stylesheet" href="assets/css/pages/auth.css">
     <link rel="shortcut icon" href="assets/images/logo/2.webp" loading="lazy" type="image/png">
     <style>
+            .phone-checking {
+        color: #ffc107;
+    }
+    .phone-available {
+        color: #28a745;
+    }
+    .phone-taken {
+        color: #dc3545;
+    }
         .modal-custom {
             display: none;
             position: fixed;
@@ -199,10 +208,11 @@
                     </select>
                 </div>
 
-                <div class="form-group mb-3">
-                    <label for="no_telp">No Telepon</label>
-                    <input id="no_hp" name="no_telp" class="form-control" placeholder="Masukkan nomor telepon" maxlength="12" minlength="8" required>
-                </div>
+<div class="form-group mb-3">
+    <label for="no_telp">No Telepon</label>
+    <input id="no_hp" name="no_telp" class="form-control" placeholder="Masukkan nomor telepon" maxlength="12" minlength="8" required>
+    <div id="phone-check-result" class="form-text"></div>
+</div>
 
 
                 <div class="form-group mb-3">
@@ -350,6 +360,69 @@
         });
 
     </script>
+
+    <script>
+    // Fungsi untuk cek duplikasi nomor HP
+    function checkDuplicatePhone(phoneNumber) {
+        return fetch('/api/check-phone?no_telp=' + encodeURIComponent(phoneNumber))
+            .then(response => response.json())
+            .then(data => data.exists);
+    }
+
+    // Event listener untuk input nomor HP
+    document.getElementById('no_hp').addEventListener('blur', function(e) {
+        const phoneNumber = this.value.trim();
+        
+        if (phoneNumber.length >= 8) { // Minimal 8 digit
+            checkDuplicatePhone(phoneNumber).then(isDuplicate => {
+                if (isDuplicate) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Nomor HP Sudah Terdaftar',
+                        text: 'Nomor HP ini sudah terdaftar dalam sistem. Silakan gunakan nomor lain.',
+                        timer: 5000
+                    });
+                    
+                    // Reset input
+                    this.value = '';
+                    this.focus();
+                }
+            }).catch(error => {
+                console.error('Error checking phone:', error);
+            });
+        }
+    });
+
+    // Juga cek saat form disubmit
+    document.querySelector('form[action="{{ route('kk.storePublic') }}"]').addEventListener('submit', function(e) {
+        const phoneInput = document.getElementById('no_hp');
+        const phoneNumber = phoneInput.value.trim();
+        
+        if (phoneNumber.length >= 8) {
+            e.preventDefault(); // Prevent form submission sementara
+            
+            checkDuplicatePhone(phoneNumber).then(isDuplicate => {
+                if (isDuplicate) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Tidak Dapat Mendaftar',
+                        text: 'Nomor HP ini sudah terdaftar dalam sistem. Silakan gunakan nomor lain.',
+                        timer: 5000
+                    });
+                    
+                    phoneInput.value = '';
+                    phoneInput.focus();
+                } else {
+                    // Jika tidak duplicate, submit form
+                    e.target.submit();
+                }
+            }).catch(error => {
+                console.error('Error checking phone:', error);
+                e.target.submit(); // Submit anyway jika error
+            });
+        }
+    });
+</script>
 
 
 

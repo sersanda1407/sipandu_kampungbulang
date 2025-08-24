@@ -91,6 +91,7 @@ public function reject($id)
             'kepala_keluarga' => $kk->kepala_keluarga,
             'no_kk' => $kk->no_kk,
             'no_telp' => $kk->no_telp,
+            'alamat' => $kk->alamat,
             'rt_id' => $kk->rt_id,
             'rw_id' => $kk->rw_id
         ];

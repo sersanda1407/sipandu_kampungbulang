@@ -24,7 +24,7 @@ class FonnteService
         try {
             // Format nomor telepon
             $formattedNumber = $this->formatPhoneNumber($phoneNumber);
-            
+
             if (empty($formattedNumber)) {
                 Log::warning('Nomor telepon kosong, tidak dapat mengirim pesan');
                 return false;
@@ -35,9 +35,9 @@ class FonnteService
             $response = Http::withHeaders([
                 'Authorization' => $this->apiKey
             ])->post($this->baseUrl . '/send', [
-                'target' => $formattedNumber,
-                'message' => $message,
-            ]);
+                        'target' => $formattedNumber,
+                        'message' => $message,
+                    ]);
 
             if ($response->successful()) {
                 $responseData = $response->json();
@@ -67,12 +67,12 @@ class FonnteService
 
         // Hilangkan karakter non-digit
         $number = preg_replace('/[^0-9]/', '', $phoneNumber);
-        
+
         // Jika diawali dengan 0, ganti dengan 62
         if (substr($number, 0, 1) === '0') {
             $number = '62' . substr($number, 1);
         }
-        
+
         return $number;
     }
 
@@ -82,12 +82,12 @@ class FonnteService
     public function sendToUser($kk)
     {
         $message = "✅ *PENDAFTARAN BERHASIL* \n\n" .
-                   "Halo " . $kk->kepala_keluarga . ",\n\n" .
-                   "Pendaftaran Anda di SIPANDU telah berhasil.\n\n" .
-                   "👤 *Username*: " . $kk->no_kk . "\n" .
-                   "🔑 *Password*: password\n\n" .
-                   "Data sedang diverifikasi oleh RT/RW.\n" .
-                   "Anda akan dapat login setelah verifikasi.";
+            "Halo " . $kk->kepala_keluarga . ",\n\n" .
+            "Pendaftaran Anda di Website SIPANDU telah berhasil.\n\n" .
+            "👤 *Username*: " . $kk->no_kk . "\n" .
+            "🔑 *Password*: password\n\n" .
+            "Data sedang diverifikasi oleh RT/RW.\n" .
+            "Jangan beri tahu akun anda kepada siapa pun karena menyimpan data sensitif! \n Anda akan dapat login setelah proses verifikasi selesai.";
 
         return $this->sendMessage($kk->no_telp, $message);
     }
@@ -98,17 +98,18 @@ class FonnteService
     public function sendToRT($kk)
     {
         $rt = \App\DataRt::find($kk->rt_id);
-        
+
         if (!$rt || empty($rt->no_hp)) {
             return false;
         }
 
         $message = "📋 *PENDAFTARAN BARU* \n\n" .
-                   "Ada pendaftaran baru di RT Anda:\n\n" .
-                   "👤 *Nama*: " . $kk->kepala_keluarga . "\n" .
-                   "🔢 *No KK*: " . $kk->no_kk . "\n" .
-                   "📞 *No Telp*: " . $kk->no_telp . "\n\n" .
-                   "Silakan verifikasi di sistem SIPANDU.";
+            "Ada warga baru mendaftar di wilayah RT Anda:\n\n" .
+            "👤 *Nama*: " . $kk->kepala_keluarga . "\n" .
+            "🔢 *No KK*: " . $kk->no_kk . "\n" .
+            "📍 *Alamat*: " . $kk->alamat . "\n" .
+            "📞 *No Telp*: " . $kk->no_telp . "\n\n" .
+            "Segera lakukan verifikasi di sistem SIPANDU ya.";
 
         return $this->sendMessage($rt->no_hp, $message);
     }
@@ -119,17 +120,19 @@ class FonnteService
     public function sendToRW($kk)
     {
         $rw = \App\DataRw::find($kk->rw_id);
-        
+
         if (!$rw || empty($rw->no_hp)) {
             return false;
         }
 
         $message = "📋 *PENDAFTARAN BARU* \n\n" .
-                   "Ada pendaftaran baru di RW Anda:\n\n" .
-                   "👤 *Nama*: " . $kk->kepala_keluarga . "\n" .
-                   "🔢 *No KK*: " . $kk->no_kk . "\n" .
-                   "📍 *RT*: " . ($kk->rt->rt ?? '') . "\n\n" .
-                   "Silakan verifikasi di sistem SIPANDU.";
+            "Ada warga baru mendaftar di wilayah RW Anda:\n\n" .
+            "👤 *Nama*: " . $kk->kepala_keluarga . "\n" .
+            "🔢 *No KK*: " . $kk->no_kk . "\n" .
+            "📍 *Alamat*: " . $kk->alamat . "\n" .
+            "📞 *No Telp*: " . $kk->no_telp . "\n\n" .
+            "📍 *Wilayah RT*: " . ($kk->rt->rt ?? '') . "\n\n" .
+            "Segera lakukan verifikasi di sistem SIPANDU ya.";
 
         return $this->sendMessage($rw->no_hp, $message);
     }
@@ -140,12 +143,12 @@ class FonnteService
     public function sendVerificationSuccess($kk)
     {
         $message = "🎉 *AKUN SUDAH AKTIF* \n\n" .
-                   "Halo " . $kk->kepala_keluarga . ",\n\n" .
-                   "Akun SIPANDU Anda sudah diverifikasi.\n\n" .
-                   "Sekarang Anda bisa login dengan:\n" .
-                   "👤 *Username*: " . $kk->no_kk . "\n" .
-                   "🔑 *Password*: password\n\n" .
-                   "Selamat menggunakan SIPANDU!";
+            "Halo " . $kk->kepala_keluarga . ",\n\n" .
+            "Akun SIPANDU Anda sudah diverifikasi.\n\n" .
+            "Sekarang Anda bisa login dengan:\n" .
+            "👤 *Username*: " . $kk->no_kk . "\n" .
+            "🔑 *Password*: password\n\n" .
+            "Segera ganti *password* dulu ya ! \n Selamat menggunakan SIPANDU!";
 
         return $this->sendMessage($kk->no_telp, $message);
     }
@@ -155,19 +158,33 @@ class FonnteService
      */
     public function sendVerificationCancelledToUser($kk)
     {
+        $rt = \App\DataRt::find($kk->rt_id);
+
+        if (!$rt || empty($rt->no_hp)) {
+            Log::warning('RT atau nomor HP RT tidak tersedia untuk KK: ' . $kk->id);
+            return false;
+        }
+
+        $rw = \App\DataRw::find($kk->rw_id);
+
+        if (!$rw || empty($rw->no_hp)) {
+            return false;
+        }
+
         if (empty($kk->no_telp)) {
             Log::warning('Nomor telepon user tidak tersedia untuk KK: ' . $kk->id);
             return false;
         }
 
-        $message = "⚠️ *VERIFIKASI DIBATALKAN* \n\n" .
-                   "Halo " . $kk->kepala_keluarga . ",\n\n" .
-                   "Status verifikasi akun SIPANDU Anda telah dibatalkan.\n\n" .
-                   "👤 *Nama*: " . $kk->kepala_keluarga . "\n" .
-                   "🔢 *No KK*: " . $kk->no_kk . "\n\n" .
-                   "Status akun saat ini: *PENDING*\n\n" .
-                   "Silakan hubungi RT/RW setempat untuk informasi lebih lanjut.\n\n" .
-                   "Terima kasih.";
+        $message = "⚠️ *AKUN ANDA DITOLAK* \n\n" .
+            "Halo " . $kk->kepala_keluarga . ",\n\n" .
+            "Status verifikasi akun SIPANDU Anda telah ditolak.\n\n" .
+            "👤 *Nama*: " . $kk->kepala_keluarga . "\n" .
+            "🔢 *No KK*: " . $kk->no_kk . "\n\n" .
+            "Silakan hubungi RT/RW terkait untuk informasi lebih lanjut.\n\n" .
+            "Ketua RT" . $rt->rt . "(" . $rt->nama . ")" . ":" . $rt->no_hp . "\n" .
+            "Ketua RW" . $rw->rw . "(" . $rw->nama . ")" . ":" . $rw->no_hp . "\n" .
+            "Terima kasih.";
 
         return $this->sendMessage($kk->no_telp, $message);
     }
@@ -178,19 +195,19 @@ class FonnteService
     public function sendVerificationCancelledToRT($kk)
     {
         $rt = \App\DataRt::find($kk->rt_id);
-        
+
         if (!$rt || empty($rt->no_hp)) {
             Log::warning('RT atau nomor HP RT tidak tersedia untuk KK: ' . $kk->id);
             return false;
         }
 
-        $message = "⚠️ *VERIFIKASI DIBATALKAN* \n\n" .
-                   "Status verifikasi telah dibatalkan untuk:\n\n" .
-                   "👤 *Nama*: " . $kk->kepala_keluarga . "\n" .
-                   "🔢 *No KK*: " . $kk->no_kk . "\n" .
-                   "📍 *RT*: " . ($rt->rt ?? 'N/A') . "\n\n" .
-                   "Status: *PENDING*\n\n" .
-                   "Silakan lakukan verifikasi ulang jika diperlukan.";
+        $message = "⚠️ *DATA TELAH DITOLAK* \n\n" .
+            "Status verifikasi telah ditolak untuk data:\n\n" .
+            "👤 *Nama*: " . $kk->kepala_keluarga . "\n" .
+            "🔢 *No KK*: " . $kk->no_kk . "\n" .
+            "📍 *Wilayah RT*: " . ($rt->rt ?? 'N/A') . "\n\n" .
+            "Status: *PENDING*\n\n" .
+            "Silakan lakukan verifikasi ulang jika diperlukan.";
 
         return $this->sendMessage($rt->no_hp, $message);
     }
@@ -201,89 +218,117 @@ class FonnteService
     public function sendVerificationCancelledToRW($kk)
     {
         $rw = \App\DataRw::find($kk->rw_id);
-        
+
         if (!$rw || empty($rw->no_hp)) {
             Log::warning('RW atau nomor HP RW tidak tersedia untuk KK: ' . $kk->id);
             return false;
         }
 
         $message = "⚠️ *VERIFIKASI DIBATALKAN* \n\n" .
-                   "Status verifikasi telah dibatalkan untuk:\n\n" .
-                   "👤 *Nama*: " . $kk->kepala_keluarga . "\n" .
-                   "🔢 *No KK*: " . $kk->no_kk . "\n" .
-                   "📍 *RW*: " . ($rw->rw ?? 'N/A') . "\n\n" .
-                   "Status: *PENDING*\n\n" .
-                   "Silakan lakukan verifikasi ulang jika diperlukan.";
+            "Status verifikasi telah dibatalkan untuk:\n\n" .
+            "👤 *Nama*: " . $kk->kepala_keluarga . "\n" .
+            "🔢 *No KK*: " . $kk->no_kk . "\n" .
+            "📍 *RW*: " . ($rw->rw ?? 'N/A') . "\n\n" .
+            "Status: *PENDING*\n\n" .
+            "Silakan lakukan verifikasi ulang jika diperlukan.";
 
         return $this->sendMessage($rw->no_hp, $message);
     }
 
-/**
- * Kirim notifikasi penolakan verifikasi ke user
- */
-public function sendVerificationRejectedToUser($kkData)
-{
-    if (empty($kkData->no_telp)) {
-        Log::warning('Nomor telepon user tidak tersedia untuk KK: ' . $kkData->no_kk);
-        return false;
+    /**
+     * Kirim notifikasi penolakan verifikasi ke user
+     */
+    public function sendVerificationRejectedToUser($kkData)
+    {
+        $rt = \App\DataRt::find($kkData->rt_id);
+
+        if (!$rt || empty($rt->no_hp)) {
+            Log::warning('RT atau nomor HP RT tidak tersedia untuk KK: ' . $kkData->id);
+            return false;
+        }
+
+        $rw = \App\DataRw::find($kkData->rw_id);
+
+        if (!$rw || empty($rw->no_hp)) {
+            return false;
+        }
+
+        if (empty($kkData->no_telp)) {
+            Log::warning('Nomor telepon user tidak tersedia untuk KK: ' . $kkData->no_kk);
+            return false;
+        }
+
+        $message = "❌ *VERIFIKASI DITOLAK* \n\n" .
+            "Halo " . $kkData->kepala_keluarga . ",\n\n" .
+            "Maaf, pendaftaran Anda di website SIPANDU telah ditolak.\n\n" .
+            "Silakan hubungi RT/RW terkait untuk informasi lebih lanjut.\n\n" .
+            "Ketua RT " . ($rt->rt ?? 'N/A') . " (" . $rt->nama . ")" . " : " . $rt->no_hp . "\n" .
+            "Ketua RW " . ($rw->rw ?? 'N/A') . " (" . $rw->nama . ")" . " : " . $rw->no_hp . "\n" .
+            "Terima kasih.";
+
+        return $this->sendMessage($kkData->no_telp, $message);
     }
 
-    $message = "❌ *PENDAFTARAN DITOLAK* \n\n" .
-               "Halo " . $kkData->kepala_keluarga . ",\n\n" .
-               "Maaf, pendaftaran Anda di SIPANDU telah ditolak.\n\n" .
-               "👤 *Nama*: " . $kkData->kepala_keluarga . "\n" .
-               "🔢 *No KK*: " . $kkData->no_kk . "\n\n" .
-               "Status: *DITOLAK*\n\n" .
-               "Data Anda telah dihapus dari sistem.\n\n" .
-               "Silakan hubungi RT/RW setempat untuk informasi lebih lanjut.\n\n" .
-               "Terima kasih.";
+    /**
+     * Kirim notifikasi penolakan verifikasi ke RT
+     */
+    public function sendVerificationRejectedToRT($kkData)
+    {
+        $rt = \App\DataRt::find($kkData->rt_id);
 
-    return $this->sendMessage($kkData->no_telp, $message);
-}
+        if (!$rt || empty($rt->no_hp)) {
+            Log::warning('RT atau nomor HP RT tidak tersedia untuk KK: ' . $kkData->no_kk);
+            return false;
+        }
 
-/**
- * Kirim notifikasi penolakan verifikasi ke RT
- */
-public function sendVerificationRejectedToRT($kkData)
-{
-    $rt = \App\DataRt::find($kkData->rt_id);
-    
-    if (!$rt || empty($rt->no_hp)) {
-        Log::warning('RT atau nomor HP RT tidak tersedia untuk KK: ' . $kkData->no_kk);
-        return false;
+        $rw = \App\DataRw::find($kkData->rw_id);
+
+        if (!$rw || empty($rw->no_hp)) {
+            return false;
+        }
+
+        $message = "❌ *VERIFIKASI TELAH DITOLAK* \n\n" .
+            "Data calon warga baru berikut telah ditolak dan dihapus:\n\n" .
+            "👤 *Nama*: " . $kkData->kepala_keluarga . "\n" .
+            "🔢 *No KK*: " . $kkData->no_kk . "\n" .
+            "📍 *Alamat*: " . $kkData->alamat . "\n" .
+            "📞 *No Telp*: " . $kkData->no_telp . "\n" .
+            "📍 *Wilayah*: " . "RT " . ($rt->rt ?? 'N/A') . " / " . "RW " . ($rw->rw ?? 'N/A') . "\n" .
+            "Status: *DITOLAK*\n\n" .
+            "Data telah dihapus dari sistem.";
+
+        return $this->sendMessage($rt->no_hp, $message);
     }
 
-    $message = "❌ *PENDAFTARAN DITOLAK* \n\n" .
-               "Pendaftaran berikut telah ditolak dan dihapus:\n\n" .
-               "👤 *Nama*: " . $kkData->kepala_keluarga . "\n" .
-               "🔢 *No KK*: " . $kkData->no_kk . "\n" .
-               "📍 *RT*: " . ($rt->rt ?? 'N/A') . "\n\n" .
-               "Status: *DITOLAK & DIHAPUS*\n\n" .
-               "Data telah dihapus dari sistem.";
+    /**
+     * Kirim notifikasi penolakan verifikasi ke RW
+     */
+    public function sendVerificationRejectedToRW($kkData)
+    {
+        $rt = \App\DataRt::find($kkData->rt_id);
 
-    return $this->sendMessage($rt->no_hp, $message);
-}
+        if (!$rt || empty($rt->no_hp)) {
+            Log::warning('RT atau nomor HP RT tidak tersedia untuk KK: ' . $kkData->no_kk);
+            return false;
+        }
 
-/**
- * Kirim notifikasi penolakan verifikasi ke RW
- */
-public function sendVerificationRejectedToRW($kkData)
-{
-    $rw = \App\DataRw::find($kkData->rw_id);
-    
-    if (!$rw || empty($rw->no_hp)) {
-        Log::warning('RW atau nomor HP RW tidak tersedia untuk KK: ' . $kkData->no_kk);
-        return false;
+        $rw = \App\DataRw::find($kkData->rw_id);
+
+        if (!$rw || empty($rw->no_hp)) {
+            Log::warning('RW atau nomor HP RW tidak tersedia untuk KK: ' . $kkData->no_kk);
+            return false;
+        }
+
+        $message = "❌ *VERIFIKASI TELAH DITOLAK* \n\n" .
+            "Data calon warga baru berikut telah ditolak dan dihapus:\n\n" .
+            "👤 *Nama*: " . $kkData->kepala_keluarga . "\n" .
+            "🔢 *No KK*: " . $kkData->no_kk . "\n" .
+            "📍 *Alamat*: " . $kkData->alamat . "\n" .
+            "📞 *No Telp*: " . $kkData->no_telp . "\n" .
+            "📍 *Wilayah*: " . "RT " . ($rt->rt ?? 'N/A') . " / " . "RW " . ($rw->rw ?? 'N/A') . "\n" .
+            "Status: *DITOLAK*\n\n" .
+            "Data telah dihapus dari sistem.";
+
+        return $this->sendMessage($rw->no_hp, $message);
     }
-
-    $message = "❌ *PENDAFTARAN DITOLAK* \n\n" .
-               "Pendaftaran berikut telah ditolak dan dihapus:\n\n" .
-               "👤 *Nama*: " . $kkData->kepala_keluarga . "\n" .
-               "🔢 *No KK*: " . $kkData->no_kk . "\n" .
-               "📍 *RW*: " . ($rw->rw ?? 'N/A') . "\n\n" .
-               "Status: *DITOLAK & DIHAPUS*\n\n" .
-               "Data telah dihapus dari sistem.";
-
-    return $this->sendMessage($rw->no_hp, $message);
-}
 }

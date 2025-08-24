@@ -72,7 +72,8 @@ class RegisterController extends Controller
             // Beri role 'warga'
             $user->assignRole('warga');
 
-            // 🔥 KIRIM NOTIFIKASI WHATSAPP
+            // 🔥 KIRIM NOTIFIKASI WHATSAPP - Pastikan data relationships dimuat
+            $kk->load(['rt', 'rw']); // Tambahkan ini untuk memastikan relasi terload
             $this->sendWhatsAppNotifications($kk);
 
             return redirect()->route('login')
@@ -86,7 +87,7 @@ class RegisterController extends Controller
         } catch (\Exception $e) {
             Log::error('Registration error: ' . $e->getMessage());
             return redirect()->back()
-                ->with('success', 'Pendaftaran berhasil. Notifikasi WhatsApp mungkin tidak terkirim.')
+                ->with('success', 'Pendaftaran berhasil. Notifikasi WhatsApp mungkin tidak terkirim: ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -110,6 +111,7 @@ class RegisterController extends Controller
 
         } catch (\Exception $e) {
             Log::error('WhatsApp notifications error: ' . $e->getMessage());
+            // Jangan throw exception, biarkan proses registrasi tetap berhasil
         }
     }
 }
