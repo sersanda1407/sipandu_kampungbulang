@@ -384,7 +384,7 @@ public function editProfile(Request $request)
     return redirect()->back();
 }
 
-public function checkDuplicatePhone(Request $request)
+public function checkDuplicatenoPhone(Request $request)
 {
     $phone = $request->query('no_telp');
 

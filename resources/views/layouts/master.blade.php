@@ -558,7 +558,7 @@
         // Fungsi untuk memeriksa duplikasi no HP/telepon
         async function checkDuplicatePhone(phoneNumber) {
             try {
-                const response = await fetch('/api/check-phone?no_telp=' + encodeURIComponent(phoneNumber));
+                const response = await fetch('/api/check-nophone?no_telp=' + encodeURIComponent(phoneNumber));
                 const data = await response.json();
                 return data.exists;
             } catch (error) {

@@ -81,7 +81,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/edit-profile', [DashboardController::class, 'editProfile'])->name('profile.edit');
     Route::put('/edit-lurah', [DashboardController::class, 'editLurah'])->name('edit.lurah');
     // Route untuk validasi duplikasi no HP/telepon
-Route::get('/api/check-phone', [DashboardController::class, 'checkDuplicatePhone'])->name('api.check-phone');
+Route::get('/api/check-nophone', [DashboardController::class, 'checkDuplicatenoPhone'])->name('api.check-nophone');
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     /*
