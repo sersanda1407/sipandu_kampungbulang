@@ -209,8 +209,8 @@
 
                         {{-- Table Responsive --}}
                         <div class="table-responsive">
-                            <table class="table table-striped table-bordered" id="table1">
-                                <thead class="table-light">
+                            <table class="table table-striped" id="table1">
+                                <thead>
                                     <tr>
                                         <th>No.</th>
                                         <th>Nama</th>
@@ -220,13 +220,13 @@
                                         <th>Alamat</th>
                                         <th>RT/RW</th>
                                         <th>Agama</th>
-                                        <th>Usia</th>
                                         <th>Tempat & Tanggal Lahir</th>
                                         <th>Pekerjaan</th>
-                                        <th>Pendapatan</th>
+                                        {{-- <th>Usia</th> --}}
+                                        {{-- <th>Pendapatan</th>
                                         <th>Status Ekonomi (rata-rata)</th>
                                         <th>Status Keluarga</th>
-                                        <th>Status Pernikahan</th>
+                                        <th>Status Pernikahan</th> --}}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -240,11 +240,11 @@
                                             <td>{{ $d->alamat }}</td>
                                             <td>{{ $d->rt->rt }}/{{ $d->rw->rw }}</td>
                                             <td>{{ $d->agama }}</td>
-                                            <td>{{ $d->usia }}</td>
                                             <td>{{ $d->tmp_lahir }}, {{ \Carbon\Carbon::parse($d->tgl_lahir)->format('d-m-Y') }}
                                             </td>
                                             <td>{{ $d->pekerjaan }}</td>
-                                            <td class="d-none d-lg-table-cell">Rp.{{ number_format($d->gaji, 0, '.', '.') }},-
+                                            {{-- <td>{{ $d->usia }}</td> --}}
+                                            {{-- <td class="d-none d-lg-table-cell">Rp.{{ number_format($d->gaji, 0, '.', '.') }},-
                                             </td>
                                             <td>
                                                 @php
@@ -271,10 +271,8 @@
                                                 <br>
                                                 <small class="text-muted">Rp.{{ number_format($rataRata, 0, ',', '.') }}</small>
                                             </td>
-
-
                                             <td>{{ $d->status_keluarga }}</td>
-                                            <td>{{ $d->status_pernikahan }}</td>
+                                            <td>{{ $d->status_pernikahan }}</td> --}}
                                         </tr>
                                     @endforeach
                                 </tbody>

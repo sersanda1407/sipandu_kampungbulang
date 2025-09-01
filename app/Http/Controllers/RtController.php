@@ -12,6 +12,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
+use App\Helpers\HistoryLogHelper;
 
 class RtController extends Controller
 {
@@ -105,6 +106,9 @@ class RtController extends Controller
             $data->save();
             $rtUser->assignRole('rt');
 
+            // Catat log penambahan data RT
+            createHistoryLog('create', 'Menambahkan data RT: ' . $request->nama . ' (RT ' . $request->rt . ' RW ' . $dataRw->rw . ')');
+
             Alert::success('Sukses!', 'Berhasil menambah Data RT');
             return redirect()->back();
         } catch (\Exception $e) {
@@ -176,6 +180,10 @@ class RtController extends Controller
             $data->image_rt = $filename;
         }
 
+        // Simpan data RW untuk log
+        $dataRw = DataRw::find($request->rw_id);
+        $rwNumber = $dataRw ? $dataRw->rw : 'Unknown';
+
         // Update data RT
         $data->nama = $request->nama;
         $data->no_hp = $request->no_hp;
@@ -189,51 +197,55 @@ class RtController extends Controller
 
         // Update User jika ada
         if ($data->user_id) {
-            $dataRw = DataRw::find($request->rw_id);
             User::where('id', $data->user_id)->update([
                 'name' => $request->nama,
-                'email' => 'ketua-rt' . $request->rt . '.' . $dataRw->rw . '@kampungbulang',
+                'email' => 'ketua-rt' . $request->rt . '.' . $rwNumber . '@kampungbulang',
             ]);
         }
+
+        // Catat log update data RT
+        createHistoryLog('update', 'Mengupdate data RT: ' . $request->nama . ' (RT ' . $request->rt . ' RW ' . $rwNumber . ')');
 
         Alert::success('Sukses!', 'Berhasil mengedit Data RT');
         return redirect()->route('rt.index');
     }
 
-public function destroy($id)
-{
-    try {
-        $id = Crypt::decryptString($id);
-    } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-        Alert::error('Gagal!', 'ID tidak valid atau telah rusak.');
+    public function destroy($id)
+    {
+        try {
+            $id = Crypt::decryptString($id);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            Alert::error('Gagal!', 'ID tidak valid atau telah rusak.');
+            return redirect()->route('rt.index');
+        }
+
+        $data = DataRt::find($id);
+
+        if (!$data) {
+            Alert::error('Gagal!', 'Data RT tidak ditemukan.');
+            return redirect()->route('rt.index');
+        }
+
+        // ✅ Cek apakah masih ada penduduk di RT ini
+        $jumlahPenduduk = \App\DataPenduduk::where('rt_id', $data->id)->count();
+        if ($jumlahPenduduk > 0) {
+            Alert::error('Gagal!', 'Tidak dapat menghapus RT karena masih ada penduduk di wilayah ini.');
+            return redirect()->route('rt.index');
+        }
+
+        // Catat log sebelum menghapus data
+        createHistoryLog('delete', 'Menghapus data RT: ' . $data->nama . ' (RT ' . $data->rt . ')');
+
+        // ✅ Hapus user RT jika ada
+        if ($data->user_id) {
+            User::where('id', $data->user_id)->delete();
+        }
+
+        $data->delete();
+
+        Alert::success('Sukses!', 'Berhasil menghapus Data RT');
         return redirect()->route('rt.index');
     }
-
-    $data = DataRt::find($id);
-
-    if (!$data) {
-        Alert::error('Gagal!', 'Data RT tidak ditemukan.');
-        return redirect()->route('rt.index');
-    }
-
-    // ✅ Cek apakah masih ada penduduk di RT ini
-    $jumlahPenduduk = \App\DataPenduduk::where('rt_id', $data->id)->count();
-    if ($jumlahPenduduk > 0) {
-        Alert::error('Gagal!', 'Tidak dapat menghapus RT karena masih ada penduduk di wilayah ini.');
-        return redirect()->route('rt.index');
-    }
-
-    // ✅ Hapus user RT jika ada
-    if ($data->user_id) {
-        User::where('id', $data->user_id)->delete();
-    }
-
-    $data->delete();
-
-    Alert::success('Sukses!', 'Berhasil menghapus Data RT');
-    return redirect()->route('rt.index');
-}
-
 
     public function resetPassword($id)
     {
@@ -244,6 +256,9 @@ public function destroy($id)
                 'password' => bcrypt('password'),
             ]);
 
+            // Catat log reset password
+            createHistoryLog('update', 'Reset password untuk RT: ' . $data->nama . ' (RT ' . $data->rt . ')');
+
             Alert::success('Sukses!', 'Password berhasil direset ke: password');
         } else {
             Alert::error('Gagal!', 'User RT tidak ditemukan.');
@@ -251,6 +266,4 @@ public function destroy($id)
 
         return redirect()->route('rt.index');
     }
-
-
 }

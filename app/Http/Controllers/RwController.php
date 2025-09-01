@@ -13,6 +13,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
+use App\Helpers\HistoryLogHelper;
 
 
 class RwController extends Controller
@@ -107,6 +108,9 @@ class RwController extends Controller
 
             // Memberikan role 'rw' ke user
             $rw->assignRole('rw');
+
+            // Catat log penambahan data RW
+            createHistoryLog('create', 'Menambahkan data RW: ' . $request->nama . ' (RW ' . $request->rw . ')');
 
             Alert::success('Sukses!', 'Berhasil menambah Data RW');
             return redirect()->back();
@@ -217,11 +221,12 @@ class RwController extends Controller
             ]);
         }
 
+        // Catat log update data RW
+        createHistoryLog('update', 'Mengupdate data RW: ' . $request->nama . ' (RW ' . $request->rw . ')');
+
         Alert::success('Sukses!', 'Berhasil mengedit Data RW');
         return redirect()->back();
     }
-
-
 
 
     /**
@@ -230,53 +235,55 @@ class RwController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-public function destroy($encryptedId)
-{
-    try {
-        $id = Crypt::decryptString($encryptedId);
-    } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-        Alert::error('Gagal!', 'ID tidak valid.');
-        return redirect()->route('rw.index');
-    }
-
-    $data = DataRw::find($id);
-
-    if (!$data) {
-        Alert::error('Gagal!', 'Data RW tidak ditemukan.');
-        return redirect()->route('rw.index');
-    }
-
-    // 💡 Tambahkan pengecekan: apakah ada penduduk di wilayah RW ini?
-    $jumlahPenduduk = \App\DataPenduduk::where('rw_id', $data->id)->count();
-    if ($jumlahPenduduk > 0) {
-        Alert::error('Gagal!', 'Tidak dapat menghapus Data RW karena masih ada penduduk di wilayah ini.');
-        return redirect()->route('rw.index');
-    }
-
-    $userRwId = $data->user_id;
-
-    // Hapus semua RT milik RW ini
-    $dataRts = DataRt::where('rw_id', $data->id)->get();
-    foreach ($dataRts as $rt) {
-        if ($rt->user_id) {
-            User::where('id', $rt->user_id)->delete();
+    public function destroy($encryptedId)
+    {
+        try {
+            $id = Crypt::decryptString($encryptedId);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            Alert::error('Gagal!', 'ID tidak valid.');
+            return redirect()->route('rw.index');
         }
-        $rt->delete();
+
+        $data = DataRw::find($id);
+
+        if (!$data) {
+            Alert::error('Gagal!', 'Data RW tidak ditemukan.');
+            return redirect()->route('rw.index');
+        }
+
+        // 💡 Tambahkan pengecekan: apakah ada penduduk di wilayah RW ini?
+        $jumlahPenduduk = \App\DataPenduduk::where('rw_id', $data->id)->count();
+        if ($jumlahPenduduk > 0) {
+            Alert::error('Gagal!', 'Tidak dapat menghapus Data RW karena masih ada penduduk di wilayah ini.');
+            return redirect()->route('rw.index');
+        }
+
+        // Catat log sebelum menghapus data
+        createHistoryLog('delete', 'Menghapus data RW: ' . $data->nama . ' (RW ' . $data->rw . ') dan semua RT terkait');
+
+        $userRwId = $data->user_id;
+
+        // Hapus semua RT milik RW ini
+        $dataRts = DataRt::where('rw_id', $data->id)->get();
+        foreach ($dataRts as $rt) {
+            // Catat log penghapusan RT
+            createHistoryLog('delete', 'Menghapus data RT terkait: ' . $rt->nama . ' (RT ' . $rt->rt . ')');
+            
+            if ($rt->user_id) {
+                User::where('id', $rt->user_id)->delete();
+            }
+            $rt->delete();
+        }
+
+        if ($userRwId) {
+            User::where('id', $userRwId)->delete();
+        }
+
+        $data->delete();
+
+        Alert::success('Sukses!', 'Berhasil menghapus Data RW dan semua RT terkait');
+        return redirect()->route('rw.index');
     }
-
-    if ($userRwId) {
-        User::where('id', $userRwId)->delete();
-    }
-
-    $data->delete();
-
-    Alert::success('Sukses!', 'Berhasil menghapus Data RW dan semua RT terkait');
-    return redirect()->route('rw.index');
-}
-
-
-
-
 
     public function resetPassword($id)
     {
@@ -293,6 +300,9 @@ public function destroy($encryptedId)
         // Reset password ke string 'password'
         $user->password = bcrypt('password');
         $user->save();
+
+        // Catat log reset password
+        createHistoryLog('update', 'Reset password untuk RW: ' . $data->nama . ' (RW ' . $data->rw . ')');
 
         Alert::success('Sukses!', 'Password berhasil direset ke: password');
 

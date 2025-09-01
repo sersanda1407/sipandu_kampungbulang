@@ -22,9 +22,23 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule)
+ protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Membersihkan history log setiap bulan pada tanggal 1 jam 00:00
+        $schedule->command('logs:clean')
+                 ->monthlyOn(1, '00:00')
+                 ->before(function () {
+                     \Log::info('Scheduled history log cleanup starting...');
+                 })
+                 ->onSuccess(function () {
+                     \Log::info('Scheduled history log cleanup completed successfully.');
+                 })
+                 ->onFailure(function () {
+                     \Log::error('Scheduled history log cleanup failed.');
+                 })
+                 ->after(function () {
+                     \Log::info('Scheduled history log cleanup finished.');
+                 });
     }
 
     /**

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 use Spatie\Permission\Traits\HasRoles;
+use App\Helpers\HistoryLogHelper;
 
 class DashboardController extends Controller
 {
@@ -226,186 +227,197 @@ class DashboardController extends Controller
         ];
     }
 
-public function editProfile(Request $request)
-{
-    $user = Auth::user();
-    
-    $request->validate([
-        'password' => 'nullable|min:6',
-        'nama' => 'required|string|max:255',
-    ]);
-
-    // Validasi duplikasi no HP untuk RW/RT
-    if ($user->hasRole('rw')) {
-        $rwData = DataRw::where('user_id', $user->id)->first();
+    public function editProfile(Request $request)
+    {
+        $user = Auth::user();
+        
         $request->validate([
-            'no_hp' => [
-                'required',
-                'digits_between:8,12',
-                function ($attribute, $value, $fail) use ($user, $rwData) {
-                    $currentNoHp = $rwData ? $rwData->no_hp : '';
-                    
-                    if ($value !== $currentNoHp) {
-                        // Cek duplikasi di semua tabel
-                        $existsInKk = DataKk::where('no_telp', $value)->exists();
-                        $existsInRt = DataRt::where('no_hp', $value)->exists();
-                        $existsInRw = DataRw::where('no_hp', $value)
-                            ->when($rwData, function($query) use ($rwData) {
-                                return $query->where('id', '!=', $rwData->id);
-                            })
-                            ->exists();
+            'password' => 'nullable|min:6',
+            'nama' => 'required|string|max:255',
+        ]);
+
+        // Validasi duplikasi no HP untuk RW/RT
+        if ($user->hasRole('rw')) {
+            $rwData = DataRw::where('user_id', $user->id)->first();
+            $request->validate([
+                'no_hp' => [
+                    'required',
+                    'digits_between:8,12',
+                    function ($attribute, $value, $fail) use ($user, $rwData) {
+                        $currentNoHp = $rwData ? $rwData->no_hp : '';
                         
-                        if ($existsInKk || $existsInRt || $existsInRw) {
-                            $fail('Nomor HP sudah digunakan oleh pengguna lain.');
+                        if ($value !== $currentNoHp) {
+                            // Cek duplikasi di semua tabel
+                            $existsInKk = DataKk::where('no_telp', $value)->exists();
+                            $existsInRt = DataRt::where('no_hp', $value)->exists();
+                            $existsInRw = DataRw::where('no_hp', $value)
+                                ->when($rwData, function($query) use ($rwData) {
+                                    return $query->where('id', '!=', $rwData->id);
+                                })
+                                ->exists();
+                            
+                            if ($existsInKk || $existsInRt || $existsInRw) {
+                                $fail('Nomor HP sudah digunakan oleh pengguna lain.');
+                            }
                         }
                     }
-                }
-            ]
-        ]);
-    } elseif ($user->hasRole('rt')) {
-        $rtData = DataRt::where('user_id', $user->id)->first();
-        $request->validate([
-            'no_hp' => [
-                'required',
-                'digits_between:8,12',
-                function ($attribute, $value, $fail) use ($user, $rtData) {
-                    $currentNoHp = $rtData ? $rtData->no_hp : '';
-                    
-                    if ($value !== $currentNoHp) {
-                        // Cek duplikasi di semua tabel
-                        $existsInKk = DataKk::where('no_telp', $value)->exists();
-                        $existsInRt = DataRt::where('no_hp', $value)
-                            ->when($rtData, function($query) use ($rtData) {
-                                return $query->where('id', '!=', $rtData->id);
-                            })
-                            ->exists();
-                        $existsInRw = DataRw::where('no_hp', $value)->exists();
+                ]
+            ]);
+        } elseif ($user->hasRole('rt')) {
+            $rtData = DataRt::where('user_id', $user->id)->first();
+            $request->validate([
+                'no_hp' => [
+                    'required',
+                    'digits_between:8,12',
+                    function ($attribute, $value, $fail) use ($user, $rtData) {
+                        $currentNoHp = $rtData ? $rtData->no_hp : '';
                         
-                        if ($existsInKk || $existsInRt || $existsInRw) {
-                            $fail('Nomor HP sudah digunakan oleh pengguna lain.');
+                        if ($value !== $currentNoHp) {
+                            // Cek duplikasi di semua tabel
+                            $existsInKk = DataKk::where('no_telp', $value)->exists();
+                            $existsInRt = DataRt::where('no_hp', $value)
+                                ->when($rtData, function($query) use ($rtData) {
+                                    return $query->where('id', '!=', $rtData->id);
+                                })
+                                ->exists();
+                            $existsInRw = DataRw::where('no_hp', $value)->exists();
+                            
+                            if ($existsInKk || $existsInRt || $existsInRw) {
+                                $fail('Nomor HP sudah digunakan oleh pengguna lain.');
+                            }
                         }
                     }
-                }
-            ]
-        ]);
-    }
+                ]
+            ]);
+        }
 
-    // Validasi duplikasi no telepon untuk warga
-    if ($user->hasRole('warga')) {
-        $kkData = DataKk::where('user_id', $user->id)->first();
-        $request->validate([
-            'no_telp' => [
-                'required',
-                'digits_between:8,12',
-                function ($attribute, $value, $fail) use ($user, $kkData) {
-                    $currentNoTelp = $kkData ? $kkData->no_telp : '';
-                    
-                    if ($value !== $currentNoTelp) {
-                        // Cek duplikasi di semua tabel
-                        $existsInKk = DataKk::where('no_telp', $value)
-                            ->when($kkData, function($query) use ($kkData) {
-                                return $query->where('id', '!=', $kkData->id);
-                            })
-                            ->exists();
-                        $existsInRt = DataRt::where('no_hp', $value)->exists();
-                        $existsInRw = DataRw::where('no_hp', $value)->exists();
+        // Validasi duplikasi no telepon untuk warga
+        if ($user->hasRole('warga')) {
+            $kkData = DataKk::where('user_id', $user->id)->first();
+            $request->validate([
+                'no_telp' => [
+                    'required',
+                    'digits_between:8,12',
+                    function ($attribute, $value, $fail) use ($user, $kkData) {
+                        $currentNoTelp = $kkData ? $kkData->no_telp : '';
                         
-                        if ($existsInKk || $existsInRt || $existsInRw) {
-                            $fail('Nomor telepon sudah digunakan oleh pengguna lain.');
+                        if ($value !== $currentNoTelp) {
+                            // Cek duplikasi di semua tabel
+                            $existsInKk = DataKk::where('no_telp', $value)
+                                ->when($kkData, function($query) use ($kkData) {
+                                    return $query->where('id', '!=', $kkData->id);
+                                })
+                                ->exists();
+                            $existsInRt = DataRt::where('no_hp', $value)->exists();
+                            $existsInRw = DataRw::where('no_hp', $value)->exists();
+                            
+                            if ($existsInKk || $existsInRt || $existsInRw) {
+                                $fail('Nomor telepon sudah digunakan oleh pengguna lain.');
+                            }
                         }
                     }
+                ]
+            ]);
+        }
+
+        // Simpan data lama untuk log
+        $oldName = $user->name;
+        $passwordChanged = !empty($request->password);
+
+        // Update data user
+        $user->name = $request->nama;
+        
+        // Update password hanya jika diisi
+        if ($passwordChanged) {
+            $user->password = bcrypt($request->password);
+        }
+        
+        $user->save();
+
+        // Jika user adalah warga, update data KK terkait
+        if ($user->hasRole('warga')) {
+            $kkData = DataKk::where('user_id', $user->id)->first();
+            if ($kkData) {
+                $kkData->kepala_keluarga = $request->nama;
+                if ($request->has('alamat')) {
+                    $kkData->alamat = $request->alamat;
                 }
-            ]
-        ]);
-    }
-
-    // Update data user
-    $user->name = $request->nama;
-    
-    // Update password hanya jika diisi
-    if (!empty($request->password)) {
-        $user->password = bcrypt($request->password);
-    }
-    
-    $user->save();
-
-    // Jika user adalah warga, update data KK terkait
-    if ($user->hasRole('warga')) {
-        $kkData = DataKk::where('user_id', $user->id)->first();
-        if ($kkData) {
-            $kkData->kepala_keluarga = $request->nama;
-            if ($request->has('alamat')) {
-                $kkData->alamat = $request->alamat;
+                if ($request->has('no_telp')) {
+                    $kkData->no_telp = $request->no_telp;
+                }
+                $kkData->save();
             }
-            if ($request->has('no_telp')) {
-                $kkData->no_telp = $request->no_telp;
-            }
-            $kkData->save();
         }
-    }
 
-    // Jika user adalah RW, update data RW terkait
-    if ($user->hasRole('rw')) {
-        $rwData = DataRw::where('user_id', $user->id)->first();
-        if ($rwData) {
-            $rwData->nama = $request->nama;
-            if ($request->has('no_hp')) {
-                $rwData->no_hp = $request->no_hp;
+        // Jika user adalah RW, update data RW terkait
+        if ($user->hasRole('rw')) {
+            $rwData = DataRw::where('user_id', $user->id)->first();
+            if ($rwData) {
+                $rwData->nama = $request->nama;
+                if ($request->has('no_hp')) {
+                    $rwData->no_hp = $request->no_hp;
+                }
+                if ($request->has('gmail_rw')) {
+                    $rwData->gmail_rw = $request->gmail_rw;
+                }
+                if ($request->has('alamat_rw')) {
+                    $rwData->alamat_rw = $request->alamat_rw;
+                }
+                $rwData->save();
             }
-            if ($request->has('gmail_rw')) {
-                $rwData->gmail_rw = $request->gmail_rw;
-            }
-            if ($request->has('alamat_rw')) {
-                $rwData->alamat_rw = $request->alamat_rw;
-            }
-            $rwData->save();
         }
-    }
 
-    // Jika user adalah RT, update data RT terkait
-    if ($user->hasRole('rt')) {
-        $rtData = DataRt::where('user_id', $user->id)->first();
-        if ($rtData) {
-            $rtData->nama = $request->nama;
-            if ($request->has('no_hp')) {
-                $rtData->no_hp = $request->no_hp;
+        // Jika user adalah RT, update data RT terkait
+        if ($user->hasRole('rt')) {
+            $rtData = DataRt::where('user_id', $user->id)->first();
+            if ($rtData) {
+                $rtData->nama = $request->nama;
+                if ($request->has('no_hp')) {
+                    $rtData->no_hp = $request->no_hp;
+                }
+                if ($request->has('gmail_rt')) {
+                    $rtData->gmail_rt = $request->gmail_rt;
+                }
+                if ($request->has('alamat_rt')) {
+                    $rtData->alamat_rt = $request->alamat_rt;
+                }
+                $rtData->save();
             }
-            if ($request->has('gmail_rt')) {
-                $rtData->gmail_rt = $request->gmail_rt;
-            }
-            if ($request->has('alamat_rt')) {
-                $rtData->alamat_rt = $request->alamat_rt;
-            }
-            $rtData->save();
         }
+
+        // Catat log update profile
+        $logMessage = 'Memperbarui profil: ' . $oldName . ' → ' . $request->nama;
+        if ($passwordChanged) {
+            $logMessage .= ' (termasuk perubahan password)';
+        }
+        createHistoryLog('update', $logMessage);
+
+        Alert::success('Sukses!', 'Berhasil memperbarui data pengguna');
+        return redirect()->back();
     }
 
-    Alert::success('Sukses!', 'Berhasil memperbarui data pengguna');
-    return redirect()->back();
-}
+    public function checkDuplicatenoPhone(Request $request)
+    {
+        $phone = $request->query('no_telp');
 
-public function checkDuplicatenoPhone(Request $request)
-{
-    $phone = $request->query('no_telp');
+        if (!$phone) {
+            return response()->json(['exists' => false, 'message' => 'Nomor telepon tidak diberikan']);
+        }
 
-    if (!$phone) {
-        return response()->json(['exists' => false, 'message' => 'Nomor telepon tidak diberikan']);
+        // Cek di tabel DataKk (kolom 'no_telp')
+        $existsInKk = DataKk::where('no_telp', $phone)->exists();
+
+        // Cek di tabel Rt (kolom 'no_hp')
+        $existsInRt = DataRt::where('no_hp', $phone)->exists();
+
+        // Cek di tabel Rw (kolom 'no_hp')
+        $existsInRw = DataRw::where('no_hp', $phone)->exists();
+
+        // Jika nomor ada di SALAH SATU dari ketiga tabel, dianggap terdaftar
+        $exists = $existsInKk || $existsInRt || $existsInRw;
+
+        return response()->json(['exists' => $exists]);
     }
-
-    // Cek di tabel DataKk (kolom 'no_telp')
-    $existsInKk = DataKk::where('no_telp', $phone)->exists();
-
-    // Cek di tabel Rt (kolom 'no_hp')
-    $existsInRt = DataRt::where('no_hp', $phone)->exists();
-
-    // Cek di tabel Rw (kolom 'no_hp')
-    $existsInRw = DataRw::where('no_hp', $phone)->exists();
-
-    // Jika nomor ada di SALAH SATU dari ketiga tabel, dianggap terdaftar
-    $exists = $existsInKk || $existsInRt || $existsInRw;
-
-    return response()->json(['exists' => $exists]);
-}
 
     public function editLurah(Request $request)
     {
@@ -417,10 +429,33 @@ public function checkDuplicatenoPhone(Request $request)
 
         $lurah = Lurah::first();
 
+        // Simpan data lama untuk log
+        $oldData = $lurah ? clone $lurah : null;
+
         if ($lurah) {
             $lurah->update($request->only(['nama', 'jabatan', 'nip']));
         } else {
-            Lurah::create($request->only(['nama', 'jabatan', 'nip']));
+            $lurah = Lurah::create($request->only(['nama', 'jabatan', 'nip']));
+        }
+
+        // Catat log update data lurah
+        if ($oldData) {
+            $changes = [];
+            if ($oldData->nama !== $lurah->nama) {
+                $changes[] = 'Nama: ' . $oldData->nama . ' → ' . $lurah->nama;
+            }
+            if ($oldData->jabatan !== $lurah->jabatan) {
+                $changes[] = 'Jabatan: ' . $oldData->jabatan . ' → ' . $lurah->jabatan;
+            }
+            if ($oldData->nip !== $lurah->nip) {
+                $changes[] = 'NIP: ' . $oldData->nip . ' → ' . $lurah->nip;
+            }
+            
+            if (!empty($changes)) {
+                createHistoryLog('update', 'Memperbarui data Lurah: ' . implode(', ', $changes));
+            }
+        } else {
+            createHistoryLog('create', 'Menambahkan data Lurah: ' . $lurah->nama . ' (' . $lurah->jabatan . ')');
         }
 
         Alert::success('Sukses!', 'Data Lurah berhasil diperbarui.');

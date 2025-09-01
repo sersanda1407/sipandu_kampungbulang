@@ -56,7 +56,8 @@
             border-radius: 50%;
             display: inline-block;
         }
-         /* Privacy Policy Modal Styles */
+
+        /* Privacy Policy Modal Styles */
         .privacy-modal {
             display: none;
             position: fixed;
@@ -68,7 +69,7 @@
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
         }
-        
+
         .privacy-modal-content {
             background-color: #fefefe;
             margin: 5% auto;
@@ -80,7 +81,7 @@
             overflow-y: auto;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-        
+
         .privacy-close {
             color: #aaa;
             float: right;
@@ -88,26 +89,27 @@
             font-weight: bold;
             cursor: pointer;
         }
-        
+
         .privacy-close:hover {
             color: #000;
         }
-        
+
         .privacy-title {
             color: #2c3e50;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        
+
         .privacy-section {
             margin-bottom: 20px;
         }
-        
+
         .privacy-section h3 {
             color: #3498db;
             margin-bottom: 10px;
         }
+
         .log-table th {
             position: sticky;
             top: 0;
@@ -121,139 +123,138 @@
 
 
 <body>
-<div class="modal fade" id="edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Kelola Akun</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="/edit-profile" method="POST" id="profileForm">
-                @csrf
-                <div class="modal-body">
-                    <!-- Field untuk semua role -->
-                    @php
-                        $namaValue = Auth::user()->name;
-                        
-                        if (Auth::user()->hasRole('warga')) {
-                            $kkData = Auth::user()->Kk->first();
-                            $namaValue = $kkData ? $kkData->kepala_keluarga : Auth::user()->name;
-                        } elseif (Auth::user()->hasRole('rw')) {
-                            $rwData = Auth::user()->Rw->first();
-                            $namaValue = $rwData ? $rwData->nama : Auth::user()->name;
-                        } elseif (Auth::user()->hasRole('rt')) {
-                            $rtData = Auth::user()->Rt->first();
-                            $namaValue = $rtData ? $rtData->nama : Auth::user()->name;
-                        }
-                    @endphp
+    <div class="modal fade" id="edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Kelola Akun</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/edit-profile" method="POST" id="profileForm">
+                    @csrf
+                    <div class="modal-body">
+                        <!-- Field untuk semua role -->
+                        @php
+                            $namaValue = Auth::user()->name;
 
-                    <div class="mb-3">
-                        <label for="nama" class="form-label">Nama</label>
-                        <input type="text" class="form-control text-capitalize" name="nama" id="nama"
-                            value="{{ $namaValue }}" required>
-                    </div>
-                    
-                    <!-- Field khusus untuk RW -->
-                    @if(Auth::user()->hasRole('rw'))
-                        @php $rwData = \App\DataRw::where('user_id', Auth::id())->first(); @endphp
-                        @if($rwData)
+                            if (Auth::user()->hasRole('warga')) {
+                                $kkData = Auth::user()->Kk->first();
+                                $namaValue = $kkData ? $kkData->kepala_keluarga : Auth::user()->name;
+                            } elseif (Auth::user()->hasRole('rw')) {
+                                $rwData = Auth::user()->Rw->first();
+                                $namaValue = $rwData ? $rwData->nama : Auth::user()->name;
+                            } elseif (Auth::user()->hasRole('rt')) {
+                                $rtData = Auth::user()->Rt->first();
+                                $namaValue = $rtData ? $rtData->nama : Auth::user()->name;
+                            }
+                        @endphp
+
                         <div class="mb-3">
-                            <label for="no_hp" class="form-label">Nomor Telepon / WhatsApp</label>
-                            <input type="text" class="form-control" name="no_hp" id="no_hp" 
-                                value="{{ $rwData->no_hp }}" required
-                                data-current-value="{{ $rwData->no_hp }}"
-                                minlength="8" maxlength="12"
-                                pattern="[0-9]{8,12}"
-                                title="Nomor HP harus 8-12 digit angka">
-                            <div class="invalid-feedback" id="no_hp_error"></div>
-                            <small class="form-text text-muted">Minimal 8 digit, maksimal 12 digit (hanya angka)</small>
+                            <label for="nama" class="form-label">Nama</label>
+                            <input type="text" class="form-control text-capitalize" name="nama" id="nama"
+                                value="{{ $namaValue }}" required>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="gmail_rw" class="form-label">Email Pribadi</label>
-                            <input type="email" class="form-control" name="gmail_rw" id="gmail_rw"
-                                value="{{ $rwData->gmail_rw }}" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="alamat_rw" class="form-label">Alamat RW</label>
-                            <textarea class="form-control" name="alamat_rw" id="alamat_rw" required>{{ $rwData->alamat_rw }}</textarea>
-                        </div>
+
+                        <!-- Field khusus untuk RW -->
+                        @if(Auth::user()->hasRole('rw'))
+                            @php $rwData = \App\DataRw::where('user_id', Auth::id())->first(); @endphp
+                            @if($rwData)
+                                <div class="mb-3">
+                                    <label for="no_hp" class="form-label">Nomor Telepon / WhatsApp</label>
+                                    <input type="text" class="form-control" name="no_hp" id="no_hp" value="{{ $rwData->no_hp }}"
+                                        required data-current-value="{{ $rwData->no_hp }}" minlength="8" maxlength="12"
+                                        pattern="[0-9]{8,12}" title="Nomor HP harus 8-12 digit angka">
+                                    <div class="invalid-feedback" id="no_hp_error"></div>
+                                    <small class="form-text text-muted">Minimal 8 digit, maksimal 12 digit (hanya angka)</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="gmail_rw" class="form-label">Email Pribadi</label>
+                                    <input type="email" class="form-control" name="gmail_rw" id="gmail_rw"
+                                        value="{{ $rwData->gmail_rw }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="alamat_rw" class="form-label">Alamat RW</label>
+                                    <textarea class="form-control" name="alamat_rw" id="alamat_rw"
+                                        required>{{ $rwData->alamat_rw }}</textarea>
+                                </div>
+                            @endif
                         @endif
-                    @endif
-                    
-                    <!-- Field khusus untuk RT -->
-                    @if(Auth::user()->hasRole('rt'))
-                        @php $rtData = \App\DataRt::where('user_id', Auth::id())->first(); @endphp
-                        @if($rtData)
-                        <div class="mb-3">
-                            <label for="no_hp" class="form-label">Nomor Telepon / WhatsApp</label>
-                            <input type="text" class="form-control" name="no_hp" id="no_hp" 
-                                value="{{ $rtData->no_hp }}" required
-                                data-current-value="{{ $rtData->no_hp }}"
-                                minlength="8" maxlength="12"
-                                pattern="[0-9]{8,12}"
-                                title="Nomor HP harus 8-12 digit angka">
-                            <div class="invalid-feedback" id="no_hp_error"></div>
-                            <small class="form-text text-muted">Minimal 8 digit, maksimal 12 digit (hanya angka)</small>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="gmail_rt" class="form-label">Email Pribadi</label>
-                            <input type="email" class="form-control" name="gmail_rt" id="gmail_rt"
-                                value="{{ $rtData->gmail_rt }}" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="alamat_rt" class="form-label">Alamat RT</label>
-                            <textarea class="form-control" name="alamat_rt" id="alamat_rt" required>{{ $rtData->alamat_rt }}</textarea>
-                        </div>
+
+                        <!-- Field khusus untuk RT -->
+                        @if(Auth::user()->hasRole('rt'))
+                            @php $rtData = \App\DataRt::where('user_id', Auth::id())->first(); @endphp
+                            @if($rtData)
+                                <div class="mb-3">
+                                    <label for="no_hp" class="form-label">Nomor Telepon / WhatsApp</label>
+                                    <input type="text" class="form-control" name="no_hp" no_hp" id="no_hp"
+                                        value="{{ $rtData->no_hp }}" required data-current-value="{{ $rtData->no_hp }}"
+                                        minlength="8" maxlength="12" pattern="[0-9]{8,12}"
+                                        title="Nomor HP harus 8-12 digit angka">
+                                    <div class="invalid-feedback" id="no_hp_error"></div>
+                                    <small class="form-text text-muted">Minimal 8 digit, maksimal 12 digit (hanya angka)</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="gmail_rt" class="form-label">Email Pribadi</label>
+                                    <input type="email" class="form-control" name="gmail_rt" id="gmail_rt"
+                                        value="{{ $rtData->gmail_rt }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="alamat_rt" class="form-label">Alamat RT</label>
+                                    <textarea class="form-control" name="alamat_rt" id="alamat_rt"
+                                        required>{{ $rtData->alamat_rt }}</textarea>
+                                </div>
+                            @endif
                         @endif
-                    @endif
-                    
-                    <!-- Field khusus untuk Warga -->
-                    @if(Auth::user()->hasRole('warga'))
-                        @php $kkData = \App\DataKk::where('user_id', Auth::id())->first(); @endphp
-                        @if($kkData)
-                        <div class="mb-3">
-                            <label for="alamat" class="form-label">Alamat</label>
-                            <textarea class="form-control" name="alamat" id="alamat" required>{{ $kkData->alamat }}</textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="no_telp" class="form-label">Nomor Telepon / WhatsApp</label>
-                            <input type="text" class="form-control" name="no_telp" id="no_telp" 
-                                value="{{ $kkData->no_telp }}" required
-                                data-current-value="{{ $kkData->no_telp }}"
-                                minlength="8" maxlength="12"
-                                pattern="[0-9]{8,12}"
-                                title="Nomor telepon harus 8-12 digit angka">
-                            <div class="invalid-feedback" id="no_telp_error"></div>
-                            <small class="form-text text-muted">Minimal 8 digit, maksimal 12 digit (hanya angka)</small>
-                        </div>
+
+                        <!-- Field khusus untuk Warga -->
+                        @if(Auth::user()->hasRole('warga'))
+                            @php $kkData = \App\DataKk::where('user_id', Auth::id())->first(); @endphp
+                            @if($kkData)
+                                <div class="mb-3">
+                                    <label for="alamat" class="form-label">Alamat</label>
+                                    <textarea class="form-control" name="alamat" id="alamat"
+                                        required>{{ $kkData->alamat }}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="no_telp" class="form-label">Nomor Telepon / WhatsApp</label>
+                                    <input type="text" class="form-control" name="no_telp" id="no_telp"
+                                        value="{{ $kkData->no_telp }}" required data-current-value="{{ $kkData->no_telp }}"
+                                        minlength="8" maxlength="12" pattern="[0-9]{8,12}"
+                                        title="Nomor telepon harus 8-12 digit angka">
+                                    <div class="invalid-feedback" id="no_telp_error"></div>
+                                    <small class="form-text text-muted">Minimal 8 digit, maksimal 12 digit (hanya angka)</small>
+                                </div>
+                            @endif
                         @endif
-                    @endif
-                    
-                    <!-- Field untuk semua role -->
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Email / No KK</label>
-                        <input type="text" class="form-control" name="email" id="exampleInputPassword1"
-                            value="{{ \Auth::user()->email }}" required readonly>
+
+                        <!-- Field untuk semua role -->
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Email / No KK</label>
+                            <input type="text" class="form-control" name="email" id="exampleInputPassword1"
+                                value="{{ \Auth::user()->email }}" required readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" id="password" minlength="6"
+                                pattern=".{6,}" title="Password minimal 6 karakter">
+                            <div class="invalid-feedback" id="password_error"></div>
+                            <small class="text-muted">Kosongkan jika tidak ingin mengubah password (minimal 6
+                                karakter)</small>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Password</label>
-                        <input type="password" class="form-control" name="password" id="exampleInputPassword1">
-                        <small class="text-muted">Kosongkan jika tidak ingin mengubah password</small>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary" id="submitButton">Simpan Perubahan</button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="submit" class="btn btn-primary" id="submitButton">Simpan Perubahan</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
     <div class="modal fade" id="editLurahModal" tabindex="-1" aria-labelledby="editLurahModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -290,81 +291,92 @@
         </div>
     </div>
 
-<!-- Privacy Policy Modal -->
-<div id="privacyModal" class="privacy-modal">
-    <div class="privacy-modal-content">
-        <span class="privacy-close" onclick="closePrivacyModal()">&times;</span>
-        <h2 class="privacy-title">Kebijakan Privasi SIPANDU Kampung Bulang</h2>
-        
-        <div class="privacy-section">
-            <h3>1. Pengumpulan Informasi</h3>
-            <p>Kami mengumpulkan informasi pribadi yang Anda berikan secara langsung saat menggunakan layanan SIPANDU, sesuai dengan ketentuan Undang-Undang Dasar 1945 Pasal 28G dan Undang-Undang Nomor 27 Tahun 2022 tentang Perlindungan Data Pribadi. Informasi yang dikumpulkan mencakup:</p>
-            <ul>
-                <li>Data identitas (nama, NIK, nomor KK)</li>
-                <li>Data kontak (alamat, nomor telepon, email)</li>
-                <li>Data kependudukan (status keluarga, data anggota keluarga)</li>
-                <li>Data lokasi (alamat tempat tinggal, RT/RW)</li>
-            </ul>
-        </div>
-        
-        <div class="privacy-section">
-            <h3>2. Penggunaan Informasi</h3>
-            <p>Informasi pribadi digunakan untuk kepentingan pelayanan publik, termasuk namun tidak terbatas pada:</p>
-            <ul>
-                <li>Memverifikasi identitas Anda sebagai warga Kampung Bulang</li>
-                <li>Menyediakan layanan administrasi kependudukan</li>
-                <li>Mempermudah proses pelayanan publik di tingkat RT/RW</li>
-                <li>Komunikasi terkait layanan dan informasi penting</li>
-                <li>Peningkatan kualitas layanan</li>
-                <li>Statistik dan perencanaan pembangunan wilayah</li>
-            </ul>
-        </div>
-        
-        <div class="privacy-section">
-            <h3>3. Perlindungan Data</h3>
-            <p>Kami berkomitmen melindungi data pribadi Anda dengan langkah teknis dan organisasi yang sesuai. Data hanya dapat diakses oleh pihak berwenang dan dilindungi dari akses, penggunaan, atau pengungkapan yang tidak sah, sebagaimana diatur dalam UU Perlindungan Data Pribadi.</p>
-        </div>
-        
-        <div class="privacy-section">
-            <h3>4. Penyimpanan Data</h3>
-            <p>Data pribadi Anda akan disimpan selama diperlukan untuk tujuan yang dijelaskan dalam kebijakan ini atau sesuai ketentuan hukum. Apabila data tidak lagi diperlukan, data akan dihapus atau dianonimkan sesuai dengan peraturan yang berlaku.</p>
-        </div>
-        
-        <div class="privacy-section">
-            <h3>5. Hak Anda</h3>
-            <p>Sesuai UU Perlindungan Data Pribadi, Anda memiliki hak untuk:</p>
-            <ul>
-                <li>Mengakses informasi pribadi yang kami simpan</li>
-                <li>Memperbaiki data pribadi yang tidak akurat</li>
-                <li>Meminta penghapusan data dalam kondisi tertentu</li>
-                <li>Menarik kembali persetujuan atas pemrosesan data pribadi</li>
-                <li>Mengajukan keberatan atas penggunaan data Anda</li>
-            </ul>
-            <p>Untuk menggunakan hak-hak ini, silakan hubungi admin SIPANDU Kampung Bulang.</p>
-        </div>
-        
-        <div class="privacy-section">
-            <h3>6. Pembagian Informasi</h3>
-            <p>Kami tidak menjual atau memperdagangkan informasi pribadi Anda. Data hanya dapat dibagikan kepada pihak ketiga dalam kondisi:</p>
-            <ul>
-                <li>Atas persetujuan Anda</li>
-                <li>Pemenuhan kewajiban hukum atau perintah pengadilan</li>
-                <li>Penyediaan layanan publik yang Anda minta</li>
-                <li>Perlindungan hak, keamanan, dan properti Kelurahan atau warga</li>
-            </ul>
-        </div>
-        
-        <div class="privacy-section">
-            <h3>7. Perubahan Kebijakan</h3>
-            <p>Kebijakan ini dapat diperbarui sewaktu-waktu sesuai perkembangan hukum dan teknologi. Setiap perubahan akan diumumkan melalui situs resmi atau media komunikasi lain yang ditetapkan oleh Kelurahan Kampung Bulang. Dengan tetap menggunakan layanan SIPANDU, Anda dianggap menyetujui perubahan kebijakan tersebut.</p>
-        </div>
-        
-        
-        <div class="text-center mt-4">
-            <button class="btn btn-primary" onclick="closePrivacyModal()">Saya Mengerti</button>
+    <!-- Privacy Policy Modal -->
+    <div id="privacyModal" class="privacy-modal">
+        <div class="privacy-modal-content">
+            <span class="privacy-close" onclick="closePrivacyModal()">&times;</span>
+            <h2 class="privacy-title">Kebijakan Privasi SIPANDU Kampung Bulang</h2>
+
+            <div class="privacy-section">
+                <h3>1. Pengumpulan Informasi</h3>
+                <p>Kami mengumpulan informasi pribadi yang Anda berikan secara langsung saat menggunakan layanan
+                    SIPANDU, sesuai dengan ketentuan Undang-Undang Dasar 1945 Pasal 28G dan Undang-Undang Nomor 27 Tahun
+                    2022 tentang Perlindungan Data Pribadi. Informasi yang dikumpulkan mencakup:</p>
+                <ul>
+                    <li>Data identitas (nama, NIK, nomor KK)</li>
+                    <li>Data kontak (alamat, nomor telepon, email)</li>
+                    <li>Data kependudukan (status keluarga, data anggota keluarga)</li>
+                    <li>Data lokasi (alamat tempat tinggal, RT/RW)</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>2. Penggunaan Informasi</h3>
+                <p>Informasi pribadi digunakan untuk kepentingan pelayanan publik, termasuk namun tidak terbatas pada:
+                </p>
+                <ul>
+                    <li>Memverifikasi identitas Anda sebagai warga Kampung Bulang</li>
+                    <li>Menyediakan layanan administrasi kependudukan</li>
+                    <li>Mempermudah proses pelayanan publik di tingkat RT/RW</li>
+                    <li>Komunikasi terkait layanan dan informasi penting</li>
+                    <li>Peningkatan kualitas layanan</li>
+                    <li>Statistik dan perencanaan pembangunan wilayah</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>3. Perlindungan Data</h3>
+                <p>Kami berkomitmen melindungi data pribadi Anda dengan langkah teknis dan organisasi yang sesuai. Data
+                    hanya dapat diakses oleh pihak berwenang dan dilindungi dari akses, penggunaan, atau pengungkapan
+                    yang tidak sah, sebagaimana diatur dalam UU Perlindungan Data Pribadi.</p>
+            </div>
+
+            <div class="privacy-section">
+                <h3>4. Penyimpanan Data</h3>
+                <p>Data pribadi Anda akan disimpan selama diperlukan untuk tujuan yang dijelaskan dalam kebijakan ini
+                    atau sesuai ketentuan hukum. Apabila data tidak lagi diperlukan, data akan dihapus atau dianonimkan
+                    sesuai dengan peraturan yang berlaku.</p>
+            </div>
+
+            <div class="privacy-section">
+                <h3>5. Hak Anda</h3>
+                <p>Sesuai UU Perlindungan Data Pribadi, Anda memiliki hak untuk:</p>
+                <ul>
+                    <li>Mengakses informasi pribadi yang kami simpan</li>
+                    <li>Memperbaiki data pribadi yang tidak akurat</li>
+                    <li>Meminta penghapusan data dalam kondisi tertentu</li>
+                    <li>Menarik kembali persetujuan atas pemrosesan data pribadi</li>
+                    <li>Mengajukan keberatan atas penggunaan data Anda</li>
+                </ul>
+                <p>Untuk menggunakan hak-hak ini, silakan hubungi admin SIPANDU Kampung Bulang.</p>
+            </div>
+
+            <div class="privacy-section">
+                <h3>6. Pembagian Informasi</h3>
+                <p>Kami tidak menjual atau memperdagangkan informasi pribadi Anda. Data hanya dapat dibagikan kepada
+                    pihak ketiga dalam kondisi:</p>
+                <ul>
+                    <li>Atas persetujuan Anda</li>
+                    <li>Pemenuhan kewajiban hukum atau perintah pengadilan</li>
+                    <li>Penyediaan layanan publik yang Anda minta</li>
+                    <li>Perlindungan hak, keamanan, dan properti Kelurahan atau warga</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>7. Perubahan Kebijakan</h3>
+                <p>Kebijakan ini dapat diperbarui sewaktu-waktu sesuai perkembangan hukum dan teknologi. Setiap
+                    perubahan akan diumumkan melalui situs resmi atau media komunikasi lain yang ditetapkan oleh
+                    Kelurahan Kampung Bulang. Dengan tetap menggunakan layanan SIPANDU, Anda dianggap menyetujui
+                    perubahan kebijakan tersebut.</p>
+            </div>
+
+
+            <div class="text-center mt-4">
+                <button class="btn btn-primary" onclick="closePrivacyModal()">Saya Mengerti</button>
+            </div>
         </div>
     </div>
-</div>
 
 
 
@@ -505,6 +517,23 @@
                             </a>
                         </li>
                         @endhasrole
+                        <li class="sidebar-title">Privacy</li>
+
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="showPrivacyPolicy()">
+                                <i class="fas fa-shield"></i>
+                                <span>Privacy & Policy</span>
+                            </a>
+                        </li>
+
+                        @hasrole('superadmin')
+                        <li class="sidebar-item {{ request()->is('histori*') ? 'active' : '' }}">
+                            <a href="{{ route('histori.index') }}" class="sidebar-link">
+                                <i class="fas fa-history"></i>
+                                <span>History Log</span>
+                            </a>
+                        </li>
+                        @endhasrole
 
                         <li class="sidebar-title">Setting</li>
                         <li class="sidebar-item {{ request()->is('pengguna*') ? 'active' : '' }}">
@@ -514,21 +543,7 @@
                             </a>
                         </li>
 
- <li class="sidebar-item">
-                            <a href="#" class="sidebar-link" onclick="showPrivacyPolicy()">
-                                <i class="fas fa-shield"></i>
-                                <span>Privacy & Policy</span>
-                            </a>
-                        </li>
                         
-@hasrole('superadmin')
-<li class="sidebar-item {{ request()->is('histori*') ? 'active' : '' }}">
-    <a href="{{ route('histori.index') }}" class="sidebar-link">
-        <i class="fas fa-history"></i>
-        <span>History Log</span>
-    </a>
-</li>
-@endhasrole
 
                         <!-- <li class="sidebar-item">
                             <a href="#editLurahModal" class="sidebar-link" data-bs-toggle="modal"
@@ -588,14 +603,14 @@
         function showPrivacyPolicy() {
             document.getElementById('privacyModal').style.display = 'block';
         }
-        
+
         // Fungsi untuk menutup modal privacy policy
         function closePrivacyModal() {
             document.getElementById('privacyModal').style.display = 'none';
         }
-        
+
         // Tutup modal jika klik di luar konten
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const privacyModal = document.getElementById('privacyModal');
             if (event.target == privacyModal) {
                 privacyModal.style.display = 'none';
@@ -603,141 +618,182 @@
         }
     </script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Fungsi untuk validasi input nomor
-        function setupPhoneValidation(inputId, errorId) {
-            const input = document.getElementById(inputId);
-            const errorElement = document.getElementById(errorId);
-            
-            if (input && errorElement) {
-                // Validasi input hanya angka
-                input.addEventListener("input", function() {
-                    this.value = this.value.replace(/\D/g, '');
-                    
-                    // Validasi length
-                    if (this.value.length > 12) {
-                        this.value = this.value.slice(0, 12);
-                    }
-                    
-                    // Hapus error saat user mengetik
-                    if (this.value.length >= 8) {
-                        this.classList.remove('is-invalid');
-                        errorElement.textContent = '';
-                    }
-                });
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Fungsi untuk validasi input nomor
+            function setupPhoneValidation(inputId, errorId) {
+                const input = document.getElementById(inputId);
+                const errorElement = document.getElementById(errorId);
 
-                // Validasi saat blur
-                input.addEventListener("blur", function() {
-                    if (this.value.length < 8 && this.value.length > 0) {
-                        this.classList.add('is-invalid');
-                        errorElement.textContent = 'Nomor telepon/HP minimal 8 digit.';
-                    } else {
-                        this.classList.remove('is-invalid');
-                        errorElement.textContent = '';
-                    }
-                });
-            }
-        }
+                if (input && errorElement) {
+                    // Validasi input hanya angka
+                    input.addEventListener("input", function () {
+                        this.value = this.value.replace(/\D/g, '');
 
-        // Setup validasi untuk semua input no HP/telepon
-        setupPhoneValidation('no_telp', 'no_telp_error');
-        setupPhoneValidation('no_hp', 'no_hp_error');
+                        // Validasi length
+                        if (this.value.length > 12) {
+                            this.value = this.value.slice(0, 12);
+                        }
 
-        // Validasi duplikasi no HP/telepon
-        const form = document.getElementById('profileForm');
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitButton = document.getElementById('submitButton');
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memeriksa...';
-            
-            let isValid = true;
-            
-            // Validasi length no_telp
-            const noTelpInput = document.getElementById('no_telp');
-            if (noTelpInput && noTelpInput.value.length > 0 && noTelpInput.value.length < 8) {
-                noTelpInput.classList.add('is-invalid');
-                document.getElementById('no_telp_error').textContent = 'Nomor telepon minimal 8 digit.';
-                isValid = false;
-            }
-            
-            // Validasi length no_hp
-            const noHpInput = document.getElementById('no_hp');
-            if (noHpInput && noHpInput.value.length > 0 && noHpInput.value.length < 8) {
-                noHpInput.classList.add('is-invalid');
-                document.getElementById('no_hp_error').textContent = 'Nomor HP minimal 8 digit.';
-                isValid = false;
-            }
-            
-            if (!isValid) {
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Simpan Perubahan';
-                // Focus pada input pertama yang error
-                if (noTelpInput && noTelpInput.classList.contains('is-invalid')) {
-                    noTelpInput.focus();
-                } else if (noHpInput && noHpInput.classList.contains('is-invalid')) {
-                    noHpInput.focus();
-                }
-                return;
-            }
-            
-            // Validasi duplikasi no HP untuk RW/RT
-            if (noHpInput) {
-                const currentNoHp = noHpInput.getAttribute('data-current-value');
-                const newNoHp = noHpInput.value;
-                
-                if (newNoHp !== currentNoHp) {
-                    const isDuplicate = await checkDuplicatePhone(newNoHp);
-                    if (isDuplicate) {
-                        noHpInput.classList.add('is-invalid');
-                        document.getElementById('no_hp_error').textContent = 'Nomor HP sudah digunakan oleh pengguna lain.';
-                        isValid = false;
-                    } else {
-                        noHpInput.classList.remove('is-invalid');
-                    }
+                        // Hapus error saat user mengetik
+                        if (this.value.length >= 8) {
+                            this.classList.remove('is-invalid');
+                            errorElement.textContent = '';
+                        }
+                    });
+
+                    // Validasi saat blur
+                    input.addEventListener("blur", function () {
+                        if (this.value.length < 8 && this.value.length > 0) {
+                            this.classList.add('is-invalid');
+                            errorElement.textContent = 'Nomor telepon/HP minimal 8 digit.';
+                        } else {
+                            this.classList.remove('is-invalid');
+                            errorElement.textContent = '';
+                        }
+                    });
                 }
             }
-            
-            // Validasi duplikasi no telepon untuk warga
-            if (noTelpInput) {
-                const currentNoTelp = noTelpInput.getAttribute('data-current-value');
-                const newNoTelp = noTelpInput.value;
-                
-                if (newNoTelp !== currentNoTelp) {
-                    const isDuplicate = await checkDuplicatePhone(newNoTelp);
-                    if (isDuplicate) {
-                        noTelpInput.classList.add('is-invalid');
-                        document.getElementById('no_telp_error').textContent = 'Nomor telepon sudah digunakan oleh pengguna lain.';
-                        isValid = false;
-                    } else {
-                        noTelpInput.classList.remove('is-invalid');
-                    }
+
+            // Setup validasi untuk password
+            function setupPasswordValidation() {
+                const passwordInput = document.getElementById('password');
+                const passwordError = document.getElementById('password_error');
+
+                if (passwordInput && passwordError) {
+                    // Validasi saat input
+                    passwordInput.addEventListener("input", function () {
+                        if (this.value.length > 0 && this.value.length < 6) {
+                            this.classList.add('is-invalid');
+                            passwordError.textContent = 'Password minimal 6 karakter.';
+                        } else {
+                            this.classList.remove('is-invalid');
+                            passwordError.textContent = '';
+                        }
+                    });
+
+                    // Validasi saat blur
+                    passwordInput.addEventListener("blur", function () {
+                        if (this.value.length > 0 && this.value.length < 6) {
+                            this.classList.add('is-invalid');
+                            passwordError.textContent = 'Password minimal 6 karakter.';
+                        } else {
+                            this.classList.remove('is-invalid');
+                            passwordError.textContent = '';
+                        }
+                    });
                 }
             }
-            
-            if (isValid) {
-                this.submit();
-            } else {
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Simpan Perubahan';
+
+            // Setup validasi untuk semua input no HP/telepon
+            setupPhoneValidation('no_telp', 'no_telp_error');
+            setupPhoneValidation('no_hp', 'no_hp_error');
+            setupPasswordValidation();
+
+            // Validasi duplikasi no HP/telepon dan password
+            const form = document.getElementById('profileForm');
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const submitButton = document.getElementById('submitButton');
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memeriksa...';
+
+                let isValid = true;
+
+                // Validasi length no_telp
+                const noTelpInput = document.getElementById('no_telp');
+                if (noTelpInput && noTelpInput.value.length > 0 && noTelpInput.value.length < 8) {
+                    noTelpInput.classList.add('is-invalid');
+                    document.getElementById('no_telp_error').textContent = 'Nomor telepon minimal 8 digit.';
+                    isValid = false;
+                }
+
+                // Validasi length no_hp
+                const noHpInput = document.getElementById('no_hp');
+                if (noHpInput && noHpInput.value.length > 0 && noHpInput.value.length < 8) {
+                    noHpInput.classList.add('is-invalid');
+                    document.getElementById('no_hp_error').textContent = 'Nomor HP minimal 8 digit.';
+                    isValid = false;
+                }
+
+                // Validasi password
+                const passwordInput = document.getElementById('password');
+                if (passwordInput && passwordInput.value.length > 0 && passwordInput.value.length < 6) {
+                    passwordInput.classList.add('is-invalid');
+                    document.getElementById('password_error').textContent = 'Password minimal 6 karakter.';
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Simpan Perubahan';
+                    // Focus pada input pertama yang error
+                    if (noTelpInput && noTelpInput.classList.contains('is-invalid')) {
+                        noTelpInput.focus();
+                    } else if (noHpInput && noHpInput.classList.contains('is-invalid')) {
+                        noHpInput.focus();
+                    } else if (passwordInput && passwordInput.classList.contains('is-invalid')) {
+                        passwordInput.focus();
+                    }
+                    return;
+                }
+
+                // Validasi duplikasi no HP untuk RW/RT
+                if (noHpInput) {
+                    const currentNoHp = noHpInput.getAttribute('data-current-value');
+                    const newNoHp = noHpInput.value;
+
+                    if (newNoHp !== currentNoHp) {
+                        const isDuplicate = await checkDuplicatePhone(newNoHp);
+                        if (isDuplicate) {
+                            noHpInput.classList.add('is-invalid');
+                            document.getElementById('no_hp_error').textContent = 'Nomor HP sudah digunakan oleh pengguna lain.';
+                            isValid = false;
+                        } else {
+                            noHpInput.classList.remove('is-invalid');
+                        }
+                    }
+                }
+
+                // Validasi duplikasi no telepon untuk warga
+                if (noTelpInput) {
+                    const currentNoTelp = noTelpInput.getAttribute('data-current-value');
+                    const newNoTelp = noTelpInput.value;
+
+                    if (newNoTelp !== currentNoTelp) {
+                        const isDuplicate = await checkDuplicatePhone(newNoTelp);
+                        if (isDuplicate) {
+                            noTelpInput.classList.add('is-invalid');
+                            document.getElementById('no_telp_error').textContent = 'Nomor telepon sudah digunakan oleh pengguna lain.';
+                            isValid = false;
+                        } else {
+                            noTelpInput.classList.remove('is-invalid');
+                        }
+                    }
+                }
+
+                if (isValid) {
+                    this.submit();
+                } else {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Simpan Perubahan';
+                }
+            });
+
+            // Fungsi untuk memeriksa duplikasi no HP/telepon
+            async function checkDuplicatePhone(phoneNumber) {
+                try {
+                    const response = await fetch('/api/check-nophone?no_telp=' + encodeURIComponent(phoneNumber));
+                    const data = await response.json();
+                    return data.exists;
+                } catch (error) {
+                    console.error('Error checking duplicate phone:', error);
+                    return false;
+                }
             }
         });
-        
-        // Fungsi untuk memeriksa duplikasi no HP/telepon
-        async function checkDuplicatePhone(phoneNumber) {
-            try {
-                const response = await fetch('/api/check-nophone?no_telp=' + encodeURIComponent(phoneNumber));
-                const data = await response.json();
-                return data.exists;
-            } catch (error) {
-                console.error('Error checking duplicate phone:', error);
-                return false;
-            }
-        }
-    });
-</script>
+    </script>
 
 </body>
 
