@@ -14,6 +14,7 @@
                 'rt' => 'Data RT',
                 'kk' => 'Data Kartu Keluarga',
                 'penduduk' => 'Data Penduduk',
+                'histori' => 'History Log',
             ];
             $segment = Request::segment(1);
             echo $titleMap[$segment] ?? 'Dashboard';
@@ -106,6 +107,12 @@
         .privacy-section h3 {
             color: #3498db;
             margin-bottom: 10px;
+        }
+        .log-table th {
+            position: sticky;
+            top: 0;
+            background-color: #f8f9fa;
+            z-index: 10;
         }
     </style>
 
@@ -514,14 +521,14 @@
                             </a>
                         </li>
                         
-                         @hasrole('superadmin|rw|rt')
-                         <li class="sidebar-item">
-                            <a href="#" class="sidebar-link">
-                                <i class="fas fa-history"></i>
-                                <span>History Log</span>
-                            </a>
-                        </li>
-                        @endhasrole
+@hasrole('superadmin')
+<li class="sidebar-item {{ request()->is('histori*') ? 'active' : '' }}">
+    <a href="{{ route('histori.index') }}" class="sidebar-link">
+        <i class="fas fa-history"></i>
+        <span>History Log</span>
+    </a>
+</li>
+@endhasrole
 
                         <!-- <li class="sidebar-item">
                             <a href="#editLurahModal" class="sidebar-link" data-bs-toggle="modal"

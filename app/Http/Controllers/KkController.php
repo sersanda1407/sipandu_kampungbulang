@@ -16,8 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Crypt;
 use App\Providers\FonnteService;
 use Illuminate\Support\Facades\Log;
-
-
+use App\Helpers\HistoryLogHelper;
 
 class KkController extends Controller
 {
@@ -133,6 +132,9 @@ class KkController extends Controller
             // Memberikan role 'warga' ke user
             $kk->assignRole('warga');
 
+            // Catat log penambahan data KK
+            createHistoryLog('create', 'Menambahkan data KK baru: ' . $request->kepala_keluarga . ' (No. KK: ' . $request->no_kk . ')');
+
             Alert::success('Sukses!', 'Berhasil menambah kartu keluarga');
             return redirect()->back();
         } catch (\Illuminate\Database\QueryException $e) {
@@ -242,9 +244,6 @@ protected function sendWhatsAppNotifications($kk)
     }
 }
 
-
-
-
     public function resetPassword($id)
     {
         $kk = DataKk::findOrFail($id);
@@ -253,6 +252,9 @@ protected function sendWhatsAppNotifications($kk)
         // Reset password ke nilai default
         $user->password = bcrypt('password');
         $user->save();
+
+        // Catat log reset password
+        createHistoryLog('update', 'Reset password untuk KK: ' . $kk->kepala_keluarga . ' (No. KK: ' . $kk->no_kk . ')');
 
         Alert::success('Berhasil!', 'Password berhasil direset ke: password');
 
@@ -354,6 +356,9 @@ protected function sendWhatsAppNotifications($kk)
             ]);
         }
 
+        // Catat log update data KK
+        createHistoryLog('update', 'Mengupdate data KK: ' . $request->kepala_keluarga . ' (No. KK: ' . $request->no_kk . ')');
+
         Alert::success('Sukses!', 'Berhasil mengedit kartu keluarga');
         return redirect()->back();
     }
@@ -369,6 +374,10 @@ protected function sendWhatsAppNotifications($kk)
     public function destroy($id)
     {
         $data = DataKk::find($id);
+        
+        // Catat log sebelum menghapus data
+        createHistoryLog('delete', 'Menghapus data KK: ' . $data->kepala_keluarga . ' (No. KK: ' . $data->no_kk . ')');
+        
         if ($data->image) {
             Storage::delete('/foto_kk/' . $data->image);
         }

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use App\Helpers\HistoryLogHelper;
 
 
 
@@ -156,6 +157,10 @@ class PendudukController extends Controller
 
         try {
             $data->save();
+            
+            // Catat log penambahan data penduduk
+            createHistoryLog('create', 'Menambahkan data penduduk: ' . $request->nama . ' (NIK: ' . $request->nik . ') - KK: ' . $dataKk->kepala_keluarga);
+            
             Alert::success('Sukses!', 'Berhasil menambah Data Penduduk');
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->errorInfo[1] == 1062) {
@@ -267,6 +272,9 @@ class PendudukController extends Controller
 
         $data->save();
 
+        // Catat log update data penduduk
+        createHistoryLog('update', 'Mengupdate data penduduk: ' . $request->nama . ' (NIK: ' . $request->nik . ')');
+
         Alert::success('Sukses!', 'Berhasil mengedit Data Penduduk');
         return redirect()->back();
     }
@@ -280,8 +288,11 @@ class PendudukController extends Controller
      */
     public function destroy($id)
     {
-
         $data = DataPenduduk::find($id);
+        
+        // Catat log sebelum menghapus data
+        createHistoryLog('delete', 'Menghapus data penduduk: ' . $data->nama . ' (NIK: ' . $data->nik . ')');
+        
         if ($data->image_ktp) {
             Storage::delete('/foto_ktp/' . $data->image_ktp);
         }
@@ -348,6 +359,9 @@ class PendudukController extends Controller
 
         $lurah = Lurah::first();
 
+        // Catat log export data KK
+        createHistoryLog('Cetak', 'Cetak data KK: ' . $data->kepala_keluarga . ' (No. KK: ' . $data->no_kk . ')');
+
         $pdf = PDF::loadView('penduduk.export', compact('penduduk', 'lurah'))
             ->setPaper('a4', 'landscape')
             ->setWarnings(false);
@@ -375,6 +389,9 @@ class PendudukController extends Controller
         $penduduk = $this->sortPenduduk($query->get());
 
         $lurah = Lurah::first();
+
+        // Catat log export data RT
+        createHistoryLog('Cetak', 'Cetak data RT ' . $rt->rt . ' RW ' . $rw->rw . ' - Tahun: ' . ($tahun ?: 'Semua'));
 
         $filename = 'Data_Penduduk_RT' . str_pad($rt->rt, 3, '0', STR_PAD_LEFT)
             . '_RW' . str_pad($rw->rw, 3, '0', STR_PAD_LEFT);
@@ -412,6 +429,9 @@ class PendudukController extends Controller
 
         $lurah = Lurah::first();
 
+        // Catat log export data RW
+        createHistoryLog('Cetak', 'Cetak data RW ' . $rw->rw . ' - Tahun: ' . ($tahun ?: 'Semua'));
+
         $filename = 'Data_Penduduk_RW' . str_pad($rw->rw, 3, '0', STR_PAD_LEFT);
         if ($tahun) {
             $filename .= '_Tahun_' . $tahun;
@@ -440,6 +460,9 @@ class PendudukController extends Controller
         $penduduk = $this->sortPenduduk($query->get());
 
         $lurah = Lurah::first();
+
+        // Catat log export semua data
+        createHistoryLog('Cetak', 'Cetak semua data penduduk : ' . ($tahun ?: 'Semua'));
 
         $filename = 'Data_Seluruh_Warga_Kampung_Bulang';
         if ($tahun) {
@@ -489,6 +512,17 @@ class PendudukController extends Controller
         $penduduk = $this->sortPenduduk($query->with(['rt', 'rw', 'kk'])->get());
 
         $lurah = Lurah::first();
+
+        // Catat log export data filtered
+        $filterInfo = '';
+        if ($rw && $rt) {
+            $filterInfo = 'RW ' . $rw->rw . ' RT ' . $rt->rt;
+        } elseif ($rw) {
+            $filterInfo = 'RW ' . $rw->rw;
+        } elseif ($rt) {
+            $filterInfo = 'RT ' . $rt->rt;
+        }
+        createHistoryLog('Cetak', 'Cetak data penduduk - filter: ' . $filterInfo . ' - Tahun: ' . ($tahun ?: 'Semua'));
 
         $filename = 'Data_Penduduk';
         if ($rw && $rt) {
@@ -580,13 +614,4 @@ class PendudukController extends Controller
             'rt'
         ));
     }
-
-
-
-
-
-    // public function expot()
-    // {
-    //     return (new PendudukExport)->download('invoices.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
-    // }
 }

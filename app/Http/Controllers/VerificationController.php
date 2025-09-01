@@ -6,6 +6,7 @@ use App\DataKk;
 use App\Providers\FonnteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Helpers\HistoryLogHelper;
 
 class VerificationController extends Controller
 {
@@ -28,6 +29,9 @@ class VerificationController extends Controller
             // Update status verifikasi
             $kk->verifikasi = 'diterima';
             $kk->save();
+
+            // Catat log verifikasi
+            createHistoryLog('verification', 'Memverifikasi KK: ' . $kk->kepala_keluarga . ' (No. KK: ' . $kk->no_kk . ')');
 
             Log::info('KK diverifikasi: ' . $kk->id);
 
@@ -62,6 +66,9 @@ class VerificationController extends Controller
             $kk->verifikasi = 'pending';
             $kk->save();
 
+            // Catat log pembatalan verifikasi
+            createHistoryLog('verification', 'Membatalkan verifikasi KK: ' . $kk->kepala_keluarga . ' (No. KK: ' . $kk->no_kk . ')');
+
             Log::info('Verifikasi dibatalkan untuk KK: ' . $kk->id);
 
             // Kirim notifikasi hanya jika sebelumnya statusnya 'diterima'
@@ -78,69 +85,72 @@ class VerificationController extends Controller
         }
     }
 
-/**
- * Tolak verifikasi, hapus data, dan kirim notifikasi
- */
-public function reject($id)
-{
-    try {
-        $kk = DataKk::findOrFail($id);
-        
-        // Simpan data untuk notifikasi sebelum dihapus
-        $kkDataForNotification = [
-            'kepala_keluarga' => $kk->kepala_keluarga,
-            'no_kk' => $kk->no_kk,
-            'no_telp' => $kk->no_telp,
-            'alamat' => $kk->alamat,
-            'rt_id' => $kk->rt_id,
-            'rw_id' => $kk->rw_id
-        ];
+    /**
+     * Tolak verifikasi, hapus data, dan kirim notifikasi
+     */
+    public function reject($id)
+    {
+        try {
+            $kk = DataKk::findOrFail($id);
+            
+            // Catat log sebelum menghapus data
+            createHistoryLog('verification', 'Menolak dan menghapus KK: ' . $kk->kepala_keluarga . ' (No. KK: ' . $kk->no_kk . ')');
+            
+            // Simpan data untuk notifikasi sebelum dihapus
+            $kkDataForNotification = [
+                'kepala_keluarga' => $kk->kepala_keluarga,
+                'no_kk' => $kk->no_kk,
+                'no_telp' => $kk->no_telp,
+                'alamat' => $kk->alamat,
+                'rt_id' => $kk->rt_id,
+                'rw_id' => $kk->rw_id
+            ];
 
-        // Hapus user terkait jika ada
-        if ($kk->user) {
-            $kk->user->delete();
-            Log::info('User terkait dihapus: ' . $kk->user->id);
+            // Hapus user terkait jika ada
+            if ($kk->user) {
+                $kk->user->delete();
+                Log::info('User terkait dihapus: ' . $kk->user->id);
+            }
+
+            // Hapus data KK
+            $kk->delete();
+            Log::info('KK ditolak dan dihapus: ' . $id);
+
+            // Kirim notifikasi penolakan menggunakan data yang disimpan
+            $this->sendRejectionNotifications((object)$kkDataForNotification);
+            
+            return redirect()->back()->with('success', 'KK berhasil ditolak, data dihapus, dan notifikasi telah dikirim.');
+
+        } catch (\Exception $e) {
+            Log::error('Rejection error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        // Hapus data KK
-        $kk->delete();
-        Log::info('KK ditolak dan dihapus: ' . $id);
-
-        // Kirim notifikasi penolakan menggunakan data yang disimpan
-        $this->sendRejectionNotifications((object)$kkDataForNotification);
-        
-        return redirect()->back()->with('success', 'KK berhasil ditolak, data dihapus, dan notifikasi telah dikirim.');
-
-    } catch (\Exception $e) {
-        Log::error('Rejection error: ' . $e->getMessage());
-        return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
-}
 
-/**
- * Kirim notifikasi penolakan
- */
-protected function sendRejectionNotifications($kkData)
-{
-    try {
-        Log::info('Mengirim notifikasi penolakan untuk KK: ' . $kkData->no_kk);
+    /**
+     * Kirim notifikasi penolakan
+     */
+    protected function sendRejectionNotifications($kkData)
+    {
+        try {
+            Log::info('Mengirim notifikasi penolakan untuk KK: ' . $kkData->no_kk);
 
-        // 1. Kirim notifikasi ke user
-        $userResult = $this->fonnteService->sendVerificationRejectedToUser($kkData);
-        Log::info('Notifikasi penolakan ke user: ' . ($userResult ? 'Berhasil' : 'Gagal'));
+            // 1. Kirim notifikasi ke user
+            $userResult = $this->fonnteService->sendVerificationRejectedToUser($kkData);
+            Log::info('Notifikasi penolakan ke user: ' . ($userResult ? 'Berhasil' : 'Gagal'));
 
-        // 2. Kirim notifikasi ke RT
-        $rtResult = $this->fonnteService->sendVerificationRejectedToRT($kkData);
-        Log::info('Notifikasi penolakan ke RT: ' . ($rtResult ? 'Berhasil' : 'Gagal'));
+            // 2. Kirim notifikasi ke RT
+            $rtResult = $this->fonnteService->sendVerificationRejectedToRT($kkData);
+            Log::info('Notifikasi penolakan ke RT: ' . ($rtResult ? 'Berhasil' : 'Gagal'));
 
-        // 3. Kirim notifikasi ke RW
-        $rwResult = $this->fonnteService->sendVerificationRejectedToRW($kkData);
-        Log::info('Notifikasi penolakan ke RW: ' . ($rwResult ? 'Berhasil' : 'Gagal'));
+            // 3. Kirim notifikasi ke RW
+            $rwResult = $this->fonnteService->sendVerificationRejectedToRW($kkData);
+            Log::info('Notifikasi penolakan ke RW: ' . ($rwResult ? 'Berhasil' : 'Gagal'));
 
-    } catch (\Exception $e) {
-        Log::error('Error notifikasi penolakan: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Error notifikasi penolakan: ' . $e->getMessage());
+        }
     }
-}
 
     /**
      * Kirim notifikasi pembatalan verifikasi
@@ -174,6 +184,9 @@ protected function sendRejectionNotifications($kkData)
     {
         try {
             $kk = DataKk::findOrFail($id);
+            
+            // Catat log pengiriman pengingat
+            createHistoryLog('verification', 'Mengirim pengingat verifikasi untuk KK: ' . $kk->kepala_keluarga . ' (No. KK: ' . $kk->no_kk . ')');
             
             $results = [];
             

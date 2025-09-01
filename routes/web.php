@@ -16,6 +16,7 @@ use App\Http\Controllers\RtController;
 use App\Http\Controllers\VerificationController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 use App\Http\Controllers\InboxController;
+use App\Http\Controllers\HistoryLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -83,6 +84,12 @@ Route::middleware(['auth'])->group(function () {
     // Route untuk validasi duplikasi no HP/telepon
 Route::get('/api/check-nophone', [DashboardController::class, 'checkDuplicatenoPhone'])->name('api.check-nophone');
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    // History Log Routes
+// History Log Routes
+Route::get('/histori', [HistoryLogController::class, 'index'])
+    ->name('histori.index')
+    ->middleware('auth');
+
 
     /*
     |--------------------------------------------------------------------------
