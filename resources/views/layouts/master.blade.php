@@ -55,6 +55,58 @@
             border-radius: 50%;
             display: inline-block;
         }
+         /* Privacy Policy Modal Styles */
+        .privacy-modal {
+            display: none;
+            position: fixed;
+            z-index: 1060;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .privacy-modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .privacy-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .privacy-close:hover {
+            color: #000;
+        }
+        
+        .privacy-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .privacy-section {
+            margin-bottom: 20px;
+        }
+        
+        .privacy-section h3 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
     </style>
 
 
@@ -231,6 +283,83 @@
         </div>
     </div>
 
+<!-- Privacy Policy Modal -->
+<div id="privacyModal" class="privacy-modal">
+    <div class="privacy-modal-content">
+        <span class="privacy-close" onclick="closePrivacyModal()">&times;</span>
+        <h2 class="privacy-title">Kebijakan Privasi SIPANDU Kampung Bulang</h2>
+        
+        <div class="privacy-section">
+            <h3>1. Pengumpulan Informasi</h3>
+            <p>Kami mengumpulkan informasi pribadi yang Anda berikan secara langsung saat menggunakan layanan SIPANDU, sesuai dengan ketentuan Undang-Undang Dasar 1945 Pasal 28G dan Undang-Undang Nomor 27 Tahun 2022 tentang Perlindungan Data Pribadi. Informasi yang dikumpulkan mencakup:</p>
+            <ul>
+                <li>Data identitas (nama, NIK, nomor KK)</li>
+                <li>Data kontak (alamat, nomor telepon, email)</li>
+                <li>Data kependudukan (status keluarga, data anggota keluarga)</li>
+                <li>Data lokasi (alamat tempat tinggal, RT/RW)</li>
+            </ul>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>2. Penggunaan Informasi</h3>
+            <p>Informasi pribadi digunakan untuk kepentingan pelayanan publik, termasuk namun tidak terbatas pada:</p>
+            <ul>
+                <li>Memverifikasi identitas Anda sebagai warga Kampung Bulang</li>
+                <li>Menyediakan layanan administrasi kependudukan</li>
+                <li>Mempermudah proses pelayanan publik di tingkat RT/RW</li>
+                <li>Komunikasi terkait layanan dan informasi penting</li>
+                <li>Peningkatan kualitas layanan</li>
+                <li>Statistik dan perencanaan pembangunan wilayah</li>
+            </ul>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>3. Perlindungan Data</h3>
+            <p>Kami berkomitmen melindungi data pribadi Anda dengan langkah teknis dan organisasi yang sesuai. Data hanya dapat diakses oleh pihak berwenang dan dilindungi dari akses, penggunaan, atau pengungkapan yang tidak sah, sebagaimana diatur dalam UU Perlindungan Data Pribadi.</p>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>4. Penyimpanan Data</h3>
+            <p>Data pribadi Anda akan disimpan selama diperlukan untuk tujuan yang dijelaskan dalam kebijakan ini atau sesuai ketentuan hukum. Apabila data tidak lagi diperlukan, data akan dihapus atau dianonimkan sesuai dengan peraturan yang berlaku.</p>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>5. Hak Anda</h3>
+            <p>Sesuai UU Perlindungan Data Pribadi, Anda memiliki hak untuk:</p>
+            <ul>
+                <li>Mengakses informasi pribadi yang kami simpan</li>
+                <li>Memperbaiki data pribadi yang tidak akurat</li>
+                <li>Meminta penghapusan data dalam kondisi tertentu</li>
+                <li>Menarik kembali persetujuan atas pemrosesan data pribadi</li>
+                <li>Mengajukan keberatan atas penggunaan data Anda</li>
+            </ul>
+            <p>Untuk menggunakan hak-hak ini, silakan hubungi admin SIPANDU Kampung Bulang.</p>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>6. Pembagian Informasi</h3>
+            <p>Kami tidak menjual atau memperdagangkan informasi pribadi Anda. Data hanya dapat dibagikan kepada pihak ketiga dalam kondisi:</p>
+            <ul>
+                <li>Atas persetujuan Anda</li>
+                <li>Pemenuhan kewajiban hukum atau perintah pengadilan</li>
+                <li>Penyediaan layanan publik yang Anda minta</li>
+                <li>Perlindungan hak, keamanan, dan properti Kelurahan atau warga</li>
+            </ul>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>7. Perubahan Kebijakan</h3>
+            <p>Kebijakan ini dapat diperbarui sewaktu-waktu sesuai perkembangan hukum dan teknologi. Setiap perubahan akan diumumkan melalui situs resmi atau media komunikasi lain yang ditetapkan oleh Kelurahan Kampung Bulang. Dengan tetap menggunakan layanan SIPANDU, Anda dianggap menyetujui perubahan kebijakan tersebut.</p>
+        </div>
+        
+        
+        <div class="text-center mt-4">
+            <button class="btn btn-primary" onclick="closePrivacyModal()">Saya Mengerti</button>
+        </div>
+    </div>
+</div>
+
+
 
     <div id="app">
         <div id="sidebar" class="active">
@@ -378,6 +507,22 @@
                             </a>
                         </li>
 
+ <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="showPrivacyPolicy()">
+                                <i class="fas fa-shield"></i>
+                                <span>Privacy & Policy</span>
+                            </a>
+                        </li>
+                        
+                         @hasrole('superadmin|rw|rt')
+                         <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <i class="fas fa-history"></i>
+                                <span>History Log</span>
+                            </a>
+                        </li>
+                        @endhasrole
+
                         <!-- <li class="sidebar-item">
                             <a href="#editLurahModal" class="sidebar-link" data-bs-toggle="modal"
                                 data-bs-target="#editLurahModal">
@@ -431,6 +576,24 @@
     <script src={{ asset('assets/js/extensions/simple-datatables.js') }}></script>
     <script>
         document.getElementById("year").innerHTML = new Date().getFullYear() + " &copy; SIPANDU | Kampung Bulang";
+
+        // Fungsi untuk menampilkan modal privacy policy
+        function showPrivacyPolicy() {
+            document.getElementById('privacyModal').style.display = 'block';
+        }
+        
+        // Fungsi untuk menutup modal privacy policy
+        function closePrivacyModal() {
+            document.getElementById('privacyModal').style.display = 'none';
+        }
+        
+        // Tutup modal jika klik di luar konten
+        window.onclick = function(event) {
+            const privacyModal = document.getElementById('privacyModal');
+            if (event.target == privacyModal) {
+                privacyModal.style.display = 'none';
+            }
+        }
     </script>
 
 <script>

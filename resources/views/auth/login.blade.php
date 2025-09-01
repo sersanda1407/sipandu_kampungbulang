@@ -9,15 +9,18 @@
     <link rel="stylesheet" href="assets/css/pages/auth.css">
     <link rel="shortcut icon" href="assets/images/logo/2.webp" loading="lazy" type="image/png">
     <style>
-            .phone-checking {
-        color: #ffc107;
-    }
-    .phone-available {
-        color: #28a745;
-    }
-    .phone-taken {
-        color: #dc3545;
-    }
+        .phone-checking {
+            color: #ffc107;
+        }
+
+        .phone-available {
+            color: #28a745;
+        }
+
+        .phone-taken {
+            color: #dc3545;
+        }
+
         .modal-custom {
             display: none;
             position: fixed;
@@ -63,6 +66,82 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+        
+        /* Additional styles for privacy policy */
+        .privacy-check {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .privacy-link {
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        
+        .privacy-link:hover {
+            color: #0056b3;
+        }
+        
+        .privacy-modal {
+            display: none;
+            position: fixed;
+            z-index: 1060;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .privacy-modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .privacy-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .privacy-close:hover {
+            color: #000;
+        }
+        
+        .privacy-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .privacy-section {
+            margin-bottom: 20px;
+        }
+        
+        .privacy-section h3 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed !important;
         }
     </style>
 </head>
@@ -139,19 +218,6 @@
                                         Daftar di sini
                                     </button>
                                 </p>
-
-                                <div class="alert alert-info d-flex align-items-center mt-4 mb-4" role="alert">
-                                    <i class="bi bi-info-circle-fill me-2"></i>
-                                    <div>
-                                        Jika login sebagai warga, gunakan:
-                                        <ul class="mb-0 mt-1">
-                                            <li>Username: <strong>Nomor Kartu Keluarga <span
-                                                        class="text-danger">*</span></strong></li>
-                                            <li>Password (default): <strong>password <span
-                                                        class="text-danger">*</span></strong></li>
-                                        </ul>
-                                    </div>
-                                </div>
                             </form>
                         </div>
                     </div>
@@ -176,7 +242,7 @@
         <div class="modal-content-custom">
             <span class="close-button" onclick="closeModal()">&times;</span>
             <h4 class="text-center mb-3 fw-bold">Pendaftaran Akun Warga</h4>
-            <form action="{{ route('kk.storePublic') }}" method="POST" enctype="multipart/form-data">
+            <form id="registrationForm" action="{{ route('kk.storePublic') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="form-group mb-3">
@@ -208,11 +274,12 @@
                     </select>
                 </div>
 
-<div class="form-group mb-3">
-    <label for="no_telp">No Telepon</label>
-    <input id="no_hp" name="no_telp" class="form-control" placeholder="Masukkan nomor telepon" maxlength="12" minlength="8" required>
-    <div id="phone-check-result" class="form-text"></div>
-</div>
+                <div class="form-group mb-3">
+                    <label for="no_telp">No Telepon</label>
+                    <input id="no_hp" name="no_telp" class="form-control" placeholder="Masukkan nomor telepon"
+                        maxlength="12" minlength="8" required>
+                    <div id="phone-check-result" class="form-text"></div>
+                </div>
 
 
                 <div class="form-group mb-3">
@@ -222,35 +289,126 @@
                 </div>
 
                 <div class="mb-3">
-    <label>Upload Foto Kartu Keluarga</label>
-    <input type="file" name="image" class="form-control upload-gambar" accept="image/*" required>
-</div>
+                    <label>Upload Foto Kartu Keluarga</label>
+                    <input type="file" name="image" class="form-control upload-gambar" accept="image/*" required>
+                </div>
+                
+                <!-- Privacy Policy Checkbox -->
+                <div class="privacy-check">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="privacyPolicy" required>
+                        <label class="form-check-label" for="privacyPolicy">
+                            Saya setuju dengan <span class="privacy-link" onclick="showPrivacyPolicy()">Kebijakan Privasi</span> yang berlaku
+                        </label>
+                    </div>
+                </div>
 
                 <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-primary w-100">Daftar</button>
+                    <button type="submit" id="submitButton" class="btn btn-primary w-100 btn-disabled" disabled>Daftar</button>
                 </div>
             </form>
         </div>
     </div>
+    
+<!-- Privacy Policy Modal -->
+<div id="privacyModal" class="privacy-modal">
+    <div class="privacy-modal-content">
+        <span class="privacy-close" onclick="closePrivacyModal()">&times;</span>
+        <h2 class="privacy-title">Kebijakan Privasi</h2>
+        
+        <div class="privacy-section">
+            <h3>1. Pengumpulan Data Pribadi</h3>
+            <p>
+                Kami mengumpulkan data pribadi yang Anda berikan secara langsung saat mendaftar di SIPANDU Kampung Bulang, termasuk namun tidak terbatas pada:
+            </p>
+            <ul>
+                <li>Nama lengkap</li>
+                <li>Nomor Induk Kependudukan (NIK)</li>
+                <li>Nomor Kartu Keluarga (KK)</li>
+                <li>Alamat domisili</li>
+                <li>Nomor telepon atau kontak lain yang dapat dihubungi</li>
+            </ul>
+            <p>
+                Pengumpulan data ini sesuai dengan Undang-Undang Dasar Negara Republik Indonesia Tahun 1945 Pasal 28G ayat (1) dan Undang-Undang Nomor 27 Tahun 2022 tentang Perlindungan Data Pribadi.
+            </p>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>2. Tujuan Penggunaan Data</h3>
+            <p>Data pribadi Anda digunakan untuk kepentingan:</p>
+            <ul>
+                <li>Memverifikasi identitas Anda sebagai warga Kampung Bulang</li>
+                <li>Pendataan administrasi kependudukan di tingkat RT, RW, dan Kelurahan</li>
+                <li>Penyelenggaraan program pemerintah (misalnya bantuan sosial, kesehatan, atau sensus)</li>
+                <li>Komunikasi resmi terkait layanan masyarakat</li>
+                <li>Peningkatan kualitas layanan SIPANDU</li>
+            </ul>
+            <p>
+                Data tidak akan digunakan untuk tujuan komersial atau disebarluaskan kepada pihak ketiga tanpa dasar hukum yang sah.
+            </p>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>3. Perlindungan Data</h3>
+            <p>
+                Kami menerapkan langkah-langkah teknis dan organisasi yang wajar untuk melindungi data pribadi Anda dari akses, perubahan, pengungkapan, atau penggunaan yang tidak sah.
+                Akses hanya diberikan kepada pihak berwenang (RT, RW, atau Kelurahan) sesuai kebutuhan administratif.
+            </p>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>4. Penyimpanan Data</h3>
+            <p>
+                Data pribadi Anda akan disimpan selama masih diperlukan untuk tujuan administratif atau sesuai kewajiban hukum yang berlaku. Setelah tujuan tersebut tercapai, data dapat dihapus atau dianonimkan sesuai ketentuan hukum.
+            </p>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>5. Hak Warga</h3>
+            <p>Sesuai dengan UU Perlindungan Data Pribadi, Anda memiliki hak untuk:</p>
+            <ul>
+                <li>Mengakses data pribadi yang tersimpan di sistem</li>
+                <li>Meminta perbaikan atas data yang tidak akurat</li>
+                <li>Meminta penghapusan data pribadi Anda, kecuali masih diwajibkan untuk kepentingan administrasi sesuai hukum</li>
+                <li>Mendapatkan informasi mengenai penggunaan data Anda</li>
+            </ul>
+            <p>
+                Untuk menggunakan hak ini, Anda dapat menghubungi Admin SIPANDU Kampung Bulang.
+            </p>
+        </div>
+        
+        <div class="privacy-section">
+            <h3>6. Perubahan Kebijakan</h3>
+            <p>
+                Kebijakan privasi ini dapat diperbarui dari waktu ke waktu sesuai kebutuhan. Setiap perubahan akan diumumkan melalui sistem SIPANDU atau media komunikasi resmi lainnya.
+            </p>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button class="btn btn-primary" onclick="closePrivacyModal()">Saya Mengerti</button>
+        </div>
+    </div>
+</div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-    document.querySelectorAll('.upload-gambar').forEach(function(input) {
-        input.addEventListener('change', function () {
-            const file = this.files[0];
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
-            if (file && !allowedTypes.includes(file.type)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops!',
-                    text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
-                });
-                this.value = '';
-            }
+        document.querySelectorAll('.upload-gambar').forEach(function (input) {
+            input.addEventListener('change', function () {
+                const file = this.files[0];
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+                if (file && !allowedTypes.includes(file.type)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops!',
+                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                    });
+                    this.value = '';
+                }
+            });
         });
-    });
-</script>
+    </script>
 
 
     <script>
@@ -293,13 +451,13 @@
                 icon: 'error',
                 title: 'Login Gagal!',
                 html: `
-                        @if ($errors->has('email'))
-                            <div style="text-align:centre;">Silahkan cek kembali. Email atau Password Salah</div>
-                        @endif
-                        @if ($errors->has('password'))
-                            <div style="text-align:centre;"><b>Password yang anda input salah</div>
-                        @endif
-                    `,
+                            @if ($errors->has('email'))
+                                <div style="text-align:centre;">Silahkan cek kembali. Email atau Password Salah</div>
+                            @endif
+                            @if ($errors->has('password'))
+                                <div style="text-align:centre;"><b>Password yang anda input salah</div>
+                            @endif
+                        `,
                 timer: 10000
             });
         @endif
@@ -362,69 +520,119 @@
     </script>
 
     <script>
-    // Fungsi untuk cek duplikasi nomor HP
-    function checkDuplicatePhone(phoneNumber) {
-        return fetch('/api/check-phone?no_telp=' + encodeURIComponent(phoneNumber))
-            .then(response => response.json())
-            .then(data => data.exists);
-    }
-
-    // Event listener untuk input nomor HP
-    document.getElementById('no_hp').addEventListener('blur', function(e) {
-        const phoneNumber = this.value.trim();
-        
-        if (phoneNumber.length >= 8) { // Minimal 8 digit
-            checkDuplicatePhone(phoneNumber).then(isDuplicate => {
-                if (isDuplicate) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Nomor HP Sudah Terdaftar',
-                        text: 'Nomor HP ini sudah terdaftar dalam sistem. Silakan gunakan nomor lain.',
-                        timer: 5000
-                    });
-                    
-                    // Reset input
-                    this.value = '';
-                    this.focus();
-                }
-            }).catch(error => {
-                console.error('Error checking phone:', error);
-            });
+        // Fungsi untuk cek duplikasi nomor HP
+        function checkDuplicatePhone(phoneNumber) {
+            return fetch('/api/check-phone?no_telp=' + encodeURIComponent(phoneNumber))
+                .then(response => response.json())
+                .then(data => data.exists);
         }
-    });
 
-    // Juga cek saat form disubmit
-    document.querySelector('form[action="{{ route('kk.storePublic') }}"]').addEventListener('submit', function(e) {
-        const phoneInput = document.getElementById('no_hp');
-        const phoneNumber = phoneInput.value.trim();
+        // Event listener untuk input nomor HP
+        document.getElementById('no_hp').addEventListener('blur', function (e) {
+            const phoneNumber = this.value.trim();
+
+            if (phoneNumber.length >= 8) { // Minimal 8 digit
+                checkDuplicatePhone(phoneNumber).then(isDuplicate => {
+                    if (isDuplicate) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Nomor HP Sudah Terdaftar',
+                            text: 'Nomor HP ini sudah terdaftar dalam sistem. Silakan gunakan nomor lain.',
+                            timer: 5000
+                        });
+
+                        // Reset input
+                        this.value = '';
+                        this.focus();
+                    }
+                }).catch(error => {
+                    console.error('Error checking phone:', error);
+                });
+            }
+        });
+
+        // Juga cek saat form disubmit
+        document.querySelector('form[action="{{ route('kk.storePublic') }}"]').addEventListener('submit', function (e) {
+            const phoneInput = document.getElementById('no_hp');
+            const phoneNumber = phoneInput.value.trim();
+
+            if (phoneNumber.length >= 8) {
+                e.preventDefault(); // Prevent form submission sementara
+
+                checkDuplicatePhone(phoneNumber).then(isDuplicate => {
+                    if (isDuplicate) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Tidak Dapat Mendaftar',
+                            text: 'Nomor HP ini sudah terdaftar dalam sistem. Silakan gunakan nomor lain.',
+                            timer: 5000
+                        });
+
+                        phoneInput.value = '';
+                        phoneInput.focus();
+                    } else {
+                        // Jika tidak duplicate, submit form
+                        e.target.submit();
+                    }
+                }).catch(error => {
+                    console.error('Error checking phone:', error);
+                    e.target.submit(); // Submit anyway jika error
+                });
+            }
+        });
+    </script>
+    
+    <script>
+        // Fungsi untuk menampilkan modal privacy policy
+        function showPrivacyPolicy() {
+            document.getElementById('privacyModal').style.display = 'block';
+        }
         
-        if (phoneNumber.length >= 8) {
-            e.preventDefault(); // Prevent form submission sementara
+        // Fungsi untuk menutup modal privacy policy
+        function closePrivacyModal() {
+            document.getElementById('privacyModal').style.display = 'none';
+        }
+        
+        // Mengatur status tombol submit berdasarkan checkbox
+        document.getElementById('privacyPolicy').addEventListener('change', function() {
+            const submitButton = document.getElementById('submitButton');
+            if (this.checked) {
+                submitButton.disabled = false;
+                submitButton.classList.remove('btn-disabled');
+            } else {
+                submitButton.disabled = true;
+                submitButton.classList.add('btn-disabled');
+            }
+        });
+        
+        // Validasi form sebelum submit
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            const privacyCheckbox = document.getElementById('privacyPolicy');
             
-            checkDuplicatePhone(phoneNumber).then(isDuplicate => {
-                if (isDuplicate) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Tidak Dapat Mendaftar',
-                        text: 'Nomor HP ini sudah terdaftar dalam sistem. Silakan gunakan nomor lain.',
-                        timer: 5000
-                    });
-                    
-                    phoneInput.value = '';
-                    phoneInput.focus();
-                } else {
-                    // Jika tidak duplicate, submit form
-                    e.target.submit();
-                }
-            }).catch(error => {
-                console.error('Error checking phone:', error);
-                e.target.submit(); // Submit anyway jika error
-            });
+            if (!privacyCheckbox.checked) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Persetujuan Diperlukan',
+                    text: 'Anda harus menyetujui Kebijakan Privasi sebelum mendaftar',
+                    timer: 5000
+                });
+            }
+        });
+        
+        // Tutup modal jika klik di luar konten
+        window.onclick = function(event) {
+            const privacyModal = document.getElementById('privacyModal');
+            if (event.target == privacyModal) {
+                privacyModal.style.display = 'none';
+            }
+            
+            const registerModal = document.getElementById('registerModal');
+            if (event.target == registerModal) {
+                registerModal.style.display = 'none';
+            }
         }
-    });
-</script>
-
-
+    </script>
 
 </body>
 

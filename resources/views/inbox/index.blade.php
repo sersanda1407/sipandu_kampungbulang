@@ -274,7 +274,7 @@ function confirmAccept(id, nama, nokk) {
         html: `Data atas nama <strong>${nama}</strong> dengan No. KK <strong>${nokk}</strong> akan diterima dan notifikasi WhatsApp akan dikirim ke warga.`,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Terima & Kirim Notifikasi',
+        confirmButtonText: 'Terima',
         cancelButtonText: 'Batal',
         confirmButtonColor: '#28a745',
         cancelButtonColor: '#6c757d'
@@ -291,7 +291,7 @@ function confirmReject(id, nama, nokk) {
         html: `Data atas nama <strong>${nama}</strong> dengan No. KK <strong>${nokk}</strong> akan <b>DITOLAK</b> dan notifikasi akan dikirim ke warga dan RT/RW.`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Tolak & Kirim Notifikasi',
+        confirmButtonText: 'Tolak',
         cancelButtonText: 'Batal',
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d'
