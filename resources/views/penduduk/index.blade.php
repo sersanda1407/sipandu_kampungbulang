@@ -137,6 +137,7 @@
                         </select>
                     </div>
 
+<label for="keterangan" class="form-label">Keterangan Tambahan</label>
                     {{-- Checklist tambahan --}}
                     <div class="row">
                         @php
