@@ -164,7 +164,7 @@
                 <div id="auth-left">
                     <div class="auth-logo pc-only">
                         <h1>SIPANDU</h1>
-                        <p>Sistem Informasi Pendataan Penduduk Terpadu</p>
+                        <p>Sistem Pendataan Kependudukan Terpadu Kelurahan Kampung Bulang</p>
                     </div>
 
                     <div class="card shadow-lg bg-white rounded" style="width: 100%; max-width: 800px; margin: auto;">

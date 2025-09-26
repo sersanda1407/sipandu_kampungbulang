@@ -10,11 +10,11 @@
             $titleMap = [
                 'dashboard' => 'Dashboard',
                 'inbox' => 'Kotak Verifikasi',
-                'rw' => 'Data RW',
-                'rt' => 'Data RT',
+                'rw' => 'Data Ketua RW Kampung Bulang',
+                'rt' => 'Data Ketua RT Kampung Bulang',
                 'kk' => 'Data Kartu Keluarga',
-                'penduduk' => 'Data Penduduk',
-                'histori' => 'History Log',
+                'penduduk' => 'Data Penduduk Kelurahan Kampung Bulang',
+                'histori' => 'History Log User',
             ];
             $segment = Request::segment(1);
             echo $titleMap[$segment] ?? 'Dashboard';
