@@ -7,7 +7,7 @@
     <section>
         <div class="container-fluid">
             <div class="page-heading d-flex justify-content-between align-items-center">
-                <h3>Dashboard</h3>
+                <h3>Dashboard1</h3>
             </div>
 
             @hasrole('superadmin')
