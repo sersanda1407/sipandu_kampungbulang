@@ -73,7 +73,7 @@ class PendudukController extends Controller
 
         $selectRw = DataRw::get();
 
-        // ✅ Ambil angka RT unik, sort dari kecil ke besar
+        // Ambil angka RT unik, sort dari kecil ke besar
         $selectRt = DataRt::select('id', 'rt')
             ->get()
             ->map(function ($item) {
@@ -127,6 +127,12 @@ class PendudukController extends Controller
             'image_ktp' => 'required|mimes:jpeg,jpg,png,gif,svg|max:3072',
             'no_hp' => 'required',
         ]);
+
+        // Cek duplikat no_hp hanya di data Penduduk saja
+        if (DataPenduduk::where('no_hp', $request->no_hp)->exists()) {
+            Alert::error('Gagal!', 'Nomor HP sudah digunakan.');
+            return redirect()->back()->withInput();
+        }
 
         $data = new DataPenduduk();
         $data->nama = $request->nama;
@@ -233,6 +239,14 @@ class PendudukController extends Controller
 
             if ($existing) {
                 Alert::error('Gagal!', 'NIK sudah terdaftar, tidak bisa diubah.');
+                return redirect()->back()->withInput();
+            }
+        }
+
+        // Cek jika no_hp diubah dan sudah ada di data penduduk lain
+        if ($request->no_hp != $data->no_hp) {
+            if (DataPenduduk::where('no_hp', $request->no_hp)->exists()) {
+                Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
                 return redirect()->back()->withInput();
             }
         }
@@ -596,7 +610,7 @@ class PendudukController extends Controller
 
         $data = $query->get();
 
-        // ✅ ambil data RT dan RW dari ID terdekripsi
+        // ambil data RT dan RW dari ID terdekripsi
         $rw = $rwId ? DataRw::find($rwId) : null;
         $rt = $rtId ? DataRt::with('rw')->find($rtId) : null;
 

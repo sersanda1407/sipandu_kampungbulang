@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\DataKk;
 use App\DataRw;
 use App\DataRt;
+use App\DataPenduduk;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
@@ -58,9 +59,12 @@ Route::get('/api/check-phone', function (Request $request) {
 
     // Opsi: Beri tahu juga di tabel mana nomor itu ditemukan (lebih informatif)
     $foundIn = [];
-    if ($existsInKk) $foundIn[] = 'DataKk';
-    if ($existsInRt) $foundIn[] = 'Rt';
-    if ($existsInRw) $foundIn[] = 'Rw';
+    if ($existsInKk)
+        $foundIn[] = 'DataKk';
+    if ($existsInRt)
+        $foundIn[] = 'Rt';
+    if ($existsInRw)
+        $foundIn[] = 'Rw';
 
     return response()->json([
         'exists' => $exists,
@@ -82,13 +86,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/edit-profile', [DashboardController::class, 'editProfile'])->name('profile.edit');
     Route::put('/edit-lurah', [DashboardController::class, 'editLurah'])->name('edit.lurah');
     // Route untuk validasi duplikasi no HP/telepon
-Route::get('/api/check-nophone', [DashboardController::class, 'checkDuplicatenoPhone'])->name('api.check-nophone');
+    Route::get('/api/check-nophone', [DashboardController::class, 'checkDuplicatenoPhone'])->name('api.check-nophone');
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     // History Log Routes
 // History Log Routes
-Route::get('/histori', [HistoryLogController::class, 'index'])
-    ->name('histori.index')
-    ->middleware('auth');
+    Route::get('/histori', [HistoryLogController::class, 'index'])
+        ->name('histori.index')
+        ->middleware('auth');
 
 
     /*
@@ -105,8 +109,22 @@ Route::get('/histori', [HistoryLogController::class, 'index'])
         Route::get('/{id}/showRW', [RwController::class, 'show'])->name('rw.show');
 
         // API Check
+        // Route::get('/api/check-nohp', function (Request $r) {
+        //     return ['exists' => DataRw::where('no_hp', $r->no_hp)->exists()];
+        // })->name('api.check-nohp');
         Route::get('/api/check-nohp', function (Request $r) {
-            return ['exists' => DataRw::where('no_hp', $r->no_hp)->exists()];
+            $exists = false;
+
+            // Cek di semua tabel yang memiliki no_hp
+            if (DataRt::where('no_hp', $r->no_hp)->exists()) {
+                $exists = true;
+            } elseif (DataRw::where('no_hp', $r->no_hp)->exists()) {
+                $exists = true;
+            } elseif (DataPenduduk::where('no_hp', $r->no_hp)->exists()) {
+                $exists = true;
+            }
+
+            return ['exists' => $exists];
         })->name('api.check-nohp');
 
         Route::get('/api/check-rw', function (Request $r) {
@@ -127,9 +145,24 @@ Route::get('/histori', [HistoryLogController::class, 'index'])
         Route::post('/reset-password/{id}', [RtController::class, 'resetPassword'])->name('rt.resetPassword');
         Route::get('/{id}/showRT', [RtController::class, 'show'])->name('rt.show');
 
+        // API Check untuk data RT saja
+        // Route::get('/api/check-nohp', function (Request $r) {
+        //     return ['exists' => DataRt::where('no_hp', $r->no_hp)->exists()];
+        // })->name('api.check-nohp');
         // API Check
         Route::get('/api/check-nohp', function (Request $r) {
-            return ['exists' => DataRt::where('no_hp', $r->no_hp)->exists()];
+            $exists = false;
+
+            // Cek di semua tabel yang memiliki no_hp
+            if (DataRt::where('no_hp', $r->no_hp)->exists()) {
+                $exists = true;
+            } elseif (DataRw::where('no_hp', $r->no_hp)->exists()) {
+                $exists = true;
+            } elseif (DataPenduduk::where('no_hp', $r->no_hp)->exists()) {
+                $exists = true;
+            }
+
+            return ['exists' => $exists];
         })->name('api.check-nohp');
     });
 

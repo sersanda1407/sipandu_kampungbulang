@@ -6,6 +6,7 @@ use App\DataRt;
 use App\DataRw;
 use App\User;
 use App\Lurah;
+use App\DataPenduduk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -61,14 +62,20 @@ class RtController extends Controller
             'periode_akhir' => 'required'
         ]);
 
-        // ❗ Cek duplikat RT di RW yang sama
+        // Cek duplikat RT di RW yang sama
         if (DataRt::where('rt', $request->rt)->where('rw_id', $request->rw_id)->exists()) {
             Alert::error('Gagal!', 'Nomor Wilayah RT ' . $request->rt . ' sudah terdaftar di wilayah RW tersebut.');
             return redirect()->back()->withInput();
         }
 
-        // ❗ Cek duplikat no_hp
-        if (DataRt::where('no_hp', $request->no_hp)->exists()) {
+        // Cek duplikat no_hp hanya di data RT saja
+        // if (DataRt::where('no_hp', $request->no_hp)->exists()) {
+        //     Alert::error('Gagal!', 'Nomor HP sudah digunakan.');
+        //     return redirect()->back()->withInput();
+        // }
+
+        // Cek duplikat no_hp di seluruh data
+        if ($this->isPhoneNumberExists($request->no_hp)) {
             Alert::error('Gagal!', 'Nomor HP sudah digunakan.');
             return redirect()->back()->withInput();
         }
@@ -147,15 +154,23 @@ class RtController extends Controller
             'periode_akhir' => 'required',
         ]);
 
-        // ❗ Cek jika no_hp diubah dan sudah ada di data lain
+        // Cek jika no_hp diubah dan sudah ada di data lain tapi di Data RT saja
+        // if ($request->no_hp != $data->no_hp) {
+        //     if (DataRt::where('no_hp', $request->no_hp)->exists()) {
+        //         Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
+        //         return redirect()->back()->withInput();
+        //     }
+        // }
+
+        // Cek jika no_hp diubah dan sudah ada di data lain
         if ($request->no_hp != $data->no_hp) {
-            if (DataRt::where('no_hp', $request->no_hp)->exists()) {
+            if ($this->isPhoneNumberExists($request->no_hp)) {
                 Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
                 return redirect()->back()->withInput();
             }
         }
 
-        // ❗ Cek jika rt diubah dan sudah ada di RW yang sama
+        // Cek jika rt diubah dan sudah ada di RW yang sama
         if ($request->rt != $data->rt || $request->rw_id != $data->rw_id) {
             $exists = DataRt::where('rt', $request->rt)
                 ->where('rw_id', $request->rw_id)
@@ -168,7 +183,7 @@ class RtController extends Controller
             }
         }
 
-        // ❗ Ganti gambar jika ada yang baru
+        // Ganti gambar jika ada yang baru
         if ($request->hasFile('image_rt')) {
             if ($data->image_rt) {
                 Storage::disk('public')->delete('foto_rt/' . $data->image_rt);
@@ -226,7 +241,7 @@ class RtController extends Controller
             return redirect()->route('rt.index');
         }
 
-        // ✅ Cek apakah masih ada penduduk di RT ini
+        // Cek apakah masih ada penduduk di RT ini
         $jumlahPenduduk = \App\DataPenduduk::where('rt_id', $data->id)->count();
         if ($jumlahPenduduk > 0) {
             Alert::error('Gagal!', 'Tidak dapat menghapus RT karena masih ada penduduk di wilayah ini.');
@@ -236,7 +251,7 @@ class RtController extends Controller
         // Catat log sebelum menghapus data
         createHistoryLog('delete', 'Menghapus data RT: ' . $data->nama . ' (RT ' . $data->rt . ')');
 
-        // ✅ Hapus user RT jika ada
+        // Hapus user RT jika ada
         if ($data->user_id) {
             User::where('id', $data->user_id)->delete();
         }
@@ -266,4 +281,38 @@ class RtController extends Controller
 
         return redirect()->route('rt.index');
     }
+
+    /**
+     * Fungsi untuk mengecek apakah nomor HP sudah ada di seluruh data
+     *
+     * @param string $phoneNumber
+     * @return bool
+     */
+    private function isPhoneNumberExists($phoneNumber)
+    {
+        // Cek di tabel DataRt (untuk Ketua RT)
+        if (DataRt::where('no_hp', $phoneNumber)->exists()) {
+            return true;
+        }
+
+        // Cek di tabel DataRw (untuk Ketua RW)
+        if (DataRw::where('no_hp', $phoneNumber)->exists()) {
+            return true;
+        }
+
+        // Cek di tabel DataPenduduk (untuk Penduduk)
+        if (DataPenduduk::where('no_hp', $phoneNumber)->exists()) {
+            return true;
+        }
+
+        // Cek di tabel Lurah (untuk Lurah)
+        // if (Lurah::where('no_hp', $phoneNumber)->exists()) {
+        //     return true;
+        // }
+
+        // Anda bisa tambahkan tabel lain yang memiliki field no_hp di sini
+
+        return false;
+    }
+
 }

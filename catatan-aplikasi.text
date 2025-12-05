@@ -19,6 +19,19 @@ akun rw otomatis dibuat setelah admin menambahkan data rw dengan format akun ber
 jika yang dimasukan (rw 12), maka akunnya nanti : 
 ketua-rw12@kampungbulang
 
-akun rt otomatis dibuat setelahadmin menambahkan data rt dengan format akun berikut : 
+akun rt otomatis dibuat setelah admin menambahkan data rt dengan format akun berikut : 
 jika yang dimasukan (rt 1) & pilihan (rw 12), maka akunnya nanti : 
 ketua-rt1.12@kampungbulang
+
+
+catatan wawancara :
+1. warga pindah rt/rw masih manual, artinya masih harus mengurus beberapa hal secara tatap muka
+2. buat narasi kalau notifikasi ada warga baru yang mendaftar dan verifikasi rt/rw/admin sepakat menggunakan wa
+3. buat narasi kalau pihak kelurahan,rt dan rw sangat butuh aplikasi ini
+4. buat narasi kalau pihak kelurahan, rt dan rw mau tampilan yang sederhana dan mudah untuk dipelajari
+5. buat narasi kalau bentuk pelaporan data bisa di print data keseluruhan, per rt/rw, keseluruhan difilter perkategori dan pertahun
+6. jawaban ketika ditanya kenapa nggak buat ada pindah data, filter bulanan dll (jangan lupa tambahkan batasan masalahnya !) :
+    "Ruang lingkup penelitian saya difokuskan pada kondisi data terkini, 
+    bukan histori perubahan. Karena itu sistem hanya menyediakan filter tahunan dan kategori. 
+    Untuk filter bulanan diperlukan pencatatan peristiwa kependudukan (log perubahan), 
+    dan itu bisa jadi pengembangan berikutnya."

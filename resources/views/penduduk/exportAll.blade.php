@@ -149,10 +149,11 @@
 
   <div class="mb-3">
     <p>
-      Berikut ini adalah data lengkap warga yang berdomisili di wilayah Kelurahan Kampung Bulang Pada
+      Berikut ini adalah data lengkap warga yang berdomisili di wilayah Kelurahan Kampung Bulang
       @if(isset($tahun))
-      Tahun {{ $tahun }} :
+       Pada Tahun {{ $tahun }}
     @endif
+    :
     </p>
   </div>
 

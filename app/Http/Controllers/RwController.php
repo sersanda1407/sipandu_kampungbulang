@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
-use App\Helpers\HistoryLogHelper;
+// use App\Helpers\HistoryLogHelper;
 
 
 class RwController extends Controller
@@ -64,9 +64,15 @@ class RwController extends Controller
         ]);
 
         try {
-            // Cek manual untuk no_hp duplicate
-            $existingNoHp = DataRw::where('no_hp', $request->no_hp)->first();
-            if ($existingNoHp) {
+            // Cek manual untuk no_hp duplicate di data RW
+            // $existingNoHp = DataRw::where('no_hp', $request->no_hp)->first();
+            // if ($existingNoHp) {
+            //     Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
+            //     return redirect()->back()->withInput();
+            // }
+
+            // cek data duplikat di seluruh data
+            if ($this->isPhoneNumberExists($request->no_hp)) {
                 Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
                 return redirect()->back()->withInput();
             }
@@ -175,13 +181,21 @@ class RwController extends Controller
             'periode_akhir' => 'required',
         ]);
 
-        // Cek jika no_hp diubah dan sudah ada di data lain
+        // Cek jika no_hp diubah dan sudah ada di data lain di data RW
+        // if ($request->no_hp != $data->no_hp) {
+        //     if (DataRw::where('no_hp', $request->no_hp)->exists()) {
+        //         Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
+        //         return redirect()->back()->withInput();
+        //     }
+        // }
+        // cek apakah ada duplikat di seluruh data
         if ($request->no_hp != $data->no_hp) {
-            if (DataRw::where('no_hp', $request->no_hp)->exists()) {
+            if ($this->isPhoneNumberExists($request->no_hp)) {
                 Alert::error('Gagal!', 'Nomor Handphone sudah digunakan oleh data lain.');
                 return redirect()->back()->withInput();
             }
         }
+
 
         // Cek jika rw diubah dan sudah ada di data lain
         if ($request->rw != $data->rw) {
@@ -308,6 +322,31 @@ class RwController extends Controller
 
         // Kembalikan ke halaman indeks RW, bukan RT
         return redirect()->route('rw.index');
+    }
+
+     private function isPhoneNumberExists($phoneNumber)
+    {
+        // Cek di tabel DataRw (untuk Ketua RW) - kecuali data saat ini jika sedang update
+        if (DataRw::where('no_hp', $phoneNumber)->exists()) {
+            return true;
+        }
+
+        // Cek di tabel DataRt (untuk Ketua RT)
+        if (DataRt::where('no_hp', $phoneNumber)->exists()) {
+            return true;
+        }
+
+        // Cek di tabel DataPenduduk (untuk Penduduk)
+        if (DataPenduduk::where('no_hp', $phoneNumber)->exists()) {
+            return true;
+        }
+
+        // Cek di tabel Lurah (untuk Lurah)
+        // if (Lurah::where('no_hp', $phoneNumber)->exists()) {
+        //     return true;
+        // }
+
+        return false;
     }
 
 }

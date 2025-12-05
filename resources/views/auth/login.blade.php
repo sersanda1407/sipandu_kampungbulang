@@ -67,7 +67,7 @@
                 transform: translateY(0);
             }
         }
-        
+
         /* Additional styles for privacy policy */
         .privacy-check {
             margin: 15px 0;
@@ -76,17 +76,17 @@
             border-radius: 8px;
             border-left: 4px solid #007bff;
         }
-        
+
         .privacy-link {
             color: #007bff;
             text-decoration: underline;
             cursor: pointer;
         }
-        
+
         .privacy-link:hover {
             color: #0056b3;
         }
-        
+
         .privacy-modal {
             display: none;
             position: fixed;
@@ -98,7 +98,7 @@
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
         }
-        
+
         .privacy-modal-content {
             background-color: #fefefe;
             margin: 5% auto;
@@ -110,7 +110,7 @@
             overflow-y: auto;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-        
+
         .privacy-close {
             color: #aaa;
             float: right;
@@ -118,27 +118,27 @@
             font-weight: bold;
             cursor: pointer;
         }
-        
+
         .privacy-close:hover {
             color: #000;
         }
-        
+
         .privacy-title {
             color: #2c3e50;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        
+
         .privacy-section {
             margin-bottom: 20px;
         }
-        
+
         .privacy-section h3 {
             color: #3498db;
             margin-bottom: 10px;
         }
-        
+
         .btn-disabled {
             opacity: 0.6;
             cursor: not-allowed !important;
@@ -155,7 +155,7 @@
                     <img src="assets/images/Lambang_Kota_Tanjungpinang.webp" loading="lazy" alt="Logo"
                         class="overlay-logo1">
                     <div class="overlay-text">
-                        <p>Sistem Informasi <br> Pendataan Penduduk Terpadu <br>Kampung Bulang</p>
+                        <p>Sistem Informasi <br> Pendataan Kependudukan Terpadu <br>Kampung Bulang</p>
                     </div>
                 </div>
             </div>
@@ -292,7 +292,7 @@
                     <label>Upload Foto Kartu Keluarga</label>
                     <input type="file" name="image" class="form-control upload-gambar" accept="image/*" required>
                 </div>
-                
+
                 <!-- Privacy Policy Checkbox -->
                 <div class="privacy-check">
                     <div class="form-check">
@@ -309,13 +309,13 @@
             </form>
         </div>
     </div>
-    
+
 <!-- Privacy Policy Modal -->
 <div id="privacyModal" class="privacy-modal">
     <div class="privacy-modal-content">
         <span class="privacy-close" onclick="closePrivacyModal()">&times;</span>
         <h2 class="privacy-title">Kebijakan Privasi</h2>
-        
+
         <div class="privacy-section">
             <h3>1. Pengumpulan Data Pribadi</h3>
             <p>
@@ -332,7 +332,7 @@
                 Pengumpulan data ini sesuai dengan Undang-Undang Dasar Negara Republik Indonesia Tahun 1945 Pasal 28G ayat (1) dan Undang-Undang Nomor 27 Tahun 2022 tentang Perlindungan Data Pribadi.
             </p>
         </div>
-        
+
         <div class="privacy-section">
             <h3>2. Tujuan Penggunaan Data</h3>
             <p>Data pribadi Anda digunakan untuk kepentingan:</p>
@@ -347,7 +347,7 @@
                 Data tidak akan digunakan untuk tujuan komersial atau disebarluaskan kepada pihak ketiga tanpa dasar hukum yang sah.
             </p>
         </div>
-        
+
         <div class="privacy-section">
             <h3>3. Perlindungan Data</h3>
             <p>
@@ -355,14 +355,14 @@
                 Akses hanya diberikan kepada pihak berwenang (RT, RW, atau Kelurahan) sesuai kebutuhan administratif.
             </p>
         </div>
-        
+
         <div class="privacy-section">
             <h3>4. Penyimpanan Data</h3>
             <p>
                 Data pribadi Anda akan disimpan selama masih diperlukan untuk tujuan administratif atau sesuai kewajiban hukum yang berlaku. Setelah tujuan tersebut tercapai, data dapat dihapus atau dianonimkan sesuai ketentuan hukum.
             </p>
         </div>
-        
+
         <div class="privacy-section">
             <h3>5. Hak Warga</h3>
             <p>Sesuai dengan UU Perlindungan Data Pribadi, Anda memiliki hak untuk:</p>
@@ -376,14 +376,14 @@
                 Untuk menggunakan hak ini, Anda dapat menghubungi Admin SIPANDU Kampung Bulang.
             </p>
         </div>
-        
+
         <div class="privacy-section">
             <h3>6. Perubahan Kebijakan</h3>
             <p>
                 Kebijakan privasi ini dapat diperbarui dari waktu ke waktu sesuai kebutuhan. Setiap perubahan akan diumumkan melalui sistem SIPANDU atau media komunikasi resmi lainnya.
             </p>
         </div>
-        
+
         <div class="text-center mt-4">
             <button class="btn btn-primary" onclick="closePrivacyModal()">Saya Mengerti</button>
         </div>
@@ -581,18 +581,18 @@
             }
         });
     </script>
-    
+
     <script>
         // Fungsi untuk menampilkan modal privacy policy
         function showPrivacyPolicy() {
             document.getElementById('privacyModal').style.display = 'block';
         }
-        
+
         // Fungsi untuk menutup modal privacy policy
         function closePrivacyModal() {
             document.getElementById('privacyModal').style.display = 'none';
         }
-        
+
         // Mengatur status tombol submit berdasarkan checkbox
         document.getElementById('privacyPolicy').addEventListener('change', function() {
             const submitButton = document.getElementById('submitButton');
@@ -604,11 +604,11 @@
                 submitButton.classList.add('btn-disabled');
             }
         });
-        
+
         // Validasi form sebelum submit
         document.getElementById('registrationForm').addEventListener('submit', function(e) {
             const privacyCheckbox = document.getElementById('privacyPolicy');
-            
+
             if (!privacyCheckbox.checked) {
                 e.preventDefault();
                 Swal.fire({
@@ -619,14 +619,14 @@
                 });
             }
         });
-        
+
         // Tutup modal jika klik di luar konten
         window.onclick = function(event) {
             const privacyModal = document.getElementById('privacyModal');
             if (event.target == privacyModal) {
                 privacyModal.style.display = 'none';
             }
-            
+
             const registerModal = document.getElementById('registerModal');
             if (event.target == registerModal) {
                 registerModal.style.display = 'none';

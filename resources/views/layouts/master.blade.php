@@ -14,7 +14,7 @@
                 'rt' => 'Data Ketua RT Kampung Bulang',
                 'kk' => 'Data Kartu Keluarga',
                 'penduduk' => 'Data Penduduk Kelurahan Kampung Bulang',
-                'histori' => 'History Log User',
+                'histori' => 'History Log',
             ];
             $segment = Request::segment(1);
             echo $titleMap[$segment] ?? 'Dashboard';
@@ -48,7 +48,6 @@
             display: none !important;
         }
 
-        /* Dot hijau indikator aktif */
         .dot-indicator {
             width: 10px;
             height: 10px;
