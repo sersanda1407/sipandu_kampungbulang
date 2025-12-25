@@ -8,13 +8,13 @@ use App\Providers\FonnteService;
 class TestFonnteSimple extends Command
 {
     protected $signature = 'fonnte:test-simple';
-    protected $description = 'Test Fonnte API dengan pilihan';
+    protected $description = 'Test API WhatsApp dengan pilihan';
 
     public function handle()
     {
         $fonnteService = new FonnteService();
         
-        $this->info('🎯 TEST FONNTE API SIPANDU');
+        $this->info('TEST API WhatsApp - SIPANDU');
         $this->info('==========================');
         
         $choice = $this->choice('Pilih test:', [
@@ -28,7 +28,7 @@ class TestFonnteSimple extends Command
         switch ($choice) {
             case 'Test nomor tertentu':
                 $phone = $this->ask('Masukkan nomor telepon (contoh: 081234567890)');
-                $message = "✅ Test Notifikasi SIPANDU\n\nIni adalah pesan test.";
+                $message = "Test Notifikasi SIPANDU\n\nIni adalah pesan test.";
                 $result = $fonnteService->sendMessage($phone, $message);
                 break;
                 
@@ -78,9 +78,9 @@ class TestFonnteSimple extends Command
         }
         
         if ($result) {
-            $this->info('✅ Pesan berhasil dikirim!');
+            $this->info('Pesan berhasil dikirim!');
         } else {
-            $this->error('❌ Gagal mengirim pesan');
+            $this->error('Gagal mengirim pesan');
         }
         
         $this->info('Cek log: storage/logs/laravel.log');
