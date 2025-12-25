@@ -544,13 +544,13 @@
 
                         
 
-                        <!-- <li class="sidebar-item">
+                        {{-- <li class="sidebar-item">
                             <a href="#editLurahModal" class="sidebar-link" data-bs-toggle="modal"
                                 data-bs-target="#editLurahModal">
                                 <i class="fas fa-user-tie"></i>
                                 <span>Edit Data Lurah</span>
                             </a>
-                        </li> -->
+                        </li> --}}
 
 
                         <li class="sidebar-item ">

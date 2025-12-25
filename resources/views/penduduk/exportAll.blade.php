@@ -356,11 +356,11 @@
       <div class="footer-right">
         <p style="margin: 0;">
           Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}<br>
-          Lurah Kampung Bulang
-          <br><br><br>
-          <strong>{{ $lurah->nama ?? '-' }}</strong><br>
+          Admin Kelurahan Kampung Bulang
+          <br><br><br><br>
+          {{-- <strong>{{ $lurah->nama ?? '-' }}</strong><br> --}}
           {{ $lurah->jabatan ?? '-' }}<br>
-          NIP. {{ $lurah->nip ?? '-' }}
+          {{-- NIP. {{ $lurah->nip ?? '-' }} --}}
         </p>
       </div>
       {{-- selesai - sesuaikan bagian ini --}}
