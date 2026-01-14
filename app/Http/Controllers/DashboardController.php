@@ -57,7 +57,7 @@ class DashboardController extends Controller
             $filter_rt = $rt_user_id;
         }
 
-        // Query penduduk dengan filter
+        // Query penduduk dengan filter - SEMUA DATA TANPA FILTER TAHUN
         $query = DataPenduduk::query();
 
         if ($filter_rw) {
@@ -72,20 +72,21 @@ class DashboardController extends Controller
             $query->where('kk_id', $kk_user_id);
         }
 
-        $dataPenduduk = $query->whereYear('created_at', $tahun_terpilih)->get();
+        // Ambil semua data penduduk tanpa filter tahun
+        $dataPenduduk = $query->get();
 
-        // Ambil data pertambahan per bulan
+        // Hanya untuk pertambahan warga yang tetap menggunakan filter tahun
         $data_pertambahan = $this->getDataPertambahanWargaPerBulan($tahun_terpilih, $filter_rw, $filter_rt, $kk_user_id);
         $data_month = $data_pertambahan['bulanan'];
         $total_pertambahan = $data_pertambahan['total'];
 
         $lurah = Lurah::first();
 
-        // Hitung gender (lebih fleksibel & tahan variasi data)
+        // Hitung gender (lebih fleksibel & tahan variasi data) - SEMUA DATA
         $gender_laki = $dataPenduduk->filter(fn($p) => stripos($p->gender, 'laki') !== false)->count();
         $gender_cewe = $dataPenduduk->filter(fn($p) => stripos($p->gender, 'perempuan') !== false)->count();
 
-        // Hitung usia berdasarkan kategori
+        // Hitung usia berdasarkan kategori - SEMUA DATA
         $now = Carbon::now();
         $usia_counts = [
             'newborn' => 0,
@@ -115,47 +116,61 @@ class DashboardController extends Controller
                 $usia_counts['dewasa']++;
         }
 
-        // Data pekerjaan
+        // Data pekerjaan - SEMUA DATA
         $data_pekerjaan = $dataPenduduk->whereNotNull('pekerjaan')
             ->groupBy('pekerjaan')
             ->map(fn($group) => $group->count())
             ->toArray();
 
-        // Data status pernikahan
+        // Data status pernikahan - SEMUA DATA
         $data_pernikahan = $dataPenduduk->whereNotNull('status_pernikahan')
             ->groupBy('status_pernikahan')
             ->map(fn($group) => $group->count())
             ->toArray();
 
-        // Data status ekonomi
-        $data_ekonomi = [
-            'Sangat Tidak Mampu' => 0,
-            'Tidak Mampu' => 0,
-            'Menengah ke Bawah' => 0,
-            'Menengah' => 0,
-            'Menengah ke Atas' => 0,
-            'Mampu' => 0,
+        // Data status ekonomi berdasarkan klasifikasi BPS - SEMUA DATA
+        $garisKemiskinan = 595000; // Garis Kemiskinan BPS
+        $statusEkonomiBPS = [
+            'Miskin' => 0,
+            'Rentan Miskin' => 0,
+            'Menuju Kelas Menengah' => 0,
+            'Kelas Menengah' => 0,
+            'Kelas Atas' => 0,
         ];
 
-        foreach ($dataPenduduk as $data) {
-            if (!$data->jumlah_penghasilan)
-                continue;
-            $gaji = $data->jumlah_penghasilan;
-
-            if ($gaji < 1000000)
-                $data_ekonomi['Sangat Tidak Mampu']++;
-            elseif ($gaji < 2000000)
-                $data_ekonomi['Tidak Mampu']++;
-            elseif ($gaji < 3000000)
-                $data_ekonomi['Menengah ke Bawah']++;
-            elseif ($gaji < 4000000)
-                $data_ekonomi['Menengah']++;
-            elseif ($gaji < 5000000)
-                $data_ekonomi['Menengah ke Atas']++;
-            else
-                $data_ekonomi['Mampu']++;
+        // Kelompokkan data per KK - SEMUA DATA
+        $kkGroups = $dataPenduduk->groupBy('kk_id');
+        
+        foreach ($kkGroups as $kk_id => $anggotaKK) {
+            // Hitung rata-rata pendapatan per KK
+            $rataRata = $anggotaKK->whereNotNull('jumlah_penghasilan')
+                ->pluck('jumlah_penghasilan')
+                ->avg();
+            
+            if ($rataRata === null) {
+                continue; // Skip jika tidak ada data gaji
+            }
+            
+            // Hitung rasio terhadap garis kemiskinan
+            $rasio = $garisKemiskinan > 0 ? $rataRata / $garisKemiskinan : 0;
+            
+            // Klasifikasi BPS
+            if ($rasio < 1) {
+                $status = 'Miskin';
+            } elseif ($rasio < 1.5) {
+                $status = 'Rentan Miskin';
+            } elseif ($rasio < 3.5) {
+                $status = 'Menuju Kelas Menengah';
+            } elseif ($rasio < 17) {
+                $status = 'Kelas Menengah';
+            } else {
+                $status = 'Kelas Atas';
+            }
+            
+            $statusEkonomiBPS[$status]++;
         }
 
+        // Data agama - SEMUA DATA
         $data_agama = $dataPenduduk->whereNotNull('agama')
             ->groupBy('agama')
             ->map(function ($group) {
@@ -183,7 +198,7 @@ class DashboardController extends Controller
             'lurah',
             'usia_counts',
             'data_pekerjaan',
-            'data_ekonomi',
+            'statusEkonomiBPS',
             'data_pernikahan',
             'dataPenduduk',
             'tahun_terpilih',

@@ -77,7 +77,7 @@
                         <div class="mb-3">
                             <label class="form-label">Foto Ketua RT</label>
                             <input type="file" class="form-control upload-gambar" name="image_rt" accept="image/*" required>
-                            <small class="text-muted">Upload foto Ketua RT</small>
+                            <small class="text-muted">Format yang diperbolehkan: JPG, JPEG, PNG. Maksimal ukuran file: 3 MB</small>
                         </div>
 
                     </div>
@@ -104,10 +104,21 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops!',
-                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png)'
                     });
-                    this.value = ''; // Reset input
+                    this.value = '';
                 }
+
+                const maxSize = 3 * 1024 * 1024; // 3 MB dalam bytes
+            if (file.size > maxSize) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File Terlalu Besar!',
+                    text: 'Ukuran file maksimal adalah 3 MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+                });
+                this.value = '';
+                return;
+            }
             });
         });
     </script>

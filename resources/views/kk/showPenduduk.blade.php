@@ -205,6 +205,7 @@
                                         class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="image_ktp" id="upload_ktp" accept="image/*"
                                     required>
+                                     <small class="text-muted">Format yang diperbolehkan: JPG, JPEG, PNG. Maksimal ukuran file: 3 MB</small><br>
                             </div>
 
 
@@ -226,11 +227,22 @@
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Oops!',
-                                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png)'
                                     });
 
                                     this.value = ''; // Reset input
                                 }
+                            }
+
+                            const maxSize = 3 * 1024 * 1024; // 3 MB dalam bytes
+                            if (file.size > maxSize) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'File Terlalu Besar!',
+                                    text: 'Ukuran file maksimal adalah 3 MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+                                });
+                                this.value = '';
+                                return;
                             }
                         });
                     </script>
@@ -326,7 +338,7 @@
                                         <span class="fw-bold me-2">RT / RW:</span>
                                         <span>{{ $data->rt->rt }} / {{ $data->rw->rw }}</span>
                                     </div>
-                                    @php
+                                    {{-- @php
                                         $totalGaji = $penduduk->sum('gaji');
                                         $jumlah = $penduduk->count();
                                         $rataRata = $jumlah > 0 ? $totalGaji / $jumlah : 0;
@@ -356,7 +368,44 @@
                                     <div class="col-12 col-md-6 d-flex">
                                         <span class="fw-bold me-2">Status Ekonomi:</span>
                                         <span>{{ $statusEkonomi }}</span>
-                                    </div>
+                                    </div> --}}
+
+                                    @php
+    // Garis Kemiskinan BPS (per kapita per bulan)
+    $garisKemiskinan = 595000;
+
+    // Hitung rata-rata pendapatan
+    $totalPendapatan = $penduduk->sum('gaji');
+    $jumlahPenduduk  = $penduduk->count();
+    $rataRata        = $jumlahPenduduk > 0 ? $totalPendapatan / $jumlahPenduduk : 0;
+
+    // Rasio terhadap garis kemiskinan
+    $rasio = $garisKemiskinan > 0 ? $rataRata / $garisKemiskinan : 0;
+
+    // Klasifikasi ekonomi BPS
+    if ($rasio < 1) {
+        $statusEkonomi = 'Miskin';
+    } elseif ($rasio < 1.5) {
+        $statusEkonomi = 'Rentan Miskin';
+    } elseif ($rasio < 3.5) {
+        $statusEkonomi = 'Menuju Kelas Menengah';
+    } elseif ($rasio < 17) {
+        $statusEkonomi = 'Kelas Menengah';
+    } else {
+        $statusEkonomi = 'Kelas Atas';
+    }
+@endphp
+
+<div class="col-12 col-md-6 d-flex">
+    <span class="fw-bold me-2">Rata-rata Pendapatan:</span>
+    <span>Rp {{ number_format($rataRata, 0, ',', '.') }}</span>
+</div>
+
+<div class="col-12 col-md-6 d-flex">
+    <span class="fw-bold me-2">Status Ekonomi:</span>
+    <span>{{ $statusEkonomi }}</span>
+</div>
+
 
                                     <div class="col-12 col-md-6 d-flex">
                                         <span class="fw-bold me-2">Jumlah Individu:</span>

@@ -163,10 +163,10 @@ class PendudukController extends Controller
 
         try {
             $data->save();
-            
+
             // Catat log penambahan data penduduk
             createHistoryLog('create', 'Menambahkan data penduduk: ' . $request->nama . ' (NIK: ' . $request->nik . ') - KK: ' . $dataKk->kepala_keluarga);
-            
+
             Alert::success('Sukses!', 'Berhasil menambah Data Penduduk');
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->errorInfo[1] == 1062) {
@@ -303,10 +303,10 @@ class PendudukController extends Controller
     public function destroy($id)
     {
         $data = DataPenduduk::find($id);
-        
+
         // Catat log sebelum menghapus data
         createHistoryLog('delete', 'Menghapus data penduduk: ' . $data->nama . ' (NIK: ' . $data->nik . ')');
-        
+
         if ($data->image_ktp) {
             Storage::delete('/foto_ktp/' . $data->image_ktp);
         }
@@ -397,7 +397,7 @@ class PendudukController extends Controller
 
         $query = DataPenduduk::where('rt_id', $rt->id);
         if ($tahun) {
-            $query->whereYear('created_at', $tahun);
+            $query->whereYear('created_at', '<=', $tahun);
         }
 
         $penduduk = $this->sortPenduduk($query->get());
@@ -436,7 +436,7 @@ class PendudukController extends Controller
 
         $query = DataPenduduk::where('rw_id', $rw->id);
         if ($tahun) {
-            $query->whereYear('created_at', $tahun);
+            $query->whereYear('created_at', '<=', $tahun);
         }
 
         $penduduk = $this->sortPenduduk($query->get());
@@ -468,7 +468,7 @@ class PendudukController extends Controller
 
         $query = DataPenduduk::query();
         if ($tahun) {
-            $query->whereYear('created_at', $tahun);
+            $query->whereYear('created_at', '<=', $tahun);
         }
 
         $penduduk = $this->sortPenduduk($query->get());
@@ -497,7 +497,7 @@ class PendudukController extends Controller
 
         $tahun = $request->get('tahun');
         if ($tahun) {
-            $query->whereYear('created_at', $tahun);
+            $query->whereYear('created_at', '<=', $tahun);
         }
 
         $rt = null;

@@ -77,7 +77,8 @@
                         <div class="mb-3">
                             <label class="form-label">Foto RT</label>
                             <input type="file" class="form-control upload-gambar" name="image_rt" accept="image/*">
-                            <small class="text-muted">Kosongkan jika tidak ingin mengganti foto</small><br>
+                             <small class="text-muted">Format yang diperbolehkan: JPG, JPEG, PNG. Maksimal ukuran file: 3 MB</small><br>
+                            <small class="text-muted">*Kosongkan jika tidak ingin mengganti foto</small><br>
                             @if ($d->image_rt)
                                 <img src="{{ asset('storage/foto_rt/' . $d->image_rt) }}" alt="Foto RT" width="100" height="70">
                             @endif
@@ -108,10 +109,21 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops!',
-                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png)'
                     });
-                    this.value = ''; // Reset input
+                    this.value = '';
                 }
+
+                 const maxSize = 3 * 1024 * 1024; // 3 MB dalam bytes
+            if (file.size > maxSize) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File Terlalu Besar!',
+                    text: 'Ukuran file maksimal adalah 3 MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+                });
+                this.value = '';
+                return;
+            }
             });
         });
     </script>

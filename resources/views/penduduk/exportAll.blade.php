@@ -70,14 +70,16 @@
   $jumlah_laki = $penduduk->where('gender', 'Laki-laki')->count();
   $jumlah_perempuan = $penduduk->where('gender', 'Perempuan')->count();
 
+  // Definisikan klasifikasi BPS
   $statusCounts = [
-    'Sangat Tidak Mampu' => 0,
-    'Tidak Mampu' => 0,
-    'Menengah ke Bawah' => 0,
-    'Menengah' => 0,
-    'Menengah ke Atas' => 0,
-    'Mampu' => 0,
+    'Miskin' => 0,
+    'Rentan Miskin' => 0,
+    'Menuju Kelas Menengah' => 0,
+    'Kelas Menengah' => 0,
+    'Kelas Atas' => 0,
   ];
+
+  $garisKemiskinan = 595000; // Garis Kemiskinan BPS
 
   $uniqueKks = $penduduk->pluck('kk_id')->unique();
 
@@ -86,19 +88,21 @@
     $totalGaji = $anggotaKK->sum('gaji');
     $jumlahOrang = $anggotaKK->count();
     $rataRata = $jumlahOrang > 0 ? $totalGaji / $jumlahOrang : 0;
-
-    if ($rataRata < 500000) {
-    $status = 'Sangat Tidak Mampu';
-    } elseif ($rataRata <= 1500000) {
-    $status = 'Tidak Mampu';
-    } elseif ($rataRata <= 3000000) {
-    $status = 'Menengah ke Bawah';
-    } elseif ($rataRata <= 5000000) {
-    $status = 'Menengah';
-    } elseif ($rataRata <= 10000000) {
-    $status = 'Menengah ke Atas';
+    
+    // Hitung rasio terhadap garis kemiskinan
+    $rasio = $garisKemiskinan > 0 ? $rataRata / $garisKemiskinan : 0;
+    
+    // Klasifikasi BPS
+    if ($rasio < 1) {
+      $status = 'Miskin';
+    } elseif ($rasio < 1.5) {
+      $status = 'Rentan Miskin';
+    } elseif ($rasio < 3.5) {
+      $status = 'Menuju Kelas Menengah';
+    } elseif ($rasio < 17) {
+      $status = 'Kelas Menengah';
     } else {
-    $status = 'Mampu';
+      $status = 'Kelas Atas';
     }
 
     $statusCounts[$status]++;
@@ -191,29 +195,34 @@
       <td>{{ $pd->status_pernikahan }}</td>
       <td>{{ $pd->pekerjaan }}</td>
       <td>
-        @php
-      $pendudukKK = \App\DataPenduduk::where('kk_id', $pd->kk_id)->get();
-      $totalGaji = $pendudukKK->sum('gaji');
-      $jumlahOrang = $pendudukKK->count();
-      $rataRata = $jumlahOrang > 0 ? $totalGaji / $jumlahOrang : 0;
+       @php
+    $pendudukKK = \App\DataPenduduk::where('kk_id', $pd->kk_id)->get();
+    $totalGaji = $pendudukKK->sum('gaji');
+    $jumlahOrang = $pendudukKK->count();
+    $rataRata = $jumlahOrang > 0 ? $totalGaji / $jumlahOrang : 0;
 
-      if ($rataRata < 500000) {
-      $statusEkonomi = 'Sangat Tidak Mampu';
-      } elseif ($rataRata <= 1500000) {
-      $statusEkonomi = 'Tidak Mampu';
-      } elseif ($rataRata <= 3000000) {
-      $statusEkonomi = 'Menengah ke Bawah';
-      } elseif ($rataRata <= 5000000) {
-      $statusEkonomi = 'Menengah';
-      } elseif ($rataRata <= 10000000) {
-      $statusEkonomi = 'Menengah ke Atas';
-      } else {
-      $statusEkonomi = 'Mampu';
-      }
-    @endphp
-        {{ $statusEkonomi }}
-        <br>
-        <small class="text-muted">Rp.{{ number_format($rataRata, 0, ',', '.') }}</small>
+    // Garis Kemiskinan BPS (per kapita per bulan)
+    $garisKemiskinan = 595000;
+
+    // Rasio terhadap garis kemiskinan
+    $rasio = $garisKemiskinan > 0 ? $rataRata / $garisKemiskinan : 0;
+
+    // Klasifikasi ekonomi BPS
+    if ($rasio < 1) {
+        $statusEkonomi = 'Miskin';
+    } elseif ($rasio < 1.5) {
+        $statusEkonomi = 'Rentan Miskin';
+    } elseif ($rasio < 3.5) {
+        $statusEkonomi = 'Menuju Kelas Menengah';
+    } elseif ($rasio < 17) {
+        $statusEkonomi = 'Kelas Menengah';
+    } else {
+        $statusEkonomi = 'Kelas Atas';
+    }
+@endphp
+{{ $statusEkonomi }}
+<br>
+<small class="text-muted">Rp {{ number_format($rataRata, 0, ',', '.') }} ({{ number_format($rasio, 2) }})</small>
       </td>
       </tr>
     @endforeach
@@ -221,7 +230,6 @@
   </table>
   <div style="page-break-inside: avoid;">
     <div class="footer-section">
-      {{-- start - sesuaikan bagian ini --}}
       @php
     $boxList = [];
 
@@ -239,8 +247,11 @@
         break;
 
         case 'status_ekonomi':
-        $rows = collect($statusCounts)->map(fn($jumlah, $label) => [$label, "$jumlah KK"])->values()->toArray();
-        $title = 'Status Ekonomi Keluarga';
+        $filteredStatus = array_filter($statusCounts, function($jumlah) {
+          return $jumlah > 0;
+        });
+        $rows = collect($filteredStatus)->map(fn($jumlah, $label) => [$label, "$jumlah KK"])->values()->toArray();
+        $title = 'Status Ekonomi Keluarga (BPS)';
         break;
 
         case 'agama':
@@ -363,7 +374,6 @@
           {{-- NIP. {{ $lurah->nip ?? '-' }} --}}
         </p>
       </div>
-      {{-- selesai - sesuaikan bagian ini --}}
     </div>
   </div>
 </body>

@@ -261,41 +261,63 @@
                                     <div class="accordion-body chart-container">
                                         <canvas id="gaji"></canvas>
                                     </div>
-                                    <div class="p-3">
-                                        <strong>Keterangan:</strong>
-                                        <ul class="mb-0">
-                                            @php
-                                                $statusEkonomi = [
-                                                    'Sangat Tidak Mampu' => 'text-danger',
-                                                    'Tidak Mampu' => 'text-warning',
-                                                    'Menengah ke Bawah' => 'text-secondary',
-                                                    'Menengah' => 'text-primary',
-                                                    'Menengah ke Atas' => 'text-success',
-                                                    'Mampu' => 'text-success'
-                                                ];
-                                                $statusGroups = collect($dataPenduduk)->groupBy('kk_id')->map(function ($anggota) {
-                                                    $rata2 = $anggota->pluck('gaji')->avg();
-                                                    if ($rata2 < 500000)
-                                                        return 'Sangat Tidak Mampu';
-                                                    if ($rata2 <= 1500000)
-                                                        return 'Tidak Mampu';
-                                                    if ($rata2 <= 3000000)
-                                                        return 'Menengah ke Bawah';
-                                                    if ($rata2 <= 5000000)
-                                                        return 'Menengah';
-                                                    if ($rata2 <= 10000000)
-                                                        return 'Menengah ke Atas';
-                                                    return 'Mampu';
-                                                })->countBy();
-                                            @endphp
-                                            @foreach($statusEkonomi as $status => $class)
-                                                @if(isset($statusGroups[$status]))
-                                                    <li class="{{ $class }}">{{ $status }} = {{ $statusGroups[$status] }} KK
-                                                    </li>
-                                                @endif
-                                            @endforeach
-                                        </ul>
-                                    </div>
+                                  <div class="p-3">
+    <strong>Keterangan:</strong>
+    <ul class="mb-0">
+        @php
+            // Klasifikasi BPS
+            $statusEkonomiBPS = [
+                'Miskin' => 'text-danger',
+                'Rentan Miskin' => 'text-warning',
+                'Menuju Kelas Menengah' => 'text-secondary',
+                'Kelas Menengah' => 'text-primary',
+                'Kelas Atas' => 'text-success'
+            ];
+            
+            // Hitung status ekonomi berdasarkan klasifikasi BPS
+            $garisKemiskinan = 595000;
+            $statusGroupsBPS = collect($dataPenduduk)
+                ->groupBy('kk_id')
+                ->map(function ($anggota) use ($garisKemiskinan) {
+                    $rata2 = $anggota->pluck('gaji')->avg();
+                    $rasio = $garisKemiskinan > 0 ? $rata2 / $garisKemiskinan : 0;
+                    
+                    if ($rasio < 1) {
+                        return 'Miskin';
+                    } elseif ($rasio < 1.5) {
+                        return 'Rentan Miskin';
+                    } elseif ($rasio < 3.5) {
+                        return 'Menuju Kelas Menengah';
+                    } elseif ($rasio < 17) {
+                        return 'Kelas Menengah';
+                    } else {
+                        return 'Kelas Atas';
+                    }
+                })
+                ->countBy();
+            
+            // Hitung total KK dan persentase
+            $totalKK = array_sum($statusGroupsBPS->toArray());
+        @endphp
+        @foreach($statusEkonomiBPS as $status => $class)
+            @if(isset($statusGroupsBPS[$status]))
+                @php
+                    $jumlahKK = $statusGroupsBPS[$status];
+                    $persentase = $totalKK > 0 ? ($jumlahKK / $totalKK) * 100 : 0;
+                @endphp
+                <li class="{{ $class }}">
+                    {{ $status }} = {{ $jumlahKK }} KK ({{ number_format($persentase, 1) }}%)
+                </li>
+            @endif
+        @endforeach
+        
+        @if($totalKK > 0)
+            <li class="fw-bold mt-2 border-top pt-2">
+                Total KK: {{ $totalKK }} KK
+            </li>
+        @endif
+    </ul>
+</div>
                                 </div>
                             </div>
 
@@ -529,7 +551,7 @@
         });
 
         // CHART STATUS EKONOMI
-        const penduduk = {!! json_encode($dataPenduduk) !!}; // Data dari controller
+       const penduduk = {!! json_encode($dataPenduduk) !!};
 
         // 1. Group berdasarkan KK
         const kkMap = {};
@@ -541,53 +563,60 @@
             kkMap[kk].push(p.gaji);
         });
 
-        // 2. Hitung status ekonomi per KK
-        const statusGroups = {
-            'Sangat Tidak Mampu': [],
-            'Tidak Mampu': [],
-            'Menengah ke Bawah': [],
-            'Menengah': [],
-            'Menengah ke Atas': [],
-            'Mampu': []
+        // 2. Hitung status ekonomi per KK berdasarkan klasifikasi BPS
+        const gariskemiskinan = 595000;
+        const statusGroupsBPS = {
+            'Miskin': [],
+            'Rentan Miskin': [],
+            'Menuju Kelas Menengah': [],
+            'Kelas Menengah': [],
+            'Kelas Atas': []
         };
 
         Object.values(kkMap).forEach(gajiList => {
             const total = gajiList.reduce((a, b) => a + b, 0);
             const rata2 = total / gajiList.length;
+            const rasio = gariskemiskinan > 0 ? rata2 / gariskemiskinan : 0;
 
             let status;
-            if (rata2 < 500000) status = 'Sangat Tidak Mampu';
-            else if (rata2 <= 1500000) status = 'Tidak Mampu';
-            else if (rata2 <= 3000000) status = 'Menengah ke Bawah';
-            else if (rata2 <= 5000000) status = 'Menengah';
-            else if (rata2 <= 10000000) status = 'Menengah ke Atas';
-            else status = 'Mampu';
+            if (rasio < 1) {
+                status = 'Miskin';
+            } else if (rasio < 1.5) {
+                status = 'Rentan Miskin';
+            } else if (rasio < 3.5) {
+                status = 'Menuju Kelas Menengah';
+            } else if (rasio < 17) {
+                status = 'Kelas Menengah';
+            } else {
+                status = 'Kelas Atas';
+            }
 
-            statusGroups[status].push(Math.round(rata2)); // simpan per KK
+            statusGroupsBPS[status].push({
+                rataRata: Math.round(rata2),
+                rasio: rasio.toFixed(2)
+            });
         });
 
         // 3. Ambil hanya kategori yang punya data
-        const labels = [];
-        const data = [];
-        const backgroundColor = [];
-        const rata2ListMap = {}; // kategori => [list rata2]
+        const labelsBPS = [];
+        const dataBPS = [];
+        const backgroundColorBPS = [];
+        const detailListMapBPS = {};
 
-        const colorMap = {
-            'Sangat Tidak Mampu': '#dc3545',
-            'Tidak Mampu': '#fd7e14',
-            'Menengah ke Bawah': '#ffc107',
-            'Menengah': '#0d6efd',
-            'Menengah ke Atas': '#20c997',
-            'Mampu': '#198754'
+        const colorMapBPS = {
+            'Miskin': '#dc3545',
+            'Rentan Miskin': '#fd7e14',
+            'Menuju Kelas Menengah': '#ffc107',
+            'Kelas Menengah': '#0d6efd',
+            'Kelas Atas': '#198754'
         };
 
-        for (const [status, rata2List] of Object.entries(statusGroups)) {
-            if (rata2List.length > 0) {
-                labels.push(status);
-                data.push(rata2List.length);
-                backgroundColor.push(colorMap[status]);
-                // Simpan daftar unik dan terurut
-                rata2ListMap[status] = [...new Set(rata2List)].sort((a, b) => a - b);
+        for (const [status, detailList] of Object.entries(statusGroupsBPS)) {
+            if (detailList.length > 0) {
+                labelsBPS.push(status);
+                dataBPS.push(detailList.length);
+                backgroundColorBPS.push(colorMapBPS[status]);
+                detailListMapBPS[status] = detailList;
             }
         }
 
@@ -597,11 +626,11 @@
             {
                 type: 'doughnut',
                 data: {
-                    labels: labels,
+                    labels: labelsBPS,
                     datasets: [{
-                        label: 'Status Ekonomi',
-                        data: data,
-                        backgroundColor: backgroundColor,
+                        label: 'Status Ekonomi (BPS)',
+                        data: dataBPS,
+                        backgroundColor: backgroundColorBPS,
                         hoverOffset: 4
                     }]
                 },
@@ -617,9 +646,11 @@
                                 label: function (context) {
                                     const label = context.label || '';
                                     const count = context.parsed || 0;
-                                    const rataList = rata2ListMap[label] || [];
-                                    const listString = rataList.map(r => `- Rp${r.toLocaleString()}`).join('\n');
-                                    return `${label}: ${count} KK\n${listString}`;
+                                    const detailList = detailListMapBPS[label] || [];
+                                    const listString = detailList.map(d => 
+                                        `- Rp${d.rataRata.toLocaleString()} (${d.rasio})`
+                                    ).join('\n');
+                                    return `${count} KK\n${listString}`;
                                 }
                             }
                         }
@@ -627,7 +658,6 @@
                 }
             }
         );
-
 
         // CHART STATUS PERNIKAHAN
         const chartPernikahan = new Chart(document.getElementById('pernikahan'), {

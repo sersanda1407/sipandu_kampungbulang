@@ -209,13 +209,18 @@
 
                                 <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg w-100 mb-2">Log
                                     in</button>
+                                <button type="button" onclick="openModal()"
+                                    class="btn btn-outline-primary btn-sm w-100 mb-2"
+                                    style="font-size: 1rem; padding: 6px 16px;">
+                                    Registrasi
+                                </button>
 
                                 <p class="text-center mt-3">
-                                    Belum punya akun?
-                                    <button type="button" onclick="openModal()"
+                                    Lupa Password?
+                                    <button type="button" onclick="openModalhubAdmin()"
                                         class="btn btn-outline-primary btn-sm ms-2"
                                         style="font-size: 1rem; padding: 6px 16px;">
-                                        Daftar di sini
+                                        Hubungi Admin
                                     </button>
                                 </p>
                             </form>
@@ -242,7 +247,8 @@
         <div class="modal-content-custom">
             <span class="close-button" onclick="closeModal()">&times;</span>
             <h4 class="text-center mb-3 fw-bold">Pendaftaran Akun Warga</h4>
-            <form id="registrationForm" action="{{ route('kk.storePublic') }}" method="POST" enctype="multipart/form-data">
+            <form id="registrationForm" action="{{ route('kk.storePublic') }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
 
                 <div class="form-group mb-3">
@@ -291,6 +297,8 @@
                 <div class="mb-3">
                     <label>Upload Foto Kartu Keluarga</label>
                     <input type="file" name="image" class="form-control upload-gambar" accept="image/*" required>
+                    <small class="form-text text-muted"> <i class="fas fa-info-circle"></i> Format yang diperbolehkan:
+                        JPG, JPEG, PNG. Maksimal ukuran file: 3 MB</small>
                 </div>
 
                 <!-- Privacy Policy Checkbox -->
@@ -298,98 +306,259 @@
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="privacyPolicy" required>
                         <label class="form-check-label" for="privacyPolicy">
-                            Saya setuju dengan <span class="privacy-link" onclick="showPrivacyPolicy()">Kebijakan Privasi</span> yang berlaku
+                            Saya setuju dengan <span class="privacy-link" onclick="showPrivacyPolicy()">Kebijakan
+                                Privasi</span> yang berlaku
                         </label>
                     </div>
                 </div>
 
                 <div class="d-grid mt-4">
-                    <button type="submit" id="submitButton" class="btn btn-primary w-100 btn-disabled" disabled>Daftar</button>
+                    <button type="submit" id="submitButton" class="btn btn-primary w-100 btn-disabled"
+                        disabled>Daftar</button>
                 </div>
             </form>
         </div>
     </div>
 
-<!-- Privacy Policy Modal -->
-<div id="privacyModal" class="privacy-modal">
-    <div class="privacy-modal-content">
-        <span class="privacy-close" onclick="closePrivacyModal()">&times;</span>
-        <h2 class="privacy-title">Kebijakan Privasi</h2>
+    <!-- Privacy Policy Modal -->
+    <div id="privacyModal" class="privacy-modal">
+        <div class="privacy-modal-content">
+            <span class="privacy-close" onclick="closePrivacyModal()">&times;</span>
+            <h2 class="privacy-title">Kebijakan Privasi</h2>
 
-        <div class="privacy-section">
-            <h3>1. Pengumpulan Data Pribadi</h3>
-            <p>
-                Kami mengumpulkan data pribadi yang Anda berikan secara langsung saat mendaftar di SIPANDU Kampung Bulang, termasuk namun tidak terbatas pada:
-            </p>
-            <ul>
-                <li>Nama lengkap</li>
-                <li>Nomor Induk Kependudukan (NIK)</li>
-                <li>Nomor Kartu Keluarga (KK)</li>
-                <li>Alamat domisili</li>
-                <li>Nomor telepon atau kontak lain yang dapat dihubungi</li>
-            </ul>
-            <p>
-                Pengumpulan data ini sesuai dengan Undang-Undang Dasar Negara Republik Indonesia Tahun 1945 Pasal 28G ayat (1) dan Undang-Undang Nomor 27 Tahun 2022 tentang Perlindungan Data Pribadi.
-            </p>
-        </div>
+            <div class="privacy-section">
+                <h3>1. Pengumpulan Data Pribadi</h3>
+                <p>
+                    Kami mengumpulkan data pribadi yang Anda berikan secara langsung saat mendaftar di SIPANDU Kampung
+                    Bulang, termasuk namun tidak terbatas pada:
+                </p>
+                <ul>
+                    <li>Nama lengkap</li>
+                    <li>Nomor Induk Kependudukan (NIK)</li>
+                    <li>Nomor Kartu Keluarga (KK)</li>
+                    <li>Alamat domisili</li>
+                    <li>Nomor telepon atau kontak lain yang dapat dihubungi</li>
+                </ul>
+                <p>
+                    Pengumpulan data ini sesuai dengan Undang-Undang Dasar Negara Republik Indonesia Tahun 1945 Pasal
+                    28G ayat (1) dan Undang-Undang Nomor 27 Tahun 2022 tentang Perlindungan Data Pribadi.
+                </p>
+            </div>
 
-        <div class="privacy-section">
-            <h3>2. Tujuan Penggunaan Data</h3>
-            <p>Data pribadi Anda digunakan untuk kepentingan:</p>
-            <ul>
-                <li>Memverifikasi identitas Anda sebagai warga Kampung Bulang</li>
-                <li>Pendataan administrasi kependudukan di tingkat RT, RW, dan Kelurahan</li>
-                <li>Penyelenggaraan program pemerintah (misalnya bantuan sosial, kesehatan, atau sensus)</li>
-                <li>Komunikasi resmi terkait layanan masyarakat</li>
-                <li>Peningkatan kualitas layanan SIPANDU</li>
-            </ul>
-            <p>
-                Data tidak akan digunakan untuk tujuan komersial atau disebarluaskan kepada pihak ketiga tanpa dasar hukum yang sah.
-            </p>
-        </div>
+            <div class="privacy-section">
+                <h3>2. Tujuan Penggunaan Data</h3>
+                <p>Data pribadi Anda digunakan untuk kepentingan:</p>
+                <ul>
+                    <li>Memverifikasi identitas Anda sebagai warga Kampung Bulang</li>
+                    <li>Pendataan administrasi kependudukan di tingkat RT, RW, dan Kelurahan</li>
+                    <li>Penyelenggaraan program pemerintah (misalnya bantuan sosial, kesehatan, atau sensus)</li>
+                    <li>Komunikasi resmi terkait layanan masyarakat</li>
+                    <li>Peningkatan kualitas layanan SIPANDU</li>
+                </ul>
+                <p>
+                    Data tidak akan digunakan untuk tujuan komersial atau disebarluaskan kepada pihak ketiga tanpa dasar
+                    hukum yang sah.
+                </p>
+            </div>
 
-        <div class="privacy-section">
-            <h3>3. Perlindungan Data</h3>
-            <p>
-                Kami menerapkan langkah-langkah teknis dan organisasi yang wajar untuk melindungi data pribadi Anda dari akses, perubahan, pengungkapan, atau penggunaan yang tidak sah.
-                Akses hanya diberikan kepada pihak berwenang (RT, RW, atau Kelurahan) sesuai kebutuhan administratif.
-            </p>
-        </div>
+            <div class="privacy-section">
+                <h3>3. Perlindungan Data</h3>
+                <p>
+                    Kami menerapkan langkah-langkah teknis dan organisasi yang wajar untuk melindungi data pribadi Anda
+                    dari akses, perubahan, pengungkapan, atau penggunaan yang tidak sah.
+                    Akses hanya diberikan kepada pihak berwenang (RT, RW, atau Kelurahan) sesuai kebutuhan
+                    administratif.
+                </p>
+            </div>
 
-        <div class="privacy-section">
-            <h3>4. Penyimpanan Data</h3>
-            <p>
-                Data pribadi Anda akan disimpan selama masih diperlukan untuk tujuan administratif atau sesuai kewajiban hukum yang berlaku. Setelah tujuan tersebut tercapai, data dapat dihapus atau dianonimkan sesuai ketentuan hukum.
-            </p>
-        </div>
+            <div class="privacy-section">
+                <h3>4. Penyimpanan Data</h3>
+                <p>
+                    Data pribadi Anda akan disimpan selama masih diperlukan untuk tujuan administratif atau sesuai
+                    kewajiban hukum yang berlaku. Setelah tujuan tersebut tercapai, data dapat dihapus atau dianonimkan
+                    sesuai ketentuan hukum.
+                </p>
+            </div>
 
-        <div class="privacy-section">
-            <h3>5. Hak Warga</h3>
-            <p>Sesuai dengan UU Perlindungan Data Pribadi, Anda memiliki hak untuk:</p>
-            <ul>
-                <li>Mengakses data pribadi yang tersimpan di sistem</li>
-                <li>Meminta perbaikan atas data yang tidak akurat</li>
-                <li>Meminta penghapusan data pribadi Anda, kecuali masih diwajibkan untuk kepentingan administrasi sesuai hukum</li>
-                <li>Mendapatkan informasi mengenai penggunaan data Anda</li>
-            </ul>
-            <p>
-                Untuk menggunakan hak ini, Anda dapat menghubungi Admin SIPANDU Kampung Bulang.
-            </p>
-        </div>
+            <div class="privacy-section">
+                <h3>5. Hak Warga</h3>
+                <p>Sesuai dengan UU Perlindungan Data Pribadi, Anda memiliki hak untuk:</p>
+                <ul>
+                    <li>Mengakses data pribadi yang tersimpan di sistem</li>
+                    <li>Meminta perbaikan atas data yang tidak akurat</li>
+                    <li>Meminta penghapusan data pribadi Anda, kecuali masih diwajibkan untuk kepentingan administrasi
+                        sesuai hukum</li>
+                    <li>Mendapatkan informasi mengenai penggunaan data Anda</li>
+                </ul>
+                <p>
+                    Untuk menggunakan hak ini, Anda dapat menghubungi Admin SIPANDU Kampung Bulang.
+                </p>
+            </div>
 
-        <div class="privacy-section">
-            <h3>6. Perubahan Kebijakan</h3>
-            <p>
-                Kebijakan privasi ini dapat diperbarui dari waktu ke waktu sesuai kebutuhan. Setiap perubahan akan diumumkan melalui sistem SIPANDU atau media komunikasi resmi lainnya.
-            </p>
-        </div>
+            <div class="privacy-section">
+                <h3>6. Perubahan Kebijakan</h3>
+                <p>
+                    Kebijakan privasi ini dapat diperbarui dari waktu ke waktu sesuai kebutuhan. Setiap perubahan akan
+                    diumumkan melalui sistem SIPANDU atau media komunikasi resmi lainnya.
+                </p>
+            </div>
 
-        <div class="text-center mt-4">
-            <button class="btn btn-primary" onclick="closePrivacyModal()">Saya Mengerti</button>
+            <div class="text-center mt-4">
+                <button class="btn btn-primary" onclick="closePrivacyModal()">Saya Mengerti</button>
+            </div>
         </div>
     </div>
-</div>
 
+    <!-- MODAL HUBUNGI ADMIN -->
+    <div id="hubAdminModal" class="modal-custom">
+        <div class="modal-content-custom">
+            <span class="close-button" onclick="closeHubAdminModal()">&times;</span>
+            <h4 class="text-center mb-3 fw-bold">Hubungi Admin SIPANDU</h4>
+            <p class="text-center mb-4">Silakan isi form berikut untuk menghubungi admin melalui WhatsApp</p>
+
+            <form id="contactAdminForm" onsubmit="sendWhatsAppMessage(event)">
+                <div class="form-group mb-3">
+                    <label for="contact_no_kk">Nomor Kartu Keluarga</label>
+                    <input type="text" class="form-control" id="contact_no_kk" name="no_kk" pattern="[0-9]+"
+                        inputmode="numeric" minlength="16" maxlength="16" required
+                        placeholder="Masukan Nomor Kartu Keluarga">
+                    <small class="form-text text-muted">Masukkan 16 digit nomor KK</small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="contact_nama">Nama Lengkap</label>
+                    <input type="text" class="form-control" id="contact_nama" name="nama" required
+                        placeholder="Masukkan nama lengkap">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="contact_pesan">Pesan</label>
+                    <textarea class="form-control" id="contact_pesan" name="pesan" rows="3" required
+                        placeholder="Tulis pesan Anda di sini (lupa password atau kendala lainnya)"></textarea>
+                    <small class="form-text text-muted">Pesan akan dikirimkan ke WhatsApp Admin</small>
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-whatsapp me-2"></i>Kirim Pesan
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">Admin Kelurahan (Antok): 087875538815</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tambahkan script di bagian akhir sebelum </body> -->
+    <script>
+        // Fungsi untuk membuka modal Hubungi Admin
+        function openModalhubAdmin() {
+            document.getElementById("hubAdminModal").style.display = "block";
+            // Clear form ketika modal dibuka
+            document.getElementById('contactAdminForm').reset();
+        }
+
+        // Fungsi untuk menutup modal Hubungi Admin
+        function closeHubAdminModal() {
+            document.getElementById("hubAdminModal").style.display = "none";
+        }
+
+        // Validasi nomor KK hanya angka
+        document.getElementById('contact_no_kk').addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Fungsi untuk mengirim pesan WhatsApp
+        function sendWhatsAppMessage(event) {
+            event.preventDefault();
+
+            const noKK = document.getElementById('contact_no_kk').value.trim();
+            const nama = document.getElementById('contact_nama').value.trim();
+            const pesan = document.getElementById('contact_pesan').value.trim();
+
+            // Validasi nomor KK harus 16 digit
+            if (noKK.length !== 16) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Nomor KK Tidak Valid',
+                    text: 'Nomor Kartu Keluarga harus terdiri dari 16 digit angka',
+                    timer: 5000
+                });
+                return;
+            }
+
+            // Validasi nama tidak boleh kosong
+            if (!nama) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Nama Harus Diisi',
+                    text: 'Silakan masukkan nama lengkap Anda',
+                    timer: 5000
+                });
+                return;
+            }
+
+            // Format pesan WhatsApp
+            const phoneNumber = '6287875538815';
+            let message = `*Halo Admin SIPANDU Kampung Bulang*%0A%0A`;
+            message += `*Data Pengirim:*%0A`;
+            message += `*Nama:* ${nama}%0A`;
+            message += `*No. KK:* ${noKK}%0A`;
+            message += `*Tanggal:* ${new Date().toLocaleDateString('id-ID')}%0A`;
+
+            if (pesan) {
+                message += `*Pesan:*%0A${pesan}%0A%0A`;
+            }
+
+            const whatsappURL = `https://wa.me/${phoneNumber}?text=${message}`;
+
+            // Tampilkan konfirmasi sebelum membuka WhatsApp
+            Swal.fire({
+                title: 'Konfirmasi Pengiriman',
+                html: `Anda akan diarahkan ke WhatsApp untuk mengirim pesan ke Admin.<br>`,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#4E71FF',
+                confirmButtonText: 'Kirim Pesan',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Buka WhatsApp di tab baru
+                    window.open(whatsappURL, '_blank');
+                    // Tutup modal
+                    closeHubAdminModal();
+                    // Tampilkan notifikasi sukses
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Anda akan diarahkan ke WhatsApp',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        window.onclick = function (event) {
+            const registerModal = document.getElementById("registerModal");
+            if (event.target == registerModal) {
+                registerModal.style.display = "none";
+            }
+
+            const hubAdminModal = document.getElementById("hubAdminModal");
+            if (event.target == hubAdminModal) {
+                hubAdminModal.style.display = "none";
+            }
+
+            const privacyModal = document.getElementById('privacyModal');
+            if (event.target == privacyModal) {
+                privacyModal.style.display = "none";
+            }
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -397,15 +566,33 @@
         document.querySelectorAll('.upload-gambar').forEach(function (input) {
             input.addEventListener('change', function () {
                 const file = this.files[0];
+
+                if (!file) return;
+
+                // Validasi tipe file
                 const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
-                if (file && !allowedTypes.includes(file.type)) {
+                if (!allowedTypes.includes(file.type)) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops!',
-                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png, webp)'
+                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png)'
                     });
                     this.value = '';
+                    return;
                 }
+
+                // Validasi ukuran file (3 MB = 3 * 1024 * 1024 bytes)
+                const maxSize = 3 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File Gambar Terlalu Besar!',
+                        text: 'Ukuran file maksimal adalah 3 MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+                    });
+                    this.value = '';
+                    return;
+                }
+
             });
         });
     </script>
@@ -451,13 +638,13 @@
                 icon: 'error',
                 title: 'Login Gagal!',
                 html: `
-                            @if ($errors->has('email'))
-                                <div style="text-align:centre;">Silahkan cek kembali. Email atau Password Salah</div>
-                            @endif
-                            @if ($errors->has('password'))
-                                <div style="text-align:centre;"><b>Password yang anda input salah</div>
-                            @endif
-                        `,
+                                @if ($errors->has('email'))
+                                    <div style="text-align:centre;">Silahkan cek kembali. Email atau Password Salah</div>
+                                @endif
+                                @if ($errors->has('password'))
+                                    <div style="text-align:centre;"><b>Password yang anda input salah</div>
+                                @endif
+                            `,
                 timer: 10000
             });
         @endif
@@ -594,7 +781,7 @@
         }
 
         // Mengatur status tombol submit berdasarkan checkbox
-        document.getElementById('privacyPolicy').addEventListener('change', function() {
+        document.getElementById('privacyPolicy').addEventListener('change', function () {
             const submitButton = document.getElementById('submitButton');
             if (this.checked) {
                 submitButton.disabled = false;
@@ -606,7 +793,7 @@
         });
 
         // Validasi form sebelum submit
-        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        document.getElementById('registrationForm').addEventListener('submit', function (e) {
             const privacyCheckbox = document.getElementById('privacyPolicy');
 
             if (!privacyCheckbox.checked) {
@@ -621,7 +808,7 @@
         });
 
         // Tutup modal jika klik di luar konten
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const privacyModal = document.getElementById('privacyModal');
             if (event.target == privacyModal) {
                 privacyModal.style.display = 'none';
