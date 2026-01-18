@@ -11,6 +11,7 @@ use App\DataKk;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
 use Spatie\Permission\Traits\HasRoles;
 use App\Helpers\HistoryLogHelper;
@@ -28,6 +29,12 @@ class DashboardController extends Controller
         $rw_user_id = null;
         $rt_user_id = null;
         $kk_user_id = null;
+
+        // Cek apakah perlu menampilkan pesan pengingat password
+        $showPasswordReminder = false;
+        if ($user && $user->is_default_password) {
+            $showPasswordReminder = true;
+        }
 
         // Ambil ID RW, RT, atau KK berdasarkan role user
         if ($user->hasRole('rw')) {
@@ -208,7 +215,8 @@ class DashboardController extends Controller
             'filter_rt',
             'currentYear',
             'data_agama',
-            'user'
+            'user',
+            'showPasswordReminder'
         ));
     }
 
@@ -250,6 +258,21 @@ class DashboardController extends Controller
             'password' => 'nullable|min:6',
             'nama' => 'required|string|max:255',
         ]);
+
+        // Jika user ingin mengubah password
+        if ($request->filled('password')) {
+            // Cek apakah password sama dengan password default "password"
+            if (Hash::check($request->password, bcrypt('password'))) {
+                Alert::error('Oops!', 'Tidak boleh menggunakan password akun awal ya.');
+                return redirect()->back()->withInput();
+            }
+            
+            // Cek apakah password sama dengan password saat ini
+            if (Hash::check($request->password, $user->password)) {
+                Alert::error('Oops!', 'Password baru tidak boleh sama dengan password lama.');
+                return redirect()->back()->withInput();
+            }
+        }
 
         // Validasi duplikasi no HP untuk RW/RT
         if ($user->hasRole('rw')) {
@@ -337,14 +360,16 @@ class DashboardController extends Controller
 
         // Simpan data lama untuk log
         $oldName = $user->name;
-        $passwordChanged = !empty($request->password);
+        $passwordChanged = $request->filled('password');
 
         // Update data user
         $user->name = $request->nama;
         
-        // Update password hanya jika diisi
+        // Update password jika diisi
         if ($passwordChanged) {
             $user->password = bcrypt($request->password);
+            // Tandai bahwa password sudah diubah dari default
+            $user->is_default_password = false;
         }
         
         $user->save();
@@ -474,6 +499,24 @@ class DashboardController extends Controller
         }
 
         Alert::success('Sukses!', 'Data Lurah berhasil diperbarui.');
+        return redirect()->back();
+    }
+
+    public function resetPassword($id)
+    {
+        $kk = DataKk::findOrFail($id);
+        $user = User::findOrFail($kk->user_id);
+
+        // Reset password ke nilai default
+        $user->password = bcrypt('password');
+        $user->is_default_password = true;
+        $user->save();
+
+        // Catat log reset password
+        createHistoryLog('update', 'Reset password untuk KK: ' . $kk->kepala_keluarga . ' (No. KK: ' . $kk->no_kk . ')');
+
+        Alert::success('Berhasil!', 'Password berhasil direset ke: password');
+
         return redirect()->back();
     }
 }

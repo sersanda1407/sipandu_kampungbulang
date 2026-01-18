@@ -5,6 +5,25 @@
 
 @section('master')
     <section>
+               @if(Auth::check() && Auth::user()->is_default_password)
+            <div class="alert alert-danger alert-dismissible fade show mx-3 mt-3 mb-4" role="alert" style="border-radius: 12px; border-left: 5px solid #dc3545;">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center">
+                    <div class="d-flex align-items-center mb-3 mb-md-0 me-md-3">
+                        <i class="fas fa-shield-alt me-3 fs-3" style="color: white;"></i>
+                        <div>
+                            <h5 class="alert-heading mb-1" style="color: white; font-weight: 600;">PERINGATAN KEAMANAN AKUN!</h5>
+                            <p class="mb-2" style="color:white;">Anda masih menggunakan password default. Segera ubah password untuk melindungi akun Anda.</p>
+                        </div>
+                    </div>
+                    <div class="ms-md-auto d-flex gap-2 align-self-stretch align-items-center">
+                        <a href="#" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#edit" 
+                           style="font-weight: 500; padding: 8px 16px; white-space: nowrap;">
+                            <i class="fas fa-key me-2"></i> Ubah Password Sekarang
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
         <div class="container-fluid">
             <div class="page-heading d-flex justify-content-between align-items-center">
                 <h3>Dashboard</h3>
@@ -12,7 +31,6 @@
 
             @hasrole('superadmin')
             <div class="page-content mt-4">
-                {{-- <section class="row"> --}}
                     <div class="row">
                         <div class="col-12 col-sm-6 col-lg-3 mb-3">
                             <a href="{{ url('/rw') }}">
@@ -118,8 +136,6 @@
                                             </div>
                                         </div>
                                     </form>
-
-
                                 </div>
                                 <div class="card-body chart-container" style="height: 300px;">
                                     <canvas id="warga"></canvas>
@@ -211,7 +227,6 @@
                                             </ul>
                                         </div>
                                     </div>
-
                                 </div>
 
                                 <!-- Jenis Kelamin -->
@@ -277,63 +292,64 @@
                                         <div class="accordion-body chart-container">
                                             <canvas id="gaji"></canvas>
                                         </div>
-                                      <div class="p-3">
-    <strong>Keterangan:</strong>
-    <ul class="mb-0">
-        @php
-            // Klasifikasi BPS
-            $statusEkonomiBPS = [
-                'Miskin' => 'text-danger',
-                'Rentan Miskin' => 'text-warning',
-                'Menuju Kelas Menengah' => 'text-secondary',
-                'Kelas Menengah' => 'text-primary',
-                'Kelas Atas' => 'text-success'
-            ];
-            
-            // Hitung status ekonomi berdasarkan klasifikasi BPS
-            $garisKemiskinan = 595000;
-            $statusGroupsBPS = collect($dataPenduduk)
-                ->groupBy('kk_id')
-                ->map(function ($anggota) use ($garisKemiskinan) {
-                    $rata2 = $anggota->pluck('gaji')->avg();
-                    $rasio = $garisKemiskinan > 0 ? $rata2 / $garisKemiskinan : 0;
-                    
-                    if ($rasio < 1) {
-                        return 'Miskin';
-                    } elseif ($rasio < 1.5) {
-                        return 'Rentan Miskin';
-                    } elseif ($rasio < 3.5) {
-                        return 'Menuju Kelas Menengah';
-                    } elseif ($rasio < 17) {
-                        return 'Kelas Menengah';
-                    } else {
-                        return 'Kelas Atas';
-                    }
-                })
-                ->countBy();
-            
-            // Hitung total KK dan persentase
-            $totalKK = array_sum($statusGroupsBPS->toArray());
-        @endphp
-        @foreach($statusEkonomiBPS as $status => $class)
-            @if(isset($statusGroupsBPS[$status]))
-                @php
-                    $jumlahKK = $statusGroupsBPS[$status];
-                    $persentase = $totalKK > 0 ? ($jumlahKK / $totalKK) * 100 : 0;
-                @endphp
-                <li class="{{ $class }}">
-                    {{ $status }} = {{ $jumlahKK }} KK ({{ number_format($persentase, 1) }}%)
-                </li>
-            @endif
-        @endforeach
-        
-        @if($totalKK > 0)
-            <li class="fw-bold mt-2 border-top pt-2">
-                Total KK: {{ $totalKK }} KK
-            </li>
-        @endif
-    </ul>
-</div>
+                                        <div class="p-3">
+                                            <strong>Keterangan:</strong>
+                                            <ul class="mb-0">
+                                                @php
+                                                    // Klasifikasi BPS
+                                                    $statusEkonomiBPS = [
+                                                        'Miskin' => 'text-danger',
+                                                        'Rentan Miskin' => 'text-warning',
+                                                        'Menuju Kelas Menengah' => 'text-secondary',
+                                                        'Kelas Menengah' => 'text-primary',
+                                                        'Kelas Atas' => 'text-success'
+                                                    ];
+
+                                                    // Hitung status ekonomi berdasarkan klasifikasi BPS
+                                                    $garisKemiskinan = 595000;
+                                                    $statusGroupsBPS = collect($dataPenduduk)
+                                                        ->groupBy('kk_id')
+                                                        ->map(function ($anggota) use ($garisKemiskinan) {
+                                                            $rata2 = $anggota->pluck('gaji')->avg();
+                                                            $rasio = $garisKemiskinan > 0 ? $rata2 / $garisKemiskinan : 0;
+
+                                                            if ($rasio < 1) {
+                                                                return 'Miskin';
+                                                            } elseif ($rasio < 1.5) {
+                                                                return 'Rentan Miskin';
+                                                            } elseif ($rasio < 3.5) {
+                                                                return 'Menuju Kelas Menengah';
+                                                            } elseif ($rasio < 17) {
+                                                                return 'Kelas Menengah';
+                                                            } else {
+                                                                return 'Kelas Atas';
+                                                            }
+                                                        })
+                                                        ->countBy();
+
+                                                    // Hitung total KK dan persentase
+                                                    $totalKK = array_sum($statusGroupsBPS->toArray());
+                                                @endphp
+                                                @foreach($statusEkonomiBPS as $status => $class)
+                                                    @if(isset($statusGroupsBPS[$status]))
+                                                        @php
+                                                            $jumlahKK = $statusGroupsBPS[$status];
+                                                            $persentase = $totalKK > 0 ? ($jumlahKK / $totalKK) * 100 : 0;
+                                                        @endphp
+                                                        <li class="{{ $class }}">
+                                                            {{ $status }} = {{ $jumlahKK }} KK
+                                                            ({{ number_format($persentase, 1) }}%)
+                                                        </li>
+                                                    @endif
+                                                @endforeach
+
+                                                @if($totalKK > 0)
+                                                    <li class="fw-bold mt-2 border-top pt-2">
+                                                        Total KK: {{ $totalKK }} KK
+                                                    </li>
+                                                @endif
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -361,17 +377,12 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
-
-
             </div>
             @endhasrole
-
         </div>
-
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -389,11 +400,11 @@
                     label: 'Jumlah Agama',
                     // pastikan urutan sesuai label
                     data: [
-                                    {{ $data_agama['Islam'] ?? 0 }},
-                                    {{ $data_agama['Katolik'] ?? 0 }},
-                                    {{ $data_agama['Protestan'] ?? 0 }},
-                                    {{ $data_agama['Konghucu'] ?? 0 }},
-                                    {{ $data_agama['Buddha'] ?? 0 }},
+                                        {{ $data_agama['Islam'] ?? 0 }},
+                                        {{ $data_agama['Katolik'] ?? 0 }},
+                                        {{ $data_agama['Protestan'] ?? 0 }},
+                                        {{ $data_agama['Konghucu'] ?? 0 }},
+                                        {{ $data_agama['Buddha'] ?? 0 }},
                         {{ $data_agama['Hindu'] ?? 0 }}
                     ],
                     backgroundColor: [
@@ -461,11 +472,11 @@
                 datasets: [{
                     label: 'Kategori Usia',
                     data: [
-                                            {{ $usia_counts['newborn'] ?? 0 }},
-                                            {{ $usia_counts['batita'] ?? 0 }},
-                                            {{ $usia_counts['balita'] ?? 0 }},
-                                            {{ $usia_counts['anak_anak'] ?? 0 }},
-                                            {{ $usia_counts['remaja'] ?? 0 }},
+                                                {{ $usia_counts['newborn'] ?? 0 }},
+                                                {{ $usia_counts['batita'] ?? 0 }},
+                                                {{ $usia_counts['balita'] ?? 0 }},
+                                                {{ $usia_counts['anak_anak'] ?? 0 }},
+                                                {{ $usia_counts['remaja'] ?? 0 }},
                         {{ $usia_counts['dewasa'] ?? 0 }}
                     ],
                     backgroundColor: [
@@ -507,7 +518,7 @@
                         @foreach ($data_month as $data)
                             {{ $data }},
                         @endforeach
-                                                                                                                                        ],
+                                                                                                                                            ],
                     fill: true,
                     borderColor: '#56b6f7',
                     tension: 0.3
@@ -567,7 +578,7 @@
         });
 
         // CHART STATUS EKONOMI
-      const penduduk = {!! json_encode($dataPenduduk) !!}; // Data dari controller
+        const penduduk = {!! json_encode($dataPenduduk) !!}; // Data dari controller
 
         // 1. Group berdasarkan KK
         const kkMap = {};
@@ -580,7 +591,7 @@
         });
 
         // 2. Hitung status ekonomi per KK berdasarkan klasifikasi BPS
-        const gariskemiskinan = 595000; // Garis Kemiskinan BPS
+        const gariskemiskinan = 595000;
         const statusGroupsBPS = {
             'Miskin': [],
             'Rentan Miskin': [],
@@ -663,7 +674,7 @@
                                     const label = context.label || '';
                                     const count = context.parsed || 0;
                                     const detailList = detailListMapBPS[label] || [];
-                                    const listString = detailList.map(d => 
+                                    const listString = detailList.map(d =>
                                         `- Rp${d.rataRata.toLocaleString()} (${d.rasio})`
                                     ).join('\n');
                                     return `${count} KK\n${listString}`;

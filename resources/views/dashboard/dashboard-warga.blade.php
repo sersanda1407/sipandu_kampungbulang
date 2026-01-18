@@ -2,18 +2,35 @@
 
 @extends('layouts.master')
 
-
 @section('master')
     <section>
+        @if(Auth::check() && Auth::user()->is_default_password)
+            <div class="alert alert-danger alert-dismissible fade show mx-3 mt-3 mb-4" role="alert" style="border-radius: 12px; border-left: 5px solid #dc3545;">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center">
+                    <div class="d-flex align-items-center mb-3 mb-md-0 me-md-3">
+                        <i class="fas fa-shield-alt me-3 fs-3" style="color: white;"></i>
+                        <div>
+                            <h5 class="alert-heading mb-1" style="color: white; font-weight: 600;">PERINGATAN KEAMANAN AKUN!</h5>
+                            <p class="mb-2" style="color:white;">Anda masih menggunakan password default. Segera ubah password untuk melindungi akun Anda.</p>
+                        </div>
+                    </div>
+                    <div class="ms-md-auto d-flex gap-2 align-self-stretch align-items-center">
+                        <a href="#" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#edit" 
+                           style="font-weight: 500; padding: 8px 16px; white-space: nowrap;">
+                            <i class="fas fa-key me-2"></i> Ubah Password Sekarang
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
+        
         <div class="container-fluid">
             <div class="page-heading d-flex justify-content-between align-items-center">
                 <h3>Dashboard</h3>
             </div>
 
-
             @hasrole('rw|rt|warga')
             <div class="page-content mt-4">
-
                 <h1>Selamat Datang, {{ Auth::check() ? Auth::user()->name : 'User' }}!</h1>
                 <h3>Ada Perlu apa hari ini ?</h3>
 
@@ -215,12 +232,15 @@
                         let greeting = "Selamat pagi";
 
                         if (hour >= 12 && hour < 15) {
-                            greeting = "Selamat siang";
-                        } else if (hour >= 15) {
-                            greeting = "Selamat sore";
+                            greeting = "Selamat Siang";
+                        } if (hour >= 15 && hour < 18) {
+                            greeting = "Selamat Sore"
+                        } 
+                        else if (hour >= 18) {
+                            greeting = "Selamat Malam";
                         }
 
-                        const pesan = `[PESAN DARI APLIKASI SIPANDU]  \n\n\nAssalamualaikum\n${greeting}\n\nPerkenalkan, saya:\nNama : *${nama}*\nAlamat : ${alamatWarga}, RT ${rtId} / RW ${rwId}\nKeperluan : *Ingin mengurus ${selectedKeperluan}*\n\nTerima kasih banyak atas perhatian dan waktunya. Semoga sehat selalu dan dilancarkan segala aktivitasnya. 🙏🏻\n\n\n_*Pesan ini dikirim secara otomatis_`;
+                        const pesan = `[PESAN DARI APLIKASI SIPANDU]  \n\n\n${greeting}\n\nPerkenalkan, saya:\nNama : *${nama}*\nAlamat : ${alamatWarga}, RT ${rtId} / RW ${rwId}\nKeperluan : *Ingin mengurus ${selectedKeperluan}*\n\nTerima kasih banyak atas perhatian dan waktunya. Semoga sehat selalu dan dilancarkan segala aktivitasnya. 🙏🏻\n\n\n_*Pesan ini dikirim secara otomatis_`;
 
                         const url = `https://wa.me/${noHpRt}?text=${encodeURIComponent(pesan)}`;
                         window.open(url, '_blank');
@@ -236,7 +256,5 @@
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 @endsection

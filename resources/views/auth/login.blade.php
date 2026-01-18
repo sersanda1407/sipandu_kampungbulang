@@ -216,7 +216,7 @@
                                 </button>
 
                                 <p class="text-center mt-3">
-                                    Lupa Password?
+                                    Ada kendala?
                                     <button type="button" onclick="openModalhubAdmin()"
                                         class="btn btn-outline-primary btn-sm ms-2"
                                         style="font-size: 1rem; padding: 6px 16px;">
@@ -242,7 +242,6 @@
         </div>
     </div>
 
-    <!-- MODAL REGISTRASI -->
     <div id="registerModal" class="modal-custom">
         <div class="modal-content-custom">
             <span class="close-button" onclick="closeModal()">&times;</span>
@@ -320,7 +319,6 @@
         </div>
     </div>
 
-    <!-- Privacy Policy Modal -->
     <div id="privacyModal" class="privacy-modal">
         <div class="privacy-modal-content">
             <span class="privacy-close" onclick="closePrivacyModal()">&times;</span>
@@ -409,7 +407,6 @@
         </div>
     </div>
 
-    <!-- MODAL HUBUNGI ADMIN -->
     <div id="hubAdminModal" class="modal-custom">
         <div class="modal-content-custom">
             <span class="close-button" onclick="closeHubAdminModal()">&times;</span>
@@ -451,26 +448,19 @@
         </div>
     </div>
 
-    <!-- Tambahkan script di bagian akhir sebelum </body> -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        // Fungsi untuk membuka modal Hubungi Admin
         function openModalhubAdmin() {
             document.getElementById("hubAdminModal").style.display = "block";
-            // Clear form ketika modal dibuka
             document.getElementById('contactAdminForm').reset();
         }
-
-        // Fungsi untuk menutup modal Hubungi Admin
         function closeHubAdminModal() {
             document.getElementById("hubAdminModal").style.display = "none";
         }
-
-        // Validasi nomor KK hanya angka
         document.getElementById('contact_no_kk').addEventListener('input', function (e) {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
-
-        // Fungsi untuk mengirim pesan WhatsApp
         function sendWhatsAppMessage(event) {
             event.preventDefault();
 
@@ -478,7 +468,6 @@
             const nama = document.getElementById('contact_nama').value.trim();
             const pesan = document.getElementById('contact_pesan').value.trim();
 
-            // Validasi nomor KK harus 16 digit
             if (noKK.length !== 16) {
                 Swal.fire({
                     icon: 'error',
@@ -489,7 +478,6 @@
                 return;
             }
 
-            // Validasi nama tidak boleh kosong
             if (!nama) {
                 Swal.fire({
                     icon: 'error',
@@ -500,7 +488,6 @@
                 return;
             }
 
-            // Format pesan WhatsApp
             const phoneNumber = '6287875538815';
             let message = `*Halo Admin SIPANDU Kampung Bulang*%0A%0A`;
             message += `*Data Pengirim:*%0A`;
@@ -514,7 +501,6 @@
 
             const whatsappURL = `https://wa.me/${phoneNumber}?text=${message}`;
 
-            // Tampilkan konfirmasi sebelum membuka WhatsApp
             Swal.fire({
                 title: 'Konfirmasi Pengiriman',
                 html: `Anda akan diarahkan ke WhatsApp untuk mengirim pesan ke Admin.<br>`,
@@ -526,11 +512,8 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Buka WhatsApp di tab baru
                     window.open(whatsappURL, '_blank');
-                    // Tutup modal
                     closeHubAdminModal();
-                    // Tampilkan notifikasi sukses
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil!',
@@ -559,8 +542,6 @@
             }
         }
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         document.querySelectorAll('.upload-gambar').forEach(function (input) {
@@ -597,15 +578,12 @@
         });
     </script>
 
-
     <script>
         document.getElementById("no_hp").addEventListener("input", function (e) {
             this.value = this.value.replace(/[^0-9]/g, ''); // Hanya izinkan angka
         });
     </script>
 
-
-    <!-- SCRIPT MODAL -->
     <script>
         function openModal() {
             document.getElementById("registerModal").style.display = "block";
@@ -630,7 +608,6 @@
         });
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Deteksi halaman login (tanpa modal aktif)
         @if (Route::currentRouteName() == 'login' && ($errors->has('email') || $errors->has('password')))
@@ -679,10 +656,7 @@
         @endif
     </script>
 
-
-
     <script>
-        // Menghubungkan RW dan RT
     const rtData = @json($selectRt);
 
         document.getElementById('rw_id_modal').addEventListener('change', function () {
@@ -707,7 +681,6 @@
     </script>
 
     <script>
-        // Fungsi untuk cek duplikasi nomor HP
         function checkDuplicatePhone(phoneNumber) {
             return fetch('/api/check-phone?no_telp=' + encodeURIComponent(phoneNumber))
                 .then(response => response.json())
