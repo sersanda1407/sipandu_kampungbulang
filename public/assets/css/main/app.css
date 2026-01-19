@@ -20128,6 +20128,164 @@ body .bi:before {
     background-color: #fff
 }
 
+.privacy-modal {
+    display: none;
+    position: fixed;
+    z-index: 1060;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.privacy-modal-content {
+    background-color: #fefefe;
+    color: #212529;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.privacy-close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.privacy-close:hover {
+    color: #000;
+}
+
+.privacy-title {
+    color: #2c3e50;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.privacy-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    transition: background-color 0.3s ease;
+}
+
+.privacy-section h3 {
+    color: #3498db;
+    margin-bottom: 10px;
+    transition: color 0.3s ease;
+}
+
+
+.privacy-section ul {
+    padding-left: 20px;
+    color: #495057;
+}
+
+.privacy-section li {
+    margin-bottom: 8px;
+}
+
+.modal-content-custom {
+    background-color: #fff;
+    color: #212529;
+    margin: auto;
+    padding: 30px;
+    border-radius: 16px;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.3s ease-out;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.close-button {
+    color: #666;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-button:hover {
+    color: #000;
+}
+
+.privacy-check {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+    transition: background-color 0.3s ease;
+}
+
+.privacy-link {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.privacy-link:hover {
+    color: #0056b3;
+}
+
+.log-table th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 10;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 180px;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.accordion-button::after {
+    display: none !important;
+}
+
+.dot-indicator {
+    width: 10px;
+    height: 10px;
+    background-color: #28a745;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .modal .modal-content {
     border: none;
     box-shadow: -8px 12px 18px 0 rgba(25, 42, 70, .13)

@@ -29,26 +29,6 @@ Route::get('/', function () {
     return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
-// Route::get('/update-password-status', function() {
-//     $users = \App\User::all();
-//     $defaultCount = 0;
-    
-//     foreach ($users as $user) {
-//         if (\Illuminate\Support\Facades\Hash::check('password', $user->password)) {
-//             $user->is_default_password = true;
-//             $user->password_changed_at = null;
-//             $defaultCount++;
-//         } else {
-//             $user->is_default_password = false;
-//             $user->password_changed_at = $user->created_at;
-//         }
-//         $user->save();
-//     }
-    
-//     return "Berhasil update " . count($users) . " user.<br>" . 
-//            $defaultCount . " user masih pakai password default 'password'";
-// });
-
 Route::post('/login', [LoginController::class, 'login'])
     ->middleware('throttle:5,1')
     ->name('login');

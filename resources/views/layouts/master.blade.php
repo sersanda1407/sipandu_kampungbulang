@@ -32,94 +32,7 @@
     <link rel="stylesheet" href={{ asset('assets/css/pages/fontawesome.css') }}>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-    <style>
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 180px;
-        }
-
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        .accordion-button::after {
-            display: none !important;
-        }
-
-        .dot-indicator {
-            width: 10px;
-            height: 10px;
-            background-color: #28a745;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        /* Privacy Policy Modal Styles */
-        .privacy-modal {
-            display: none;
-            position: fixed;
-            z-index: 1060;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .privacy-modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 12px;
-            width: 80%;
-            max-width: 700px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .privacy-close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .privacy-close:hover {
-            color: #000;
-        }
-
-        .privacy-title {
-            color: #2c3e50;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .privacy-section {
-            margin-bottom: 20px;
-        }
-
-        .privacy-section h3 {
-            color: #3498db;
-            margin-bottom: 10px;
-        }
-
-        .log-table th {
-            position: sticky;
-            top: 0;
-            background-color: #f8f9fa;
-            z-index: 10;
-        }
-    </style>
-
-
 </head>
-
 
 <body>
     <div class="modal fade" id="edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -294,7 +207,7 @@
     <div id="privacyModal" class="privacy-modal">
         <div class="privacy-modal-content">
             <span class="privacy-close" onclick="closePrivacyModal()">&times;</span>
-            <h2 class="privacy-title">Kebijakan Privasi SIPANDU Kampung Bulang</h2>
+            <h2 class="privacy-title ">Kebijakan Privasi SIPANDU Kampung Bulang</h2>
 
             <div class="privacy-section">
                 <h3>1. Pengumpulan Informasi</h3>
@@ -404,7 +317,6 @@
                 </div>
                 <div class="sidebar-menu">
                     <ul class="menu">
-                        {{-- sesuaikan --}}
                         <li class="sidebar-item px-3 pb-1">
                             <div class="accordion" id="accordionUserInfo">
                                 <div class="accordion-item border-0">

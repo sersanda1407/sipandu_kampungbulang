@@ -198,8 +198,6 @@
                                     </div>
                                 </div>
 
-
-
                                 <div class="form-check form-check-lg d-flex align-items-center mb-4">
                                     <input class="form-check-input me-2" type="checkbox" id="flexCheckDefault">
                                     <label class="form-check-label text-gray-600" for="flexCheckDefault">
@@ -233,10 +231,6 @@
                                 class="text-decoration-none"> &copy;</a> SIPANDU | Kampung Bulang
                         </div>
                     </footer>
-
-                    <script>
-                        document.getElementById("year").textContent = new Date().getFullYear();
-                    </script>
                 </div>
             </div>
         </div>
@@ -286,7 +280,6 @@
                     <div id="phone-check-result" class="form-text"></div>
                 </div>
 
-
                 <div class="form-group mb-3">
                     <label for="alamat">Alamat Lengkap</label>
                     <textarea name="alamat" class="form-control" rows="2" placeholder="Masukkan alamat lengkap"
@@ -299,8 +292,6 @@
                     <small class="form-text text-muted"> <i class="fas fa-info-circle"></i> Format yang diperbolehkan:
                         JPG, JPEG, PNG. Maksimal ukuran file: 3 MB</small>
                 </div>
-
-                <!-- Privacy Policy Checkbox -->
                 <div class="privacy-check">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="privacyPolicy" required>
@@ -448,185 +439,30 @@
         </div>
     </div>
 
+    <script src="{{ asset('assets/js/login.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        function openModalhubAdmin() {
-            document.getElementById("hubAdminModal").style.display = "block";
-            document.getElementById('contactAdminForm').reset();
-        }
-        function closeHubAdminModal() {
-            document.getElementById("hubAdminModal").style.display = "none";
-        }
-        document.getElementById('contact_no_kk').addEventListener('input', function (e) {
-            this.value = this.value.replace(/[^0-9]/g, '');
-        });
-        function sendWhatsAppMessage(event) {
-            event.preventDefault();
-
-            const noKK = document.getElementById('contact_no_kk').value.trim();
-            const nama = document.getElementById('contact_nama').value.trim();
-            const pesan = document.getElementById('contact_pesan').value.trim();
-
-            if (noKK.length !== 16) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Nomor KK Tidak Valid',
-                    text: 'Nomor Kartu Keluarga harus terdiri dari 16 digit angka',
-                    timer: 5000
-                });
-                return;
-            }
-
-            if (!nama) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Nama Harus Diisi',
-                    text: 'Silakan masukkan nama lengkap Anda',
-                    timer: 5000
-                });
-                return;
-            }
-
-            const phoneNumber = '6287875538815';
-            let message = `*Halo Admin SIPANDU Kampung Bulang*%0A%0A`;
-            message += `*Data Pengirim:*%0A`;
-            message += `*Nama:* ${nama}%0A`;
-            message += `*No. KK:* ${noKK}%0A`;
-            message += `*Tanggal:* ${new Date().toLocaleDateString('id-ID')}%0A`;
-
-            if (pesan) {
-                message += `*Pesan:*%0A${pesan}%0A%0A`;
-            }
-
-            const whatsappURL = `https://wa.me/${phoneNumber}?text=${message}`;
-
-            Swal.fire({
-                title: 'Konfirmasi Pengiriman',
-                html: `Anda akan diarahkan ke WhatsApp untuk mengirim pesan ke Admin.<br>`,
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#4E71FF',
-                confirmButtonText: 'Kirim Pesan',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.open(whatsappURL, '_blank');
-                    closeHubAdminModal();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Anda akan diarahkan ke WhatsApp',
-                        timer: 3000,
-                        showConfirmButton: false
-                    });
-                }
-            });
-        }
-
-        window.onclick = function (event) {
-            const registerModal = document.getElementById("registerModal");
-            if (event.target == registerModal) {
-                registerModal.style.display = "none";
-            }
-
-            const hubAdminModal = document.getElementById("hubAdminModal");
-            if (event.target == hubAdminModal) {
-                hubAdminModal.style.display = "none";
-            }
-
-            const privacyModal = document.getElementById('privacyModal');
-            if (event.target == privacyModal) {
-                privacyModal.style.display = "none";
-            }
-        }
+        window.rtDataEncrypted = "{{ base64_encode(json_encode($selectRt ?? [])) }}";
     </script>
 
     <script>
-        document.querySelectorAll('.upload-gambar').forEach(function (input) {
-            input.addEventListener('change', function () {
-                const file = this.files[0];
-
-                if (!file) return;
-
-                // Validasi tipe file
-                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
-                if (!allowedTypes.includes(file.type)) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops!',
-                        text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png)'
-                    });
-                    this.value = '';
-                    return;
-                }
-
-                // Validasi ukuran file (3 MB = 3 * 1024 * 1024 bytes)
-                const maxSize = 3 * 1024 * 1024;
-                if (file.size > maxSize) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'File Gambar Terlalu Besar!',
-                        text: 'Ukuran file maksimal adalah 3 MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB'
-                    });
-                    this.value = '';
-                    return;
-                }
-
-            });
-        });
-    </script>
-
-    <script>
-        document.getElementById("no_hp").addEventListener("input", function (e) {
-            this.value = this.value.replace(/[^0-9]/g, ''); // Hanya izinkan angka
-        });
-    </script>
-
-    <script>
-        function openModal() {
-            document.getElementById("registerModal").style.display = "block";
-        }
-
-        function closeModal() {
-            document.getElementById("registerModal").style.display = "none";
-        }
-
-        window.onclick = function (event) {
-            let modal = document.getElementById("registerModal");
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-    </script>
-
-    <script>
-        document.getElementById('no_kk').addEventListener('input', function (e) {
-            // Menghapus karakter non-angka
-            this.value = this.value.replace(/[^0-9]/g, '');
-        });
-    </script>
-
-    <script>
-        // Deteksi halaman login (tanpa modal aktif)
+        // Jangan Terlalu Ngulik banget lah
         @if (Route::currentRouteName() == 'login' && ($errors->has('email') || $errors->has('password')))
             Swal.fire({
                 icon: 'error',
                 title: 'Login Gagal!',
                 html: `
-                                @if ($errors->has('email'))
-                                    <div style="text-align:centre;">Silahkan cek kembali. Email atau Password Salah</div>
-                                @endif
-                                @if ($errors->has('password'))
-                                    <div style="text-align:centre;"><b>Password yang anda input salah</div>
-                                @endif
-                            `,
+                        @if ($errors->has('email'))
+                            <div style="text-align:center;">Silahkan cek kembali. Email atau Password Salah</div>
+                        @endif
+                        @if ($errors->has('password'))
+                            <div style="text-align:center;"><b>Password yang anda input salah</b></div>
+                        @endif
+                    `,
                 timer: 10000
             });
         @endif
-
-        // Deteksi error dari form registrasi (modal)
         @if (Route::currentRouteName() == 'kk.storePublic' && $errors->any())
             Swal.fire({
                 icon: 'error',
@@ -636,7 +472,6 @@
             });
         @endif
 
-        // Session flash message (umum)
         @if (session('error'))
             Swal.fire({
                 icon: 'error',
@@ -654,144 +489,6 @@
                 timer: 10000
             });
         @endif
-    </script>
-
-    <script>
-    const rtData = @json($selectRt);
-
-        document.getElementById('rw_id_modal').addEventListener('change', function () {
-            const rwId = this.value;
-            const rtSelect = document.getElementById('rt_id_modal');
-
-            // Kosongkan dahulu pilihan RT
-            rtSelect.innerHTML = '<option value="">-- Pilih RT --</option>';
-
-            // Filter sesuai rwId yang dipilih
-            const filteredRt = rtData.filter(rt => rt.rw_id == rwId);
-
-            // Tambahan option
-            filteredRt.forEach(rt => {
-                const option = document.createElement('option');
-                option.value = rt.id;
-                option.textContent = `${rt.rt} | ${rt.nama}`;
-                rtSelect.appendChild(option);
-            });
-        });
-
-    </script>
-
-    <script>
-        function checkDuplicatePhone(phoneNumber) {
-            return fetch('/api/check-phone?no_telp=' + encodeURIComponent(phoneNumber))
-                .then(response => response.json())
-                .then(data => data.exists);
-        }
-
-        // Event listener untuk input nomor HP
-        document.getElementById('no_hp').addEventListener('blur', function (e) {
-            const phoneNumber = this.value.trim();
-
-            if (phoneNumber.length >= 8) { // Minimal 8 digit
-                checkDuplicatePhone(phoneNumber).then(isDuplicate => {
-                    if (isDuplicate) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Nomor HP Sudah Terdaftar',
-                            text: 'Nomor HP ini sudah terdaftar dalam sistem. Silakan gunakan nomor lain.',
-                            timer: 5000
-                        });
-
-                        // Reset input
-                        this.value = '';
-                        this.focus();
-                    }
-                }).catch(error => {
-                    console.error('Error checking phone:', error);
-                });
-            }
-        });
-
-        // Juga cek saat form disubmit
-        document.querySelector('form[action="{{ route('kk.storePublic') }}"]').addEventListener('submit', function (e) {
-            const phoneInput = document.getElementById('no_hp');
-            const phoneNumber = phoneInput.value.trim();
-
-            if (phoneNumber.length >= 8) {
-                e.preventDefault(); // Prevent form submission sementara
-
-                checkDuplicatePhone(phoneNumber).then(isDuplicate => {
-                    if (isDuplicate) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Tidak Dapat Mendaftar',
-                            text: 'Nomor HP ini sudah terdaftar dalam sistem. Silakan gunakan nomor lain.',
-                            timer: 5000
-                        });
-
-                        phoneInput.value = '';
-                        phoneInput.focus();
-                    } else {
-                        // Jika tidak duplicate, submit form
-                        e.target.submit();
-                    }
-                }).catch(error => {
-                    console.error('Error checking phone:', error);
-                    e.target.submit(); // Submit anyway jika error
-                });
-            }
-        });
-    </script>
-
-    <script>
-        // Fungsi untuk menampilkan modal privacy policy
-        function showPrivacyPolicy() {
-            document.getElementById('privacyModal').style.display = 'block';
-        }
-
-        // Fungsi untuk menutup modal privacy policy
-        function closePrivacyModal() {
-            document.getElementById('privacyModal').style.display = 'none';
-        }
-
-        // Mengatur status tombol submit berdasarkan checkbox
-        document.getElementById('privacyPolicy').addEventListener('change', function () {
-            const submitButton = document.getElementById('submitButton');
-            if (this.checked) {
-                submitButton.disabled = false;
-                submitButton.classList.remove('btn-disabled');
-            } else {
-                submitButton.disabled = true;
-                submitButton.classList.add('btn-disabled');
-            }
-        });
-
-        // Validasi form sebelum submit
-        document.getElementById('registrationForm').addEventListener('submit', function (e) {
-            const privacyCheckbox = document.getElementById('privacyPolicy');
-
-            if (!privacyCheckbox.checked) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Persetujuan Diperlukan',
-                    text: 'Anda harus menyetujui Kebijakan Privasi sebelum mendaftar',
-                    timer: 5000
-                });
-            }
-        });
-
-        // Tutup modal jika klik di luar konten
-        window.onclick = function (event) {
-            const privacyModal = document.getElementById('privacyModal');
-            if (event.target == privacyModal) {
-                privacyModal.style.display = 'none';
-            }
-
-            const registerModal = document.getElementById('registerModal');
-            if (event.target == registerModal) {
-                registerModal.style.display = 'none';
-            }
-        }
     </script>
 
 </body>

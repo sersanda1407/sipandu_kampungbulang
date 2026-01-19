@@ -3,7 +3,7 @@
         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
             <div class="modal-content">
-                <div class="modal-header bg-light text-white">
+                <div class="modal-header text-white">
                     <h5 class="modal-title" id="myModalLabel1">Edit Data RT</h5>
                     <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
