@@ -140,7 +140,7 @@
       <p>Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}</p>
     </div>
     <h5 class="title">
-  DATA WARGA RT {{ $rt->rt ?? '-' }} / RW {{ $rw->rw ?? '-' }} 
+  DATA WARGA RT {{ $rt->rt ?? '-' }} / RW {{ $rw->rw ?? '-' }}
   KELURAHAN KAMPUNG BULANG
   @if(isset($tahun)) TAHUN {{ $tahun }} @endif
 </h5>

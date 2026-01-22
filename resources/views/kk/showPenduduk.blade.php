@@ -32,14 +32,13 @@
                     <h5 class="modal-title" id="exampleModalLabel">Tambah Penduduk</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ '/kk/' . $data->id . '/showPenduduk/store' }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ '/kk/' . $data->id . '/showPenduduk/store' }}" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">Nama Lengkap <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nama" placeholder="Nama Lengkap"
-                                id="exampleInputEmail1" aria-describedby="emailHelp" required>
+                            <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="nama" placeholder="Nama Lengkap" required>
                         </div>
                         <div class="mb-3">
                             <label for="nik" class="form-label">Nomor NIK <span class="text-danger">*</span></label>
@@ -55,8 +54,8 @@
                         <div class="row mb-3">
                             <div class="col-sm-4">
                                 <label for="">Usia</label>
-                                <input class="form-control" type="text" placeholder="Usia" name="usia" id="usia" required
-                                    readonly>
+                                <input class="form-control" type="text" placeholder="Usia" name="usia" id="usia"
+                                    required readonly>
                             </div>
                             <div class="col-sm-4">
                                 <label for="">Tempat Lahir <span class="text-danger">*</span></label>
@@ -98,8 +97,7 @@
                                     Isi Alamat sesuai dengan data KK
                                 </label>
                             </div>
-                            <textarea class="form-control" name="alamat" id="alamatPenduduk" cols="30" rows="3"
-                                required></textarea>
+                            <textarea class="form-control" name="alamat" id="alamatPenduduk" cols="30" rows="3" required></textarea>
                         </div>
 
 
@@ -107,8 +105,7 @@
                             <div class="col">
                                 <div class="mb-3">
                                     <label for="">Status Pernikahan <span class="text-danger">*</span></label>
-                                    <select class="form-select" type="text" placeholder="Nama Lengkap"
-                                        name="status_pernikahan" required>
+                                    <select class="form-select" type="text" name="status_pernikahan" required>
                                         <option value="">-- Pilih Status Pernikahan --</option>
                                         <option value="Kawin">Kawin</option>
                                         <option value="Belum Kawin">Belum Kawin</option>
@@ -119,8 +116,7 @@
                             <div class="col">
                                 <div class="mb-3">
                                     <label for="">Status Di Keluaraga <span class="text-danger">*</span></label>
-                                    <select class="form-select" type="text" placeholder="Nama Lengkap"
-                                        name="status_keluarga" required>
+                                    <select class="form-select" type="text" name="status_keluarga" required>
                                         <option value="">-- Pilih Status Dikeluarga --</option>
                                         <option value="Kepala Rumah Tangga">Kepala Keluarga</option>
                                         <option value="Isteri">Isteri</option>
@@ -129,6 +125,28 @@
                                     </select>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="">Pendidikan Terakhir <span class="text-danger">*</span></label>
+                            <select class="form-select" type="text" name="pendidikan" required>
+                                <option value="">-- Pilih Pendidikan Terakhir --</option>
+                                <option value="tk">TK / PAUD</option>
+                                <option value="sd">SD / MI / Paket A / Sederajat</option>
+                                <option value="smp">SMP / MTS / Paket B / Sederajat</option>
+                                <option value="sma">SMA / MA / Paket C / Sederajat</option>
+                                <option value="s1">S1</option>
+                                <option value="s2">S2</option>
+                                <option value="s3">S3</option>
+                                <option value="none">Tidak Sekolah</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nama Sekolah / Lembaga Pendidikan Terakhir</label>
+                            <input type="text" class="form-control" name="nama_pendidikan"
+                                placeholder="Isi Nama Sekolah / Lembaga Pendidikan Terakhir">
+                            <small class="text-muted">Kosongkan jika Tidak Sekolah</small>
                         </div>
 
                         <div class="mb-3">
@@ -162,7 +180,7 @@
                             const pekerjaanLainnyaDiv = document.getElementById('pekerjaanLainnyaInput');
                             const pekerjaanLainnyaInput = document.getElementById('pekerjaanLainnya');
 
-                            pekerjaanSelect.addEventListener('change', function () {
+                            pekerjaanSelect.addEventListener('change', function() {
                                 if (this.value === 'Lainnya') {
                                     pekerjaanLainnyaDiv.style.display = 'block';
                                     pekerjaanLainnyaInput.focus();
@@ -171,14 +189,15 @@
                                 }
                             });
 
-                            pekerjaanLainnyaInput.addEventListener('input', function () {
+                            pekerjaanLainnyaInput.addEventListener('input', function() {
                                 // Update selected option value in select
                                 pekerjaanSelect.options[pekerjaanSelect.selectedIndex].value = this.value;
                             });
                         </script>
 
                         <div class="mb-3">
-                            <label for="gaji" class="form-label">Pendapatan <span class="text-danger">*</span></label>
+                            <label for="gaji" class="form-label">Pendapatan <span
+                                    class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="text" id="gaji" name="gaji" class="form-control" required
                                     placeholder="Masukkan Pendapatan">
@@ -203,9 +222,10 @@
                             <div class="mb-3">
                                 <label for="exampleInputPassword1" class="form-label">Foto KTP <span
                                         class="text-danger">*</span></label>
-                                <input type="file" class="form-control" name="image_ktp" id="upload_ktp" accept="image/*"
-                                    required>
-                                <small class="text-muted">Format yang diperbolehkan: JPG, JPEG, PNG. Maksimal ukuran file: 3
+                                <input type="file" class="form-control" name="image_ktp" id="upload_ktp"
+                                    accept="image/*" required>
+                                <small class="text-muted">Format yang diperbolehkan: JPG, JPEG, PNG. Maksimal ukuran file:
+                                    3
                                     MB</small><br>
                             </div>
 
@@ -220,7 +240,7 @@
                     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
                     <script>
-                        document.getElementById('upload_ktp').addEventListener('change', function () {
+                        document.getElementById('upload_ktp').addEventListener('change', function() {
                             const file = this.files[0];
                             if (file) {
                                 const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
@@ -240,7 +260,8 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'File Terlalu Besar!',
-                                    text: 'Ukuran file maksimal adalah 3 MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+                                    text: 'Ukuran file maksimal adalah 3 MB. File Anda: ' + (file.size / (1024 * 1024))
+                                        .toFixed(2) + ' MB'
                                 });
                                 this.value = '';
                                 return;
@@ -250,7 +271,7 @@
 
 
                     <script>
-                        document.getElementById("tgl_lahir").addEventListener("change", function () {
+                        document.getElementById("tgl_lahir").addEventListener("change", function() {
                             let tglLahir = new Date(this.value);
                             let today = new Date();
                             let usia = today.getFullYear() - tglLahir.getFullYear();
@@ -265,11 +286,11 @@
                         });
                     </script>
                     <script>
-                        document.getElementById("nik").addEventListener("input", function (e) {
+                        document.getElementById("nik").addEventListener("input", function(e) {
                             this.value = this.value.replace(/[^0-9]/g, ''); // Menghapus karakter non-angka
                         });
 
-                        document.getElementById("no_hp").addEventListener("input", function (e) {
+                        document.getElementById("no_hp").addEventListener("input", function(e) {
                             this.value = this.value.replace(/[^0-9]/g, ''); // Menghapus karakter non-angka
                         });
                     </script>
@@ -277,8 +298,8 @@
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
                     <script>
-                        $(document).ready(function () {
-                            $('#gaji').on('input', function () {
+                        $(document).ready(function() {
+                            $('#gaji').on('input', function() {
                                 let angka = $(this).val().replace(/[^0-9]/g, ''); // hanya angka
                                 if (angka) {
                                     $(this).val('Rp.' + formatRupiah(angka));
@@ -297,7 +318,7 @@
                         const checkboxAlamat = document.getElementById('alamatSesuaiKK');
                         const textareaAlamat = document.getElementById('alamatPenduduk');
 
-                        checkboxAlamat.addEventListener('change', function () {
+                        checkboxAlamat.addEventListener('change', function() {
                             if (this.checked) {
                                 textareaAlamat.value = @json($data->alamat); // Ambil dari data KK
                                 textareaAlamat.setAttribute('readonly', true);
@@ -382,41 +403,42 @@
                                         <span>{{ \App\DataPenduduk::where('kk_id', $data->id)->count() }}</span>
                                     </div>
                                     @hasrole('superadmin|rw|rt')
-                                    <div class="col-12 col-md-6 d-flex align-items-center">
-                                        <span class="fw-bold me-2">Reset Password Akun:</span>
-                                        <!-- Trigger Modal -->
-                                        <a href="#" data-bs-toggle="modal"
-                                            data-bs-target="#modalResetPassword{{ $data->id }}"
-                                            class="btn btn-sm btn-warning">
-                                            Reset
-                                        </a>
-                                    </div>
+                                        <div class="col-12 col-md-6 d-flex align-items-center">
+                                            <span class="fw-bold me-2">Reset Password Akun:</span>
+                                            <!-- Trigger Modal -->
+                                            <a href="#" data-bs-toggle="modal"
+                                                data-bs-target="#modalResetPassword{{ $data->id }}"
+                                                class="btn btn-sm btn-warning">
+                                                Reset
+                                            </a>
+                                        </div>
 
-                                    <!-- MODAL RESET PASSWORD -->
-                                    <div class="modal fade" id="modalResetPassword{{ $data->id }}" tabindex="-1"
-                                        aria-labelledby="modalResetLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-body">
-                                                    <i class="fas fa-exclamation-circle mb-2"
-                                                        style="color: #f39c12; font-size:120px; justify-content:center; display:flex"></i>
-                                                    <h5 class="text-center">Apakah Anda yakin ingin mereset password akun
-                                                        keluarga <strong>{{ $data->kepala_keluarga }}</strong>?</h5>
-                                                    <p class="text-center mt-2 text-muted">Password akan direset ke:
-                                                        <strong>password</strong>
-                                                    </p>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <form action="{{ route('kk.resetPassword', $data->id) }}" method="POST">
-                                                        @csrf
-                                                        <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">Batal</button>
-                                                        <button type="submit" class="btn btn-warning">Reset</button>
-                                                    </form>
+                                        <!-- MODAL RESET PASSWORD -->
+                                        <div class="modal fade" id="modalResetPassword{{ $data->id }}" tabindex="-1"
+                                            aria-labelledby="modalResetLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-body">
+                                                        <i class="fas fa-exclamation-circle mb-2"
+                                                            style="color: #f39c12; font-size:120px; justify-content:center; display:flex"></i>
+                                                        <h5 class="text-center">Apakah Anda yakin ingin mereset password akun
+                                                            keluarga <strong>{{ $data->kepala_keluarga }}</strong>?</h5>
+                                                        <p class="text-center mt-2 text-muted">Password akan direset ke:
+                                                            <strong>password</strong>
+                                                        </p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <form action="{{ route('kk.resetPassword', $data->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" class="btn btn-warning">Reset</button>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
                                     @endhasrole
 
 
@@ -504,9 +526,19 @@
                                                     $imageKtpSrc = 'storage/foto_ktp/default.jpg';
 
                                                     if ($pd->image_ktp) {
-                                                        if (Str::startsWith($pd->image_ktp, ['data:image', 'http', 'https'])) {
+                                                        if (
+                                                            Str::startsWith($pd->image_ktp, [
+                                                                'data:image',
+                                                                'http',
+                                                                'https',
+                                                            ])
+                                                        ) {
                                                             $imageKtpSrc = $pd->image_ktp;
-                                                        } elseif (file_exists(public_path('storage/foto_ktp/' . $pd->image_ktp))) {
+                                                        } elseif (
+                                                            file_exists(
+                                                                public_path('storage/foto_ktp/' . $pd->image_ktp),
+                                                            )
+                                                        ) {
                                                             $imageKtpSrc = 'storage/foto_ktp/' . $pd->image_ktp;
                                                         }
                                                     }
@@ -514,7 +546,8 @@
 
                                                 <a href="#"
                                                     onclick="showImageModal('{{ asset($imageKtpSrc) }}','{{ $pd->nama }}')">
-                                                    <img src="{{ asset($imageKtpSrc) }}" alt="Foto KTP" class="img-thumbnail"
+                                                    <img src="{{ asset($imageKtpSrc) }}" alt="Foto KTP"
+                                                        class="img-thumbnail"
                                                         style="width: 100%; height: 100%; object-fit: cover;">
                                                 </a>
 
@@ -523,49 +556,52 @@
                                             <td class="d-none d-md-table-cell">{{ $pd->nik }}</td>
                                             <td>{{ $pd->no_hp }}</td>
                                             {{-- <td class="d-none d-lg-table-cell">{{ $pd->alamat }}</td> --}}
-                                            <td class="d-none d-md-table-cell">{{ $pd->rt->rt }} / {{ $pd->rw->rw }}</td>
+                                            <td class="d-none d-md-table-cell">{{ $pd->rt->rt }} / {{ $pd->rw->rw }}
+                                            </td>
                                             {{-- <td class="d-none d-lg-table-cell">Rp.{{ number_format($pd->gaji, 0, '.', '.')
                                                 }},-
                                             </td> --}}
                                             <td>
                                                 <div class="dropdown">
                                                     <button class="btn btn-info dropdown-toggle btn-sm" type="button"
-                                                        id="dropdownMenuButton{{ $pd->id }}" data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
+                                                        id="dropdownMenuButton{{ $pd->id }}"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
                                                         Aksi
                                                     </button>
                                                     <ul class="dropdown-menu shadow-lg border-0 rounded-3"
                                                         aria-labelledby="dropdownMenuButton{{ $pd->id }}">
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center" href="#"
-                                                                data-bs-toggle="modal" data-bs-target="#infoData{{ $pd->id }}">
+                                                            <a class="dropdown-item d-flex align-items-center"
+                                                                href="#" data-bs-toggle="modal"
+                                                                data-bs-target="#infoData{{ $pd->id }}">
                                                                 <i class="fas fa-eye text-info me-2"></i> Lihat
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center" href="#"
-                                                                data-bs-toggle="modal" data-bs-target="#editData{{ $pd->id }}">
+                                                            <a class="dropdown-item d-flex align-items-center"
+                                                                href="#" data-bs-toggle="modal"
+                                                                data-bs-target="#editData{{ $pd->id }}">
                                                                 <i class="fas fa-edit text-primary me-2"></i> Edit
                                                             </a>
                                                         </li>
                                                         @hasrole('superadmin|rw|rt')
-                                                        <li>
-                                                            <hr class="dropdown-divider">
-                                                        </li>
-                                                        <li>
-                                                            <a href="#"
-                                                                onclick="confirmDeletePdd('{{ $pd->id }}', '{{ $pd->nama }}')"
-                                                                class="dropdown-item text-danger d-flex align-items-center">
-                                                                <i class="fas fa-trash-alt me-2"></i> Hapus
-                                                            </a>
+                                                            <li>
+                                                                <hr class="dropdown-divider">
+                                                            </li>
+                                                            <li>
+                                                                <a href="#"
+                                                                    onclick="confirmDeletePdd('{{ $pd->id }}', '{{ $pd->nama }}')"
+                                                                    class="dropdown-item text-danger d-flex align-items-center">
+                                                                    <i class="fas fa-trash-alt me-2"></i> Hapus
+                                                                </a>
 
-                                                            <form id="delete-form-pdd-{{ $pd->id }}"
-                                                                action="{{ route('kk.deletePdd', $pd->id) }}" method="POST"
-                                                                style="display: none;">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                            </form>
-                                                        </li>
+                                                                <form id="delete-form-pdd-{{ $pd->id }}"
+                                                                    action="{{ route('kk.deletePdd', $pd->id) }}"
+                                                                    method="POST" style="display: none;">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                </form>
+                                                            </li>
                                                         @endhasrole
                                                     </ul>
 
@@ -608,17 +644,20 @@
             </section>
 
             <!-- MODAL UNTUK PREVIEW GAMBAR -->
-            <div id="imageModal" class="modal fade" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div id="imageModal" class="modal fade" tabindex="-1" aria-labelledby="imageModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Preview Foto KTP</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body text-center">
                             <div id="imageContainer" class="d-inline-block"
                                 style="max-width: 100%; max-height: 80vh; overflow: hidden;">
-                                <img id="modalImage" src="" class="img-fluid" style="max-width: 100%; height: auto;">
+                                <img id="modalImage" src="" class="img-fluid"
+                                    style="max-width: 100%; height: auto;">
                             </div>
                         </div>
                         <div class="modal-footer justify-content-center">
@@ -664,19 +703,20 @@
                 }
 
                 function downloadAsPDF() {
-                    const { jsPDF } = window.jspdf;
+                    const {
+                        jsPDF
+                    } = window.jspdf;
                     const doc = new jsPDF();
                     const img = new Image();
                     img.src = currentImageUrl;
 
-                    img.onload = function () {
+                    img.onload = function() {
                         const imgWidth = 180;
                         const imgHeight = (img.height / img.width) * imgWidth;
                         doc.addImage(img, 'JPEG', 15, 40, imgWidth, imgHeight);
                         doc.save(`KTP_${currentNamaOrang}.pdf`);
                     };
                 }
-
             </script>
 
             <!-- IMPORT LIBRARY jsPDF -->

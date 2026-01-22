@@ -123,6 +123,11 @@ class DashboardController extends Controller
                 $usia_counts['dewasa']++;
         }
 
+        $data_pendidikan = $dataPenduduk->whereNotNull('pendidikan')
+            ->groupBy('pendidikan')
+            ->map(fn($group) => $group->count())
+            ->toArray();
+
         // Data pekerjaan - SEMUA DATA
         $data_pekerjaan = $dataPenduduk->whereNotNull('pekerjaan')
             ->groupBy('pekerjaan')
@@ -147,20 +152,20 @@ class DashboardController extends Controller
 
         // Kelompokkan data per KK - SEMUA DATA
         $kkGroups = $dataPenduduk->groupBy('kk_id');
-        
+
         foreach ($kkGroups as $kk_id => $anggotaKK) {
             // Hitung rata-rata pendapatan per KK
             $rataRata = $anggotaKK->whereNotNull('jumlah_penghasilan')
                 ->pluck('jumlah_penghasilan')
                 ->avg();
-            
+
             if ($rataRata === null) {
                 continue; // Skip jika tidak ada data gaji
             }
-            
+
             // Hitung rasio terhadap garis kemiskinan
             $rasio = $garisKemiskinan > 0 ? $rataRata / $garisKemiskinan : 0;
-            
+
             // Klasifikasi BPS
             if ($rasio < 1) {
                 $status = 'Miskin';
@@ -173,7 +178,7 @@ class DashboardController extends Controller
             } else {
                 $status = 'Kelas Atas';
             }
-            
+
             $statusEkonomiBPS[$status]++;
         }
 
@@ -204,6 +209,7 @@ class DashboardController extends Controller
             'gender_cewe',
             'lurah',
             'usia_counts',
+            'data_pendidikan',
             'data_pekerjaan',
             'statusEkonomiBPS',
             'data_pernikahan',
@@ -253,7 +259,7 @@ class DashboardController extends Controller
     public function editProfile(Request $request)
     {
         $user = Auth::user();
-        
+
         $request->validate([
             'password' => 'nullable|min:6',
             'nama' => 'required|string|max:255',
@@ -266,7 +272,7 @@ class DashboardController extends Controller
                 Alert::error('Oops!', 'Tidak boleh menggunakan password akun awal ya.');
                 return redirect()->back()->withInput();
             }
-            
+
             // Cek apakah password sama dengan password saat ini
             if (Hash::check($request->password, $user->password)) {
                 Alert::error('Oops!', 'Password baru tidak boleh sama dengan password lama.');
@@ -283,7 +289,7 @@ class DashboardController extends Controller
                     'digits_between:8,12',
                     function ($attribute, $value, $fail) use ($user, $rwData) {
                         $currentNoHp = $rwData ? $rwData->no_hp : '';
-                        
+
                         if ($value !== $currentNoHp) {
                             // Cek duplikasi di semua tabel
                             $existsInKk = DataKk::where('no_telp', $value)->exists();
@@ -293,7 +299,7 @@ class DashboardController extends Controller
                                     return $query->where('id', '!=', $rwData->id);
                                 })
                                 ->exists();
-                            
+
                             if ($existsInKk || $existsInRt || $existsInRw) {
                                 $fail('Nomor HP sudah digunakan oleh pengguna lain.');
                             }
@@ -309,7 +315,7 @@ class DashboardController extends Controller
                     'digits_between:8,12',
                     function ($attribute, $value, $fail) use ($user, $rtData) {
                         $currentNoHp = $rtData ? $rtData->no_hp : '';
-                        
+
                         if ($value !== $currentNoHp) {
                             // Cek duplikasi di semua tabel
                             $existsInKk = DataKk::where('no_telp', $value)->exists();
@@ -319,7 +325,7 @@ class DashboardController extends Controller
                                 })
                                 ->exists();
                             $existsInRw = DataRw::where('no_hp', $value)->exists();
-                            
+
                             if ($existsInKk || $existsInRt || $existsInRw) {
                                 $fail('Nomor HP sudah digunakan oleh pengguna lain.');
                             }
@@ -338,7 +344,7 @@ class DashboardController extends Controller
                     'digits_between:8,12',
                     function ($attribute, $value, $fail) use ($user, $kkData) {
                         $currentNoTelp = $kkData ? $kkData->no_telp : '';
-                        
+
                         if ($value !== $currentNoTelp) {
                             // Cek duplikasi di semua tabel
                             $existsInKk = DataKk::where('no_telp', $value)
@@ -348,7 +354,7 @@ class DashboardController extends Controller
                                 ->exists();
                             $existsInRt = DataRt::where('no_hp', $value)->exists();
                             $existsInRw = DataRw::where('no_hp', $value)->exists();
-                            
+
                             if ($existsInKk || $existsInRt || $existsInRw) {
                                 $fail('Nomor telepon sudah digunakan oleh pengguna lain.');
                             }
@@ -364,14 +370,14 @@ class DashboardController extends Controller
 
         // Update data user
         $user->name = $request->nama;
-        
+
         // Update password jika diisi
         if ($passwordChanged) {
             $user->password = bcrypt($request->password);
             // Tandai bahwa password sudah diubah dari default
             $user->is_default_password = false;
         }
-        
+
         $user->save();
 
         // Jika user adalah warga, update data KK terkait
@@ -490,7 +496,7 @@ class DashboardController extends Controller
             if ($oldData->nip !== $lurah->nip) {
                 $changes[] = 'NIP: ' . $oldData->nip . ' → ' . $lurah->nip;
             }
-            
+
             if (!empty($changes)) {
                 createHistoryLog('update', 'Memperbarui data Lurah: ' . implode(', ', $changes));
             }

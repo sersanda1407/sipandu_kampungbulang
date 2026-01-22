@@ -5,19 +5,22 @@
 
 @section('master')
     <section>
-               @if(Auth::check() && Auth::user()->is_default_password)
-            <div class="alert alert-danger alert-dismissible fade show mx-3 mt-3 mb-4" role="alert" style="border-radius: 12px; border-left: 5px solid #dc3545;">
+        @if (Auth::check() && Auth::user()->is_default_password)
+            <div class="alert alert-danger alert-dismissible fade show mx-3 mt-3 mb-4" role="alert"
+                style="border-radius: 12px; border-left: 5px solid #dc3545;">
                 <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center">
                     <div class="d-flex align-items-center mb-3 mb-md-0 me-md-3">
                         <i class="fas fa-shield-alt me-3 fs-3" style="color: white;"></i>
                         <div>
-                            <h5 class="alert-heading mb-1" style="color: white; font-weight: 600;">PERINGATAN KEAMANAN AKUN!</h5>
-                            <p class="mb-2" style="color:white;">Anda masih menggunakan password default. Segera ubah password untuk melindungi akun Anda.</p>
+                            <h5 class="alert-heading mb-1" style="color: white; font-weight: 600;">PERINGATAN KEAMANAN AKUN!
+                            </h5>
+                            <p class="mb-2" style="color:white;">Anda masih menggunakan password default. Segera ubah
+                                password untuk melindungi akun Anda.</p>
                         </div>
                     </div>
                     <div class="ms-md-auto d-flex gap-2 align-self-stretch align-items-center">
-                        <a href="#" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#edit" 
-                           style="font-weight: 500; padding: 8px 16px; white-space: nowrap;">
+                        <a href="#" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal"
+                            data-bs-target="#edit" style="font-weight: 500; padding: 8px 16px; white-space: nowrap;">
                             <i class="fas fa-key me-2"></i> Ubah Password Sekarang
                         </a>
                     </div>
@@ -30,7 +33,7 @@
             </div>
 
             @hasrole('superadmin')
-            <div class="page-content mt-4">
+                <div class="page-content mt-4">
                     <div class="row">
                         <div class="col-12 col-sm-6 col-lg-3 mb-3">
                             <a href="{{ url('/rw') }}">
@@ -127,8 +130,9 @@
                                             <div style="max-width: 200px; width: 100%;">
                                                 <select name="tahun" class="form-select form-select-sm"
                                                     onchange="this.form.submit()">
-                                                    @foreach($list_tahun as $tahunItem)
-                                                        <option value="{{ $tahunItem }}" {{ request()->get('tahun', $tahun_terpilih) == $tahunItem ? 'selected' : '' }}>
+                                                    @foreach ($list_tahun as $tahunItem)
+                                                        <option value="{{ $tahunItem }}"
+                                                            {{ request()->get('tahun', $tahun_terpilih) == $tahunItem ? 'selected' : '' }}>
                                                             {{ $tahunItem }}
                                                         </option>
                                                     @endforeach
@@ -155,10 +159,24 @@
                                                 <div class="accordion-body">
                                                     <ul class="mb-0">
                                                         @php
-                                                            $bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                                                            $bulan = [
+                                                                'Januari',
+                                                                'Februari',
+                                                                'Maret',
+                                                                'April',
+                                                                'Mei',
+                                                                'Juni',
+                                                                'Juli',
+                                                                'Agustus',
+                                                                'September',
+                                                                'Oktober',
+                                                                'November',
+                                                                'Desember',
+                                                            ];
                                                         @endphp
-                                                        @foreach($bulan as $index => $namaBulan)
-                                                            <li>{{ $namaBulan }} : {{ $data_month[$index] ?? 0 }} orang</li>
+                                                        @foreach ($bulan as $index => $namaBulan)
+                                                            <li>{{ $namaBulan }} : {{ $data_month[$index] ?? 0 }} orang
+                                                            </li>
                                                         @endforeach
                                                     </ul>
                                                     <hr>
@@ -176,6 +194,57 @@
                         <!-- Sidebar Grafik Kanan -->
                         <div class="col-12 col-lg-3">
                             <div class="accordion" id="grafikAccordion">
+                                <!-- Pendidikan Terakhir -->
+                                <div class="accordion-item shadow mb-2">
+                                    <h2 class="accordion-header" id="headingPendidikan">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapsePendidikan" aria-expanded="false"
+                                            aria-controls="collapsePendidikan">
+                                            Pendidikan Terakhir
+                                        </button>
+                                    </h2>
+                                    <div id="collapsePendidikan" class="accordion-collapse collapse"
+                                        aria-labelledby="headingPendidikan" data-bs-parent="#grafikAccordion">
+                                        <div class="accordion-body chart-container" style="height: 300px;">
+                                            <canvas id="pendidikan"></canvas>
+                                        </div>
+                                        <div class="p-3">
+                                            <strong>Keterangan:</strong>
+                                            <ul class="mb-0">
+                                                @php
+                                                    $pendidikanLabels = [
+                                                        'tk' => 'TK/PAUD',
+                                                        'sd' => 'SD',
+                                                        'smp' => 'SMP',
+                                                        'sma' => 'SMA',
+                                                        's1' => 'S1',
+                                                        's2' => 'S2',
+                                                        's3' => 'S3',
+                                                        'none' => 'Tidak Sekolah',
+                                                    ];
+
+                                                    // Urutkan sesuai urutan yang diinginkan
+                                                    $sortedOrder = ['tk', 'sd', 'smp', 'sma', 's1', 's2', 's3', 'none'];
+                                                @endphp
+
+                                                @foreach ($sortedOrder as $key)
+                                                    @if (isset($data_pendidikan[$key]))
+                                                        <li>{{ $pendidikanLabels[$key] }} = {{ $data_pendidikan[$key] }} orang
+                                                        </li>
+                                                    @endif
+                                                @endforeach
+
+                                                {{-- Tampilkan juga data lain yang tidak terdaftar --}}
+                                                @foreach ($data_pendidikan as $key => $jumlah)
+                                                    @if (!array_key_exists($key, $pendidikanLabels))
+                                                        <li>{{ $key }} = {{ $jumlah }} orang</li>
+                                                    @endif
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Agama -->
                                 <div class="accordion-item shadow mb-2">
                                     <h2 class="accordion-header" id="headingAgama">
@@ -193,7 +262,7 @@
                                         <div class="p-3">
                                             <strong>Keterangan:</strong>
                                             <ul class="mb-0">
-                                                @foreach($data_agama as $agama => $jumlah)
+                                                @foreach ($data_agama as $agama => $jumlah)
                                                     <li>{{ $agama }} = {{ $jumlah }} orang</li>
                                                 @endforeach
                                             </ul>
@@ -270,7 +339,7 @@
                                         <div class="p-3">
                                             <strong>Keterangan:</strong>
                                             <ul class="mb-0">
-                                                @foreach($data_pekerjaan as $nama => $jumlah)
+                                                @foreach ($data_pekerjaan as $nama => $jumlah)
                                                     <li>{{ $nama }} = {{ $jumlah }} orang</li>
                                                 @endforeach
                                             </ul>
@@ -302,7 +371,7 @@
                                                         'Rentan Miskin' => 'text-warning',
                                                         'Menuju Kelas Menengah' => 'text-secondary',
                                                         'Kelas Menengah' => 'text-primary',
-                                                        'Kelas Atas' => 'text-success'
+                                                        'Kelas Atas' => 'text-success',
                                                     ];
 
                                                     // Hitung status ekonomi berdasarkan klasifikasi BPS
@@ -311,7 +380,8 @@
                                                         ->groupBy('kk_id')
                                                         ->map(function ($anggota) use ($garisKemiskinan) {
                                                             $rata2 = $anggota->pluck('gaji')->avg();
-                                                            $rasio = $garisKemiskinan > 0 ? $rata2 / $garisKemiskinan : 0;
+                                                            $rasio =
+                                                                $garisKemiskinan > 0 ? $rata2 / $garisKemiskinan : 0;
 
                                                             if ($rasio < 1) {
                                                                 return 'Miskin';
@@ -330,11 +400,12 @@
                                                     // Hitung total KK dan persentase
                                                     $totalKK = array_sum($statusGroupsBPS->toArray());
                                                 @endphp
-                                                @foreach($statusEkonomiBPS as $status => $class)
-                                                    @if(isset($statusGroupsBPS[$status]))
+                                                @foreach ($statusEkonomiBPS as $status => $class)
+                                                    @if (isset($statusGroupsBPS[$status]))
                                                         @php
                                                             $jumlahKK = $statusGroupsBPS[$status];
-                                                            $persentase = $totalKK > 0 ? ($jumlahKK / $totalKK) * 100 : 0;
+                                                            $persentase =
+                                                                $totalKK > 0 ? ($jumlahKK / $totalKK) * 100 : 0;
                                                         @endphp
                                                         <li class="{{ $class }}">
                                                             {{ $status }} = {{ $jumlahKK }} KK
@@ -343,7 +414,7 @@
                                                     @endif
                                                 @endforeach
 
-                                                @if($totalKK > 0)
+                                                @if ($totalKK > 0)
                                                     <li class="fw-bold mt-2 border-top pt-2">
                                                         Total KK: {{ $totalKK }} KK
                                                     </li>
@@ -370,7 +441,7 @@
                                         <div class="p-3">
                                             <strong>Keterangan:</strong>
                                             <ul class="mb-0">
-                                                @foreach($data_pernikahan as $status => $jumlah)
+                                                @foreach ($data_pernikahan as $status => $jumlah)
                                                     <li>{{ $status }} = {{ $jumlah }} orang</li>
                                                 @endforeach
                                             </ul>
@@ -380,7 +451,7 @@
                             </div>
                         </div>
                     </div>
-            </div>
+                </div>
             @endhasrole
         </div>
     </section>
@@ -389,7 +460,89 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    @php
+        $chartLabels = [];
+        $chartData = [];
+        $chartColors = [
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+            'rgba(255, 159, 64, 0.6)',
+            'rgba(54, 162, 235, 0.6)',
+            'rgba(255, 206, 86, 0.6)',
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(201, 203, 207, 0.6)',
+            'rgba(100, 181, 246, 0.6)',
+        ];
+
+        $colorIndex = 0;
+
+        // Urutkan data sesuai sortedOrder
+        foreach ($sortedOrder as $key) {
+            if (isset($data_pendidikan[$key])) {
+                $chartLabels[] = $pendidikanLabels[$key];
+                $chartData[] = $data_pendidikan[$key];
+                $colorIndex++;
+            }
+        }
+
+        // Tambahkan data lain yang tidak terdaftar
+        foreach ($data_pendidikan as $key => $jumlah) {
+            if (!array_key_exists($key, $pendidikanLabels) && !in_array($key, $sortedOrder)) {
+                $chartLabels[] = $key;
+                $chartData[] = $jumlah;
+            }
+        }
+    @endphp
+
     <script>
+        // CHART PENDIDIKAN
+        const chartPendidikan = new Chart(document.getElementById('pendidikan'), {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($chartLabels) !!},
+                datasets: [{
+                    label: 'Jumlah Lulusan',
+                    data: {!! json_encode($chartData) !!},
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)',
+                        'rgba(255, 159, 64, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(201, 203, 207, 0.6)',
+                        'rgba(100, 181, 246, 0.6)'
+                    ],
+                    borderColor: 'rgba(0,0,0,0.1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
+                }
+            }
+        });
+
         // CHART AGAMA
         const chartAgama = new Chart(document.getElementById('agama'), {
             type: 'bar',
@@ -400,11 +553,11 @@
                     label: 'Jumlah Agama',
                     // pastikan urutan sesuai label
                     data: [
-                                        {{ $data_agama['Islam'] ?? 0 }},
-                                        {{ $data_agama['Katolik'] ?? 0 }},
-                                        {{ $data_agama['Protestan'] ?? 0 }},
-                                        {{ $data_agama['Konghucu'] ?? 0 }},
-                                        {{ $data_agama['Buddha'] ?? 0 }},
+                        {{ $data_agama['Islam'] ?? 0 }},
+                        {{ $data_agama['Katolik'] ?? 0 }},
+                        {{ $data_agama['Protestan'] ?? 0 }},
+                        {{ $data_agama['Konghucu'] ?? 0 }},
+                        {{ $data_agama['Buddha'] ?? 0 }},
                         {{ $data_agama['Hindu'] ?? 0 }}
                     ],
                     backgroundColor: [
@@ -422,8 +575,12 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'top' },
-                    tooltip: { enabled: true }
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
                 },
                 scales: {
                     x: {
@@ -460,7 +617,11 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { position: 'top' } }
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
             }
         });
 
@@ -468,15 +629,17 @@
         const chartUsia = new Chart(document.getElementById('usia'), {
             type: 'bar',
             data: {
-                labels: ['Newborn(<1)', 'Batita(<3)', 'Balita(<5)', 'Anak-anak(6-15)', 'Remaja(17-20)', 'Dewasa(21+)'],
+                labels: ['Newborn(<1)', 'Batita(<3)', 'Balita(<5)', 'Anak-anak(6-15)', 'Remaja(17-20)',
+                    'Dewasa(21+)'
+                ],
                 datasets: [{
                     label: 'Kategori Usia',
                     data: [
-                                                {{ $usia_counts['newborn'] ?? 0 }},
-                                                {{ $usia_counts['batita'] ?? 0 }},
-                                                {{ $usia_counts['balita'] ?? 0 }},
-                                                {{ $usia_counts['anak_anak'] ?? 0 }},
-                                                {{ $usia_counts['remaja'] ?? 0 }},
+                        {{ $usia_counts['newborn'] ?? 0 }},
+                        {{ $usia_counts['batita'] ?? 0 }},
+                        {{ $usia_counts['balita'] ?? 0 }},
+                        {{ $usia_counts['anak_anak'] ?? 0 }},
+                        {{ $usia_counts['remaja'] ?? 0 }},
                         {{ $usia_counts['dewasa'] ?? 0 }}
                     ],
                     backgroundColor: [
@@ -498,11 +661,17 @@
                             minRotation: 45
                         }
                     },
-                    y: { beginAtZero: true }
+                    y: {
+                        beginAtZero: true
+                    }
                 },
                 plugins: {
-                    legend: { position: 'top' },
-                    tooltip: { enabled: true }
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
                 }
             }
         });
@@ -511,14 +680,15 @@
         const chartWarga = new Chart(document.getElementById('warga'), {
             type: 'line',
             data: {
-                labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September',
+                    'Oktober', 'November', 'Desember'
+                ],
                 datasets: [{
                     label: 'Warga',
                     data: [
                         @foreach ($data_month as $data)
-                            {{ $data }},
-                        @endforeach
-                                                                                                                                            ],
+                            {{ $data }}, @endforeach
+                    ],
                     fill: true,
                     borderColor: '#56b6f7',
                     tension: 0.3
@@ -571,8 +741,12 @@
                     }
                 },
                 plugins: {
-                    legend: { position: 'top' },
-                    tooltip: { enabled: true }
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
                 }
             }
         });
@@ -649,8 +823,7 @@
 
         // 4. Buat chart
         const chartEkonomi = new Chart(
-            document.getElementById('gaji'),
-            {
+            document.getElementById('gaji'), {
                 type: 'doughnut',
                 data: {
                     labels: labelsBPS,
@@ -670,7 +843,7 @@
                         },
                         tooltip: {
                             callbacks: {
-                                label: function (context) {
+                                label: function(context) {
                                     const label = context.label || '';
                                     const count = context.parsed || 0;
                                     const detailList = detailListMapBPS[label] || [];

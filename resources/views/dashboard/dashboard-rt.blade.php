@@ -16,7 +16,7 @@
                         </div>
                     </div>
                     <div class="ms-md-auto d-flex gap-2 align-self-stretch align-items-center">
-                        <a href="#" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#edit" 
+                        <a href="#" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#edit"
                            style="font-weight: 500; padding: 8px 16px; white-space: nowrap;">
                             <i class="fas fa-key me-2"></i> Ubah Password Sekarang
                         </a>
@@ -163,6 +163,58 @@
                     <!-- Sidebar Grafik Kanan -->
                     <div class="col-12 col-lg-3">
                         <div class="accordion" id="grafikAccordion">
+                             <!-- Pendidikan Terakhir -->
+                                <div class="accordion-item shadow mb-2">
+                                    <h2 class="accordion-header" id="headingPendidikan">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapsePendidikan" aria-expanded="false"
+                                            aria-controls="collapsePendidikan">
+                                            Pendidikan Terakhir
+                                        </button>
+                                    </h2>
+                                    <div id="collapsePendidikan" class="accordion-collapse collapse"
+                                        aria-labelledby="headingPendidikan" data-bs-parent="#grafikAccordion">
+                                        <div class="accordion-body chart-container" style="height: 300px;">
+                                            <canvas id="pendidikan"></canvas>
+                                        </div>
+                                        <div class="p-3">
+                                            <strong>Keterangan:</strong>
+                                            <ul class="mb-0">
+                                                @php
+                                                    $pendidikanLabels = [
+                                                        'tk' => 'TK/PAUD',
+                                                        'sd' => 'SD',
+                                                        'smp' => 'SMP',
+                                                        'sma' => 'SMA',
+                                                        's1' => 'S1',
+                                                        's2' => 'S2',
+                                                        's3' => 'S3',
+                                                        'none' => 'Tidak Sekolah',
+                                                    ];
+
+                                                    // Urutkan sesuai urutan yang diinginkan
+                                                    $sortedOrder = ['tk', 'sd', 'smp', 'sma', 's1', 's2', 's3', 'none'];
+                                                @endphp
+
+                                                @foreach ($sortedOrder as $key)
+                                                    @if (isset($data_pendidikan[$key]))
+                                                        <li>{{ $pendidikanLabels[$key] }} = {{ $data_pendidikan[$key] }} orang
+                                                        </li>
+                                                    @endif
+                                                @endforeach
+
+                                                {{-- Tampilkan juga data lain yang tidak terdaftar --}}
+                                                @foreach ($data_pendidikan as $key => $jumlah)
+                                                    @if (!array_key_exists($key, $pendidikanLabels))
+                                                        <li>{{ $key }} = {{ $jumlah }} orang</li>
+                                                    @endif
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            <!-- Agama -->
                             <div class="accordion-item shadow mb-2">
                                 <h2 class="accordion-header" id="headingAgama">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -372,7 +424,91 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    @php
+        $chartLabels = [];
+        $chartData = [];
+        $chartColors = [
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+            'rgba(255, 159, 64, 0.6)',
+            'rgba(54, 162, 235, 0.6)',
+            'rgba(255, 206, 86, 0.6)',
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(201, 203, 207, 0.6)',
+            'rgba(100, 181, 246, 0.6)',
+        ];
+
+        $colorIndex = 0;
+
+        // Urutkan data sesuai sortedOrder
+        foreach ($sortedOrder as $key) {
+            if (isset($data_pendidikan[$key])) {
+                $chartLabels[] = $pendidikanLabels[$key];
+                $chartData[] = $data_pendidikan[$key];
+                $colorIndex++;
+            }
+        }
+
+        // Tambahkan data lain yang tidak terdaftar
+        foreach ($data_pendidikan as $key => $jumlah) {
+            if (!array_key_exists($key, $pendidikanLabels) && !in_array($key, $sortedOrder)) {
+                $chartLabels[] = $key;
+                $chartData[] = $jumlah;
+            }
+        }
+    @endphp
+
+
     <script>
+ // CHART PENDIDIKAN
+        const chartPendidikan = new Chart(document.getElementById('pendidikan'), {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($chartLabels) !!},
+                datasets: [{
+                    label: 'Jumlah Lulusan',
+                    data: {!! json_encode($chartData) !!},
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)',
+                        'rgba(255, 159, 64, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(201, 203, 207, 0.6)',
+                        'rgba(100, 181, 246, 0.6)'
+                    ],
+                    borderColor: 'rgba(0,0,0,0.1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
+                }
+            }
+        });
+
+
         // CHART AGAMA
         const chartAgama = new Chart(document.getElementById('agama'), {
             type: 'bar',

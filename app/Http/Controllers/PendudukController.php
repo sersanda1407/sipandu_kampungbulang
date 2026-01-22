@@ -123,6 +123,8 @@ class PendudukController extends Controller
             'status_keluarga' => 'required',
             'status_sosial' => 'required',
             'pekerjaan' => 'required',
+            'pendidikan' => 'required',
+            'nama_pendidikan' => 'required',
             'gaji' => 'required',
             'image_ktp' => 'required|mimes:jpeg,jpg,png,gif,svg|max:3072',
             'no_hp' => 'required',
@@ -150,6 +152,8 @@ class PendudukController extends Controller
         $data->status_keluarga = $request->status_keluarga;
         $data->status_sosial = $request->status_sosial;
         $data->pekerjaan = $request->pekerjaan;
+        $data->pendidikan = $request->pendidikan;
+        $data->nama_pendidikan = $request->nama_pendidikan;
         $data->gaji = (int) str_replace(['Rp', '.', ' '], '', $request->gaji);
         $data->no_hp = $request->no_hp;
 
@@ -228,6 +232,8 @@ class PendudukController extends Controller
             'status_keluarga' => 'required',
             'status_sosial' => 'required',
             'pekerjaan' => 'required',
+            'pendidikan' => 'required',
+            'nama_pendidikan' => 'required',
             'gaji' => 'required',
             'image_ktp' => 'nullable|mimes:jpeg,jpg,png,gif,svg|max:3072',
             'no_hp' => 'required',
@@ -280,6 +286,8 @@ class PendudukController extends Controller
             : $request->pekerjaan;
 
         $data->pekerjaan = $pekerjaanFinal;
+        $data->pendidikan = $request->pendidikan;
+        $data->nama_pendidikan = $request->nama_pendidikan;
 
         $data->gaji = (int) str_replace(['Rp', '.', ' '], '', $request->gaji);
         $data->no_hp = $request->no_hp;

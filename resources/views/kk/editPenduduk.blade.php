@@ -22,7 +22,7 @@
                     <!-- Seluruh isi form tetap di sini, tidak menggunakan include -->
 <div class="mb-3">
     <label for="nama" class="form-label">Nama Lengkap</label>
-    <input type="text" class="form-control" name="nama" value="{{ $d->nama }}" required @hasrole('rw|rt|warga') readonly @endhasrole>
+    <input type="text" class="form-control" name="nama" value="{{ $d->nama }}" required @hasrole('warga') readonly @endhasrole>
 </div>
 
 <div class="mb-3">
@@ -42,22 +42,18 @@
     </div>
     <div class="col-md-4">
         <label for="tmp_lahir" class="form-label">Tempat Lahir</label>
-        <input type="text" class="form-control" name="tmp_lahir" value="{{ $d->tmp_lahir }}" required @hasrole('rw|rt|warga') readonly @endhasrole>
+        <input type="text" class="form-control" name="tmp_lahir" value="{{ $d->tmp_lahir }}" required @hasrole('warga') readonly @endhasrole>
     </div>
     <div class="col-md-4">
         <label for="tgl_lahir" class="form-label">Tanggal Lahir</label>
-        <input type="date" class="form-control" name="tgl_lahir" id="tgl_lahir{{ $d->id }}" value="{{ $d->tgl_lahir }}" required oninput="hitungUsia({{ $d->id }})" @hasrole('rw|rt|warga') readonly @endhasrole>
+        <input type="date" class="form-control" name="tgl_lahir" id="tgl_lahir{{ $d->id }}" value="{{ $d->tgl_lahir }}" required oninput="hitungUsia({{ $d->id }})" @hasrole('warga') readonly @endhasrole>
     </div>
 </div>
 
 <div class="mb-3">
     <label for="gender" class="form-label">Jenis Kelamin</label>
     @hasrole('warga')
-        <select class="form-select" disabled>
-            <option value="Laki-laki" {{ $d->gender === 'Laki-laki' ? 'selected' : '' }}>Laki-Laki</option>
-            <option value="Perempuan" {{ $d->gender === 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
-        </select>
-        <input type="hidden" name="gender" value="{{ $d->gender }}">
+         <input type="text" class="form-control" name="gender" value="{{ $d->gender }}" required readonly>
     @else
         <select class="form-select" name="gender" required>
             <option value="Laki-laki" {{ $d->gender === 'Laki-laki' ? 'selected' : '' }}>Laki-Laki</option>
@@ -68,13 +64,8 @@
 
 <div class="mb-3">
     <label for="agama" class="form-label">Agama</label>
-    @hasrole('rw|rt|warga')
-        <select class="form-select" disabled>
-            @foreach(['Islam', 'Katolik', 'Protestan', 'Konghucu', 'Buddha', 'Hindu'] as $agama)
-                <option value="{{ $agama }}" {{ $d->agama === $agama ? 'selected' : '' }}>{{ $agama }}</option>
-            @endforeach
-        </select>
-        <input type="hidden" name="agama" value="{{ $d->agama }}">
+    @hasrole('warga')
+ <input type="text" class="form-control" name="agama" value="{{ $d->agama }}" required readonly>
     @else
         <select class="form-select" name="agama" required>
             <option value="">-- Pilih Agama --</option>
@@ -88,22 +79,19 @@
 <div class="mb-3">
     <label for="alamat" class="form-label">Alamat</label>
     <div class="form-check mb-2">
-        <input type="checkbox" class="form-check-input" id="alamatSesuaiKK{{ $d->id }}" onchange="autofillAlamat({{ $d->id }}, '{{ addslashes($d->kk->alamat ?? '') }}')">
+        <input type="checkbox" class="form-check-input" id="alamatSesuaiKK{{ $d->id }}"
+       onchange="autofillAlamat({{ $d->id }}, '{{ addslashes($d->kk->alamat ?? '') }}')"
+       {{ old('alamat_sesuai_kk', $d->alamat_sesuai_kk ?? false) ? 'checked' : '' }}>
         <label class="form-check-label" for="alamatSesuaiKK{{ $d->id }}">Isi Alamat sesuai Kartu Keluarga</label>
     </div>
-    <textarea class="form-control" name="alamat" id="alamat{{ $d->id }}" rows="3" @hasrole('rw|rt|warga') readonly @endhasrole>{{ $d->alamat }}</textarea>
+    <textarea class="form-control" name="alamat" id="alamat{{ $d->id }}" rows="3">{{ $d->alamat }}</textarea>
 </div>
 
 <div class="row mb-3">
     <div class="col-md-6">
         <label for="status_pernikahan" class="form-label">Status Pernikahan</label>
-        @hasrole('rw|rt|warga')
-            <select class="form-select" disabled>
-                @foreach(['Kawin', 'Belum Kawin', 'Cerai'] as $status)
-                    <option value="{{ $status }}" {{ $d->status_pernikahan === $status ? 'selected' : '' }}>{{ $status }}</option>
-                @endforeach
-            </select>
-            <input type="hidden" name="status_pernikahan" value="{{ $d->status_pernikahan }}">
+        @hasrole('warga')
+             <input type="text" class="form-control" name="status_pernikahan" value="{{ $d->status_pernikahan }}" required readonly>
         @else
             <select class="form-select" name="status_pernikahan" required>
                 @foreach(['Kawin', 'Belum Kawin', 'Cerai'] as $status)
@@ -114,13 +102,8 @@
     </div>
     <div class="col-md-6">
         <label for="status_keluarga" class="form-label">Status Di Keluarga</label>
-        @hasrole('rw|rt|warga')
-            <select class="form-select" disabled>
-                @foreach(['Kepala Rumah Tangga', 'Isteri', 'Anak', 'Lainnya'] as $status)
-                    <option value="{{ $status }}" {{ $d->status_keluarga === $status ? 'selected' : '' }}>{{ $status }}</option>
-                @endforeach
-            </select>
-            <input type="hidden" name="status_keluarga" value="{{ $d->status_keluarga }}">
+        @hasrole('warga')
+             <input type="text" class="form-control" name="status_keluarga" value="{{ $d->status_keluarga }}" required readonly>
         @else
             <select class="form-select" name="status_keluarga" required>
                 @foreach(['Kepala Rumah Tangga', 'Isteri', 'Anak', 'Lainnya'] as $status)
@@ -131,8 +114,30 @@
     </div>
 </div>
 
+<div class="mb-3">
+    <label for="pendidikan" class="form-label">Pendidikan Terakhir</label>
+        <select class="form-select" name="pendidikan" required>
+            <option value="">-- Pilih Pendidikan Terakhir --</option>
+            @foreach(['tk' => 'TK / PAUD',
+            'sd' => 'SD / MI / Paket A / Sederajat',
+            'smp' => 'SMP / MTS / Paket B / Sederajat',
+            'sma' => 'SMA / MA / Paket C / Sederajat',
+            's1' => 'S1',
+            's2' => 'S2',
+            's3' => 'S3',
+            'none' => 'Tidak Sekolah'] as $val => $label)
+            <option value="{{ $val }}" {{ $d->pendidikan === $val ? 'selected' : '' }}>{{ $label }}</option>
+        @endforeach
+        </select>
+</div>
+
+<div class="mb-3">
+    <label for="nama_pendidikan" class="form-label">Nama Sekolah / Lembagas Pendidikan Terakhir</label>
+    <input type="text" class="form-control" name="nama_pendidikan" value="{{ $d->nama_pendidikan }}" required>
+</div>
+
 @php
-    $daftarPekerjaan = ['PNS/P3K', 'TNI', 'POLRI', 'Pegawai Honorer', 'Wiraswasta', 'Buruh Harian Lepas / Freelance', 'Wirausaha', 'Guru', 'Pensiunan/Purnawirawan', 'Ibu Rumah Tangga', 'Pelajar/Mahasiswa', 'Tidak Bekerja'];
+    $daftarPekerjaan = ['ASN (PNS)', 'TNI', 'POLRI', 'ASN (PPPK)', 'Wiraswasta', 'Buruh Harian Lepas', 'Wirausaha', 'Guru', 'Pensiunan/Purnawirawan', 'Ibu Rumah Tangga', 'Pelajar/Mahasiswa', 'Tidak Bekerja'];
     $pekerjaanUtama = in_array($d->pekerjaan, $daftarPekerjaan) ? $d->pekerjaan : 'Lainnya';
     $pekerjaanLainnya = !in_array($d->pekerjaan, $daftarPekerjaan) ? $d->pekerjaan : '';
 @endphp

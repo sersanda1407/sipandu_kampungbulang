@@ -169,7 +169,7 @@
                             @endphp
 
                             <div class="col-sm-12 col-md-4 text-center mb-3">
-                                <a href="#" onclick="downloadImageAsPDF('{{ Str::startsWith($imageKtpSrc, ['data:image', 'http', 'https']) ? $imageKtpSrc : asset($imageKtpSrc) }}')" 
+                                <a href="#" onclick="downloadImageAsPDF('{{ Str::startsWith($imageKtpSrc, ['data:image', 'http', 'https']) ? $imageKtpSrc : asset($imageKtpSrc) }}')"
                                    class="d-inline-block" title="Klik untuk mengunduh gambar">
                                     @if (Str::startsWith($imageKtpSrc, ['data:image', 'http', 'https']))
                                         <img src="{{ $imageKtpSrc }}" alt="Foto KTP"
@@ -200,6 +200,43 @@
                                 <div class="mb-2">
                                     <span class="info-label">No Telepon / WhatsApp:</span>
                                     <p class="info-value">{{ $d->no_hp }}</p>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="info-label">Pendidikan Terakhir:</span>
+                                    <p class="info-value">
+                                        @switch($d->pendidikan)
+                                            @case('tk')
+                                                TK / PAUD
+                                                @break
+                                            @case('sd')
+                                                SD / MI / Paket A / Sederajat
+                                                @break
+                                            @case('smp')
+                                                SMP / MTS / Paket B / Sederajat
+                                                @break
+                                            @case('sma')
+                                                SMA / MA / Paket C / Sederajat
+                                                @break
+                                            @case('s1')
+                                                S1
+                                                @break
+                                            @case('s2')
+                                                S2
+                                                @break
+                                            @case('s3')
+                                                S3
+                                                @break
+                                            @case('none')
+                                                Tidak Sekolah
+                                                @break
+                                            @default
+                                                {{ $d->pendidikan }}
+                                        @endswitch
+                                    </p>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="info-label">Nama Sekolah / Lembaga Pendidikan Terakhir:</span>
+                                    <p class="info-value">{{ $d->nama_pendidikan }}</p>
                                 </div>
                             </div>
                         </div>
@@ -279,21 +316,21 @@
         let img = new Image();
         img.src = imageUrl;
         img.crossOrigin = "Anonymous";
-        
+
         // Show loading indicator
         const downloadBtn = event.target;
         const originalText = downloadBtn.innerHTML;
         downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Menyiapkan...';
-        
+
         img.onload = function () {
             let imgWidth = 130;
             let imgHeight = (img.height / img.width) * imgWidth;
             pdf.addImage(img, 'JPEG', 40, 40, imgWidth, imgHeight);
             pdf.save("Foto_KTP.pdf");
-            
+
             // Reset button
             downloadBtn.innerHTML = originalText;
-            
+
             // Show success message
             Swal.fire({
                 icon: 'success',
@@ -303,11 +340,11 @@
                 showConfirmButton: false
             });
         };
-        
+
         img.onerror = function () {
             // Reset button on error
             downloadBtn.innerHTML = originalText;
-            
+
             Swal.fire({
                 icon: 'error',
                 title: 'Gagal!',
