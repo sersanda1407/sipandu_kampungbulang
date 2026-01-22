@@ -143,6 +143,19 @@
             opacity: 0.6;
             cursor: not-allowed !important;
         }
+
+        .password-toggle {
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .password-toggle:hover {
+            color: #007bff;
+        }
+
+        .form-control-icon {
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -170,7 +183,8 @@
                     <div class="card shadow-lg bg-white rounded" style="width: 100%; max-width: 800px; margin: auto;">
                         <div class="card-body">
                             <div class="logo mobile-only">
-                                <img src="assets/images/logo/logo_sipandu.webp" loading="lazy" alt="Logo" class="logo">
+                                <img src="assets/images/logo/logo_sipandu.webp" loading="lazy" alt="Logo"
+                                    class="logo">
                             </div>
                             <div class="mobile-only">
                                 <hr class="mobile-hr">
@@ -183,19 +197,32 @@
 
                                 <div class="form-group position-relative has-icon-left mb-4">
                                     <input type="text" class="form-control form-control-xl"
-                                        placeholder="Email atau No. KK" name="email" value="{{ old('email') }}" required
-                                        autofocus>
+                                        placeholder="Email atau No. KK" name="email" value="{{ old('email') }}"
+                                        required autofocus>
                                     <div class="form-control-icon">
                                         <i class="bi bi-person"></i>
                                     </div>
                                 </div>
 
-                                <div class="form-group position-relative has-icon-left mb-4">
+                                {{-- <div class="form-group position-relative has-icon-left mb-4">
                                     <input type="password" class="form-control form-control-xl" placeholder="Password"
                                         name="password" required>
                                     <div class="form-control-icon">
                                         <i class="bi bi-shield-lock"></i>
                                     </div>
+                                </div> --}}
+
+                                <div class="form-group position-relative has-icon-left mb-4">
+                                    <input type="password" class="form-control form-control-xl password-field"
+                                        placeholder="Password" name="password" required id="passwordInput">
+                                    <div class="form-control-icon">
+                                        <i class="bi bi-shield-lock"></i>
+                                    </div>
+                                    <!-- Tombol lihat password -->
+                                    <span class="position-absolute end-0 top-50 translate-middle-y me-3"
+                                        style="cursor: pointer; z-index: 10;" id="togglePassword">
+                                        <i class="bi bi-eye-slash" id="toggleIcon"></i>
+                                    </span>
                                 </div>
 
                                 <div class="form-check form-check-lg d-flex align-items-center mb-4">
@@ -227,8 +254,8 @@
 
                     <footer class="mt-4 text-center">
                         <div class="footer clearfix mb-0 text-muted">
-                            <span id="year"></span> <a href="https://www.instagram.com/sersandaabagas" target="_blank"
-                                class="text-decoration-none"> &copy;</a> SIPANDU | Kampung Bulang
+                            <span id="year"></span> <a href="https://www.instagram.com/sersandaabagas"
+                                target="_blank" class="text-decoration-none"> &copy;</a> SIPANDU | Kampung Bulang
                         </div>
                     </footer>
                 </div>
@@ -252,15 +279,16 @@
 
                 <div class="form-group mb-3">
                     <label for="no_kk">Nomor Kartu Keluarga</label>
-                    <input type="text" class="form-control" name="no_kk" id="no_kk" pattern="[0-9]+" inputmode="numeric"
-                        minlength="16" maxlength="16" required placeholder="Masukan Nomor Kartu Keluarga">
+                    <input type="text" class="form-control" name="no_kk" id="no_kk" pattern="[0-9]+"
+                        inputmode="numeric" minlength="16" maxlength="16" required
+                        placeholder="Masukan Nomor Kartu Keluarga">
                 </div>
 
                 <div class="form-group mb-3">
                     <label for="rw_id">Pilih RW</label>
                     <select name="rw_id" id="rw_id_modal" class="form-control" required>
                         <option value="">-- Pilih RW --</option>
-                        @foreach($selectRw as $rw)
+                        @foreach ($selectRw as $rw)
                             <option value="{{ $rw->id }}">{{ $rw->rw }} | {{ $rw->nama }} </option>
                         @endforeach
                     </select>
@@ -282,13 +310,13 @@
 
                 <div class="form-group mb-3">
                     <label for="alamat">Alamat Lengkap</label>
-                    <textarea name="alamat" class="form-control" rows="2" placeholder="Masukkan alamat lengkap"
-                        required></textarea>
+                    <textarea name="alamat" class="form-control" rows="2" placeholder="Masukkan alamat lengkap" required></textarea>
                 </div>
 
                 <div class="mb-3">
                     <label>Upload Foto Kartu Keluarga</label>
-                    <input type="file" name="image" class="form-control upload-gambar" accept="image/*" required>
+                    <input type="file" name="image" class="form-control upload-gambar" accept="image/*"
+                        required>
                     <small class="form-text text-muted"> <i class="fas fa-info-circle"></i> Format yang diperbolehkan:
                         JPG, JPEG, PNG. Maksimal ukuran file: 3 MB</small>
                 </div>
@@ -453,13 +481,13 @@
                 icon: 'error',
                 title: 'Login Gagal!',
                 html: `
-                        @if ($errors->has('email'))
-                            <div style="text-align:center;">Silahkan cek kembali. Email atau Password Salah</div>
-                        @endif
-                        @if ($errors->has('password'))
-                            <div style="text-align:center;"><b>Password yang anda input salah</b></div>
-                        @endif
-                    `,
+                    @if ($errors->has('email'))
+                        <div style="text-align:center;">Silahkan cek kembali. Email atau Password Salah</div>
+                    @endif
+                    @if ($errors->has('password'))
+                        <div style="text-align:center;"><b>Password yang anda input salah</b></div>
+                    @endif
+                `,
                 timer: 10000
             });
         @endif
@@ -489,6 +517,36 @@
                 timer: 10000
             });
         @endif
+
+        (function() {
+            const passwordBtn = document.querySelector('#togglePassword');
+            const passwordField = document.querySelector('#passwordInput');
+            const passwordIcon = document.querySelector('#toggleIcon');
+
+            if (passwordBtn && passwordField && passwordIcon) {
+                passwordBtn.addEventListener('click', function() {
+
+                    const currentType = passwordField.type;
+                    const newType = currentType === 'password' ? 'text' : 'password';
+                    passwordField.type = newType;
+
+                    if (newType === 'text') {
+                        passwordIcon.classList.remove('bi-eye-slash');
+                        passwordIcon.classList.add('bi-eye');
+                    } else {
+                        passwordIcon.classList.remove('bi-eye');
+                        passwordIcon.classList.add('bi-eye-slash');
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.altKey && e.key === 'p' && passwordField) {
+                    e.preventDefault();
+                    passwordBtn.click();
+                }
+            });
+        })();
     </script>
 
 </body>

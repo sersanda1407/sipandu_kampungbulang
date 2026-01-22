@@ -468,8 +468,6 @@ class PendudukController extends Controller
     }
 
 
-
-
     public function exportAll(Request $request)
     {
         $tahun = $request->get('tahun');

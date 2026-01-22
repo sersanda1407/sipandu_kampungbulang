@@ -175,6 +175,7 @@
         <th>Tempat & Tanggal Lahir</th>
         <th>Agama</th>
         <th>Status Pernikahan</th>
+        <th>Pendidikan Terakhir</th>
         <th>Pekerjaan</th>
         <th>Status Ekonomi<br>(rata-rata)</th>
       </tr>
@@ -193,6 +194,21 @@
       <td>{{ $pd->tmp_lahir }}, {{ Carbon::parse($pd->tgl_lahir)->format('d-m-Y') }}</td>
       <td>{{ $pd->agama }}</td>
       <td>{{ $pd->status_pernikahan }}</td>
+       <td>
+    @php
+        $pendidikanLabels = [
+            'tk' => 'TK/PAUD',
+            'sd' => 'SD',
+            'smp' => 'SMP',
+            'sma' => 'SMA',
+            's1' => 'S1',
+            's2' => 'S2',
+            's3' => 'S3',
+            'none' => 'Tidak Sekolah'
+        ];
+    @endphp
+    {{ $pendidikanLabels[$pd->pendidikan] ?? $pd->pendidikan }}
+</td>
       <td>{{ $pd->pekerjaan }}</td>
       <td>
         @php
@@ -229,136 +245,209 @@
     </tbody>
   </table>
 
-  <div style="page-break-inside: avoid;">
-  {{-- Tabel Ringkasan --}}
-  @php
-  $boxList = [];
+<div style="page-break-inside: avoid;">
+    <div class="footer-section">
+        @php
+            $boxList = [];
 
-  if (request()->has('tampilkan')) {
-    foreach (request('tampilkan') as $kategori) {
-    $rows = [];
-    switch ($kategori) {
-      case 'gender':
-      $rows = [['Laki-laki', $jumlah_laki . ' orang'], ['Perempuan', $jumlah_perempuan . ' orang']];
-      $title = 'Jenis Kelamin';
-      break;
-      case 'status_ekonomi':
-      // Filter hanya status yang memiliki data lebih dari 0
-      $filteredStatus = array_filter($statusCounts, function($jumlah) {
-        return $jumlah > 0;
-      });
-      $rows = collect($filteredStatus)->map(fn($jumlah, $label) => [$label, "$jumlah KK"])->values()->toArray();
-      $title = 'Status Ekonomi (BPS)';
-      break;
-      case 'agama':
-      $rows = $penduduk->groupBy('agama')->map->count()->map(fn($jumlah, $label) => [$label, "$jumlah orang"])->values()->toArray();
-      $title = 'Agama';
-      break;
-      case 'status_pernikahan':
-      $rows = $penduduk->groupBy('status_pernikahan')->map->count()->map(fn($jumlah, $label) => [$label, "$jumlah orang"])->values()->toArray();
-      $title = 'Status Pernikahan';
-      break;
-      case 'pekerjaan':
-      $rows = $penduduk->groupBy('pekerjaan')->map->count()->map(fn($jumlah, $label) => [$label, "$jumlah orang"])->values()->toArray();
-      $title = 'Pekerjaan';
-      break;
-      case 'usia':
-      $rows = [
-        ['0–5 Tahun', $penduduk->where('usia', '<=', 5)->count() . ' orang'],
-        ['6–17 Tahun', $penduduk->whereBetween('usia', [6, 17])->count() . ' orang'],
-        ['18–59 Tahun', $penduduk->whereBetween('usia', [18, 59])->count() . ' orang'],
-        ['60+ Tahun', $penduduk->where('usia', '>=', 60)->count() . ' orang'],
-      ];
-      $title = 'Kategori Usia';
-      break;
-      default:
-      $title = null;
-    }
+            if (request()->has('tampilkan')) {
+                foreach (request('tampilkan') as $kategori) {
+                    $rows = [];
 
-    if ($title && $rows) {
-      $boxList[] = ['title' => $title, 'rows' => $rows];
-    }
-    }
-  }
-  @endphp
+                    switch ($kategori) {
+                        case 'gender':
+                            $rows = [
+                                ['Laki-laki', $jumlah_laki . ' orang'],
+                                ['Perempuan', $jumlah_perempuan . ' orang'],
+                            ];
+                            $title = 'Jenis Kelamin';
+                            break;
 
-  @if (!empty($boxList))
-    <style>
-    .summary-container {
-      margin-top: 20px;
-      font-size: 11px;
-      page-break-inside: avoid;
-    }
+                        case 'status_ekonomi':
+                            $filteredStatus = array_filter($statusCounts, function ($jumlah) {
+                                return $jumlah > 0;
+                            });
+                            $rows = collect($filteredStatus)
+                                ->map(fn($jumlah, $label) => [$label, "$jumlah KK"])
+                                ->values()
+                                ->toArray();
+                            $title = 'Status Ekonomi Keluarga (BPS)';
+                            break;
 
-    .summary-box {
-      display: inline-block;
-      width: 32%;
-      margin: 0 1% 20px 0;
-      vertical-align: top;
-    }
+                        case 'agama':
+                            $rows = $penduduk
+                                ->groupBy('agama')
+                                ->map->count()
+                                ->map(fn($jumlah, $agama) => [$agama, "$jumlah orang"])
+                                ->values()
+                                ->toArray();
+                            $title = 'Agama';
+                            break;
 
-    .summary-box table {
-      width: 100%;
-      border: 1px solid #000;
-      border-collapse: collapse;
-    }
+                        case 'status_pernikahan':
+                            $rows = $penduduk
+                                ->groupBy('status_pernikahan')
+                                ->map->count()
+                                ->map(fn($jumlah, $status) => [$status, "$jumlah orang"])
+                                ->values()
+                                ->toArray();
+                            $title = 'Status Pernikahan';
+                            break;
 
-    .summary-box th,
-    .summary-box td {
-      border: 1px solid #000;
-      padding: 4px;
-      font-size: 10px;
-    }
+                        case 'pekerjaan':
+                            $rows = $penduduk
+                                ->groupBy('pekerjaan')
+                                ->map->count()
+                                ->map(fn($jumlah, $job) => [$job, "$jumlah orang"])
+                                ->values()
+                                ->toArray();
+                            $title = 'Pekerjaan';
+                            break;
 
-    .summary-box th {
-      background-color: #f2f2f2;
-      text-align: center;
-    }
-    </style>
+                        case 'usia':
+                            $rows = [
+                                ['0–5 Tahun', $penduduk->where('usia', '<=', 5)->count() . ' orang'],
+                                ['6–17 Tahun', $penduduk->whereBetween('usia', [6, 17])->count() . ' orang'],
+                                ['18–59 Tahun', $penduduk->whereBetween('usia', [18, 59])->count() . ' orang'],
+                                ['60+ Tahun', $penduduk->where('usia', '>=', 60)->count() . ' orang'],
+                            ];
+                            $title = 'Kategori Usia';
+                            break;
 
-    <div class="summary-container">
-    <p>Berikut adalah tabel rincian data:</p>
-    @foreach ($boxList as $box)
-    <div class="summary-box">
-      <table>
-      <thead>
-      <tr>
-      <th colspan="2">{{ $box['title'] }}</th>
-      </tr>
-      </thead>
-      <tbody>
-      @foreach ($box['rows'] as [$label, $value])
-      <tr>
-      <td>{{ $label }}</td>
-      <td style="text-align: right;">{{ $value }}</td>
-      </tr>
-      @endforeach
-      </tbody>
-      </table>
+                        case 'pendidikan':
+                            // Mapping untuk pendidikan
+                            $pendidikanLabels = [
+                                'tk' => 'TK / PAUD',
+                                'sd' => 'SD / MI / Paket A / Sederajat',
+                                'smp' => 'SMP / MTS / Paket B / Sederajat',
+                                'sma' => 'SMA / MA / Paket C / Sederajat',
+                                's1' => 'S1',
+                                's2' => 'S2',
+                                's3' => 'S3',
+                                'none' => 'Tidak Sekolah'
+                            ];
+
+                            // Urutkan sesuai urutan yang diinginkan
+                            $sortedOrder = ['tk', 'sd', 'smp', 'sma', 's1', 's2', 's3', 'none'];
+
+                            // Kelompokkan data
+                            $pendidikanGroups = $penduduk
+                                ->whereNotNull('pendidikan')
+                                ->groupBy('pendidikan')
+                                ->map->count();
+
+                            // Buat rows dengan label yang sesuai
+                            $rows = [];
+                            foreach ($sortedOrder as $key) {
+                                if (isset($pendidikanGroups[$key])) {
+                                    $rows[] = [$pendidikanLabels[$key], $pendidikanGroups[$key] . ' orang'];
+                                }
+                            }
+
+                            // Tambahkan data lain yang tidak terdaftar
+                            foreach ($pendidikanGroups as $key => $jumlah) {
+                                if (!array_key_exists($key, $pendidikanLabels) && !in_array($key, $sortedOrder)) {
+                                    $rows[] = [$key, $jumlah . ' orang'];
+                                }
+                            }
+
+                            $title = 'Pendidikan Terakhir';
+                            break;
+
+                        default:
+                            $title = null;
+                            break;
+                    }
+
+                    if ($title && $rows) {
+                        $boxList[] = [
+                            'title' => $title,
+                            'rows' => $rows,
+                        ];
+                    }
+                }
+            }
+        @endphp
+
+        @if (!empty($boxList))
+            <style>
+                .summary-container {
+                    width: 100%;
+                    margin-top: 20px;
+                    font-size: 11px;
+                    page-break-inside: avoid;
+                    page-break-before: avoid;
+                }
+
+                .summary-box {
+                    display: inline-block;
+                    width: 32%;
+                    vertical-align: top;
+                    margin: 0 1% 20px 0;
+                    page-break-inside: avoid;
+                }
+
+                .summary-box table {
+                    width: 100%;
+                    border: 1px solid #000;
+                    border-collapse: collapse;
+                }
+
+                .summary-box th,
+                .summary-box td {
+                    border: 1px solid #000;
+                    padding: 4px;
+                    font-size: 10px;
+                }
+
+                .summary-box th {
+                    background-color: #f2f2f2;
+                    text-align: center;
+                }
+            </style>
+
+            <div class="summary-container">
+                <p>Berikut adalah tabel rincian data:</p>
+                @foreach ($boxList as $box)
+                    <div class="summary-box">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th colspan="2">{{ $box['title'] }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($box['rows'] as [$label, $value])
+                                    <tr>
+                                        <td>{{ $label }}</td>
+                                        <td style="text-align: right;">{{ $value }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        <div class="footer-left">
+            <p>
+                Data ini dicetak pada hari <strong>{{ $waktu->translatedFormat('l, d F Y') }}</strong>
+                pada jam <strong>{{ $waktu->format('H:i') }} {{ $zonaAktif }}</strong>
+            </p>
+        </div>
+        <div class="footer-right">
+            <p style="margin: 0;">
+                Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}<br>
+                Admin Kelurahan Kampung Bulang
+                <br><br><br><br>
+                {{-- <strong>{{ $lurah->nama ?? '-' }}</strong><br> --}}
+                {{ $lurah->jabatan ?? '-' }}<br>
+                {{-- NIP. {{ $lurah->nip ?? '-' }} --}}
+            </p>
+        </div>
     </div>
-    @endforeach
-
-    </div>
-  @endif
-
-  <div class="footer-section">
-    <div class="footer-left">
-      <p>Data ini dicetak pada <strong>{{ $waktu->translatedFormat('l, d F Y') }}</strong> pukul
-        <strong>{{ $waktu->format('H:i') }} {{ $zonaAktif }}</strong>.
-      </p>
-    </div>
-<div class="footer-right">
-        <p style="margin: 0;">
-          Tanjungpinang, {{ $waktu->translatedFormat('d F Y') }}<br>
-          Admin Kelurahan Kampung Bulang
-          <br><br><br><br>
-          {{-- <strong>{{ $lurah->nama ?? '-' }}</strong><br> --}}
-          {{ $lurah->jabatan ?? '-' }}<br>
-          {{-- NIP. {{ $lurah->nip ?? '-' }} --}}
-        </p>
-      </div>
-  </div>
-  </div>
+</div>
 
 </body>
 
