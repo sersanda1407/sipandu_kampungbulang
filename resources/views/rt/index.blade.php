@@ -226,7 +226,7 @@
 
                                             <a href="#" onclick="showImageModal('{{ asset($imageSrc) }}', '{{ $d->nama }}')">
                                                 <img src="{{ asset($imageSrc) }}" alt="Foto RT" class="img-thumbnail"
-                                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                                   style="max-width: 120px; max-height: 120px; width: auto; height: auto; object-fit: cover;">
                                             </a>
 
                                         </td>

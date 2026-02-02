@@ -20,7 +20,7 @@ class RtController extends Controller
     public function index()
     {
         /** @var \App\User $user */
-        
+
         $user = Auth::user();
         $rw = DataRw::where('user_id', $user->id)->first();
         $rt = DataRt::where('user_id', $user->id)->first();
@@ -31,7 +31,7 @@ class RtController extends Controller
                 ->get();
         } else {
             $data = DataRt::join('rw', 'rt.rw_id', '=', 'rw.id')
-                ->orderBy('rw.rw', 'asc')
+                ->orderByRaw('CAST(rw.rw AS UNSIGNED) asc')
                 ->orderBy('rt.rt', 'asc')
                 ->select('rt.*')
                 ->get();

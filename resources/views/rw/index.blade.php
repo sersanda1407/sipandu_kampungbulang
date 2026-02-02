@@ -90,7 +90,7 @@
                     title: 'Oops!',
                     text: 'Hanya file gambar yang diperbolehkan! (jpg, jpeg, png)'
                 });
-                this.value = ''; 
+                this.value = '';
             }
 
             const maxSize = 3 * 1024 * 1024; // 3 MB dalam bytes
@@ -209,7 +209,7 @@
 
                                             <a href="#" onclick="showImageModal('{{ asset($imageSrc) }}', '{{ $d->nama }}')">
                                                 <img src="{{ asset($imageSrc) }}" alt="Foto RW" class="img-thumbnail"
-                                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                                   style="max-width: 120px; max-height: 120px; width: auto; height: auto; object-fit: cover;">
                                             </a>
 
                                         </td>

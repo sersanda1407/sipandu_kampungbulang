@@ -548,7 +548,7 @@
                                                     onclick="showImageModal('{{ asset($imageKtpSrc) }}','{{ $pd->nama }}')">
                                                     <img src="{{ asset($imageKtpSrc) }}" alt="Foto KTP"
                                                         class="img-thumbnail"
-                                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                                        style="max-width: 120px; max-height: 120px; width: auto; height: auto; object-fit: cover;">
                                                 </a>
 
                                             </td>
